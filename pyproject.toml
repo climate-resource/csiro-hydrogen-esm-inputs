@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "local"
+version = "0.1.0"
+description = "Local code for generation of hydrogen and associated input files for CSIRO's earth system modelling. The rest of the functionality is derived from the dependencies."
+authors = [
+    "Jared Lewis <jared.lewis@climate-resource.com>",
+    "Zebedee Nicholls <zebedee.nicholls@climate-resource.com>",
+]
+readme = "README.md"
+packages = [{include = "local", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+notebook = "^6.5.4"
+doit = "^0.36.0"
+ipywidgets = "^8.0.6"
+attrs = "^23.1.0"
+cattrs = "^22.2.0"
+jupytext = "^1.14.5"
+papermill = "^2.4.0"
+
+[tool.poetry.group.dev.dependencies]
+commitizen = "^3.2.1"
+black = "^23.3.0"
+
+[tool.jupytext]
+formats = "ipynb,py:percent"

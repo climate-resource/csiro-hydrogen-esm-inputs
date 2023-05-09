@@ -1,0 +1,8 @@
+output_root_dir: "dev-output"
+output_notebook_dir: "dev-output/notebooks"
+anthro_baseline:
+  input_file: "dev-output/data/processed/anthro_baseline.csv"
+delta_emissions:
+  input_file: "dev-output/data/processed/delta_emms_input.csv"
+  output_file: "dev-output/data/processed/delta_emms_output.csv"
+output_final_figure: "dev-output/figures/final.pdf"
