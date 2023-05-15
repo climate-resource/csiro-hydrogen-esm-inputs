@@ -359,6 +359,6 @@ plt.tight_layout()
 plt.savefig(h2_config.figure_baseline_by_source_and_sector)
 
 # %%
-sectoral_regional_emissions.to_csv(h2_config.baseline_anthropogenic_emissions)
+sectoral_regional_emissions.to_csv(h2_config.baseline_h2_emissions_regions)
 
 # %%

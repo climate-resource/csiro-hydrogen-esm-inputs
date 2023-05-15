@@ -5,14 +5,15 @@ historical_h2_emissions:
     "Emissions|H2|Biomass burning": Emissions|BC
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-  baseline_anthropogenic_emissions: data/processed/{run_id}/historical/baseline_h2_emissions.csv
+  baseline_h2_emissions_regions: data/processed/{run_id}/historical/baseline_h2_emissions_regions.csv
+  baseline_h2_emissions_countries: data/processed/{run_id}/historical/baseline_h2_emissions_country.csv
   figure_baseline_by_sector: data/processed/{run_id}/historical/plots/baseline_by-sector.pdf
   figure_baseline_by_source: data/processed/{run_id}/historical/plots/baseline_by-source.pdf
   figure_baseline_by_source_and_sector: data/processed/{run_id}/historical/plots/baseline_by-source-sector.pdf
 
-
 anthro_baseline:
   input_file: data/processed/{run_id}/anthro_baseline.csv
+
 delta_emissions:
   input_file: data/processed/{run_id}/delta_emms_input.csv
   output_file: data/processed/{run_id}/delta_emms_output.csv

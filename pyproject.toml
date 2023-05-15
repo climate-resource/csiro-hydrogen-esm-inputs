@@ -24,12 +24,15 @@ matplotlib = "^3.7.1"
 datapackage = "^1.15"
 bookshelf = "^0.2.2"
 scipy = "^1.4"
+# TODO: remove dependency
+# Technically it is MIT, but I don't think that is what CA intended
+domestic-pathways = {git = "ssh://git@gitlab.com/lewisjarednz/domestic_pathways.git", rev = "custom-registry"}
+seaborn = "^0.12.2"
 
 ## Temporary pin until requests and botocore support urllib3>=2
 # https://github.com/psf/requests/issues/6432
 # https://github.com/boto/botocore/issues/2926
 urllib3 = "<2"
-seaborn = "^0.12.2"
 
 [tool.poetry.group.dev.dependencies]
 commitizen = "^3.2.1"

@@ -62,9 +62,14 @@ class HistoricalH2Emissions:
     """
 
     # Data
-    baseline_anthropogenic_emissions: Path
+    baseline_h2_emissions_regions: Path
     """
     Calculated baseline H2 emissions, by gas, by sector and by region
+    """
+
+    baseline_h2_emissions_countries: Path
+    """
+    Calculated historical emissions downscaled to each country
     """
 
     # Figures
@@ -305,10 +310,19 @@ def get_notebook_steps(
             raw_notebook_ext=".py",
             dependencies=(config.historical_h2_emissions.baseline_source,),
             targets=(
-                config.historical_h2_emissions.baseline_anthropogenic_emissions,
+                config.historical_h2_emissions.baseline_h2_emissions_regions,
                 config.historical_h2_emissions.figure_baseline_by_source,
                 config.historical_h2_emissions.figure_baseline_by_sector,
                 config.historical_h2_emissions.figure_baseline_by_source_and_sector,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="downscale historical H2 regional emissions to countries",
+            notebook="100_historical_h2_emissions/110_downscale_historical_emissions",
+            raw_notebook_ext=".py",
+            dependencies=(config.historical_h2_emissions.baseline_h2_emissions_regions,),
+            targets=(
+                config.historical_h2_emissions.baseline_h2_emissions_countries,
             ),
         ),
     ]
