@@ -3,13 +3,9 @@ Tools to help with config discovery
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable
-
-import os.path
+from collections.abc import Iterable
 from pathlib import Path
-
-if TYPE_CHECKING:
-    import os
+from typing import Any
 
 glob_config_files_task_params: list[dict[str, Any]] = [
     {
@@ -32,7 +28,7 @@ Task parameters to use when discovering files with glob
 """
 
 
-def glob_config_files(configdir: os.PathLike, configglob: str) -> Iterable[os.PathLike]:
+def glob_config_files(configdir: Path, configglob: str) -> Iterable[Path]:
     """
     Glob config files within a directory
 

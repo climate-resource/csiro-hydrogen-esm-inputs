@@ -7,8 +7,9 @@ application
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Iterable
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from attrs import define
 
@@ -16,12 +17,13 @@ from local.pydoit_nb.gen_notebook_tasks import gen_run_notebook_tasks
 from local.pydoit_nb.notebooks import NotebookStep, SingleNotebookDirStep
 from local.serialization import converter_yaml, parse_placeholders
 
-if TYPE_CHECKING:
-    import os
-
 
 @define
 class ConfigDeltaEmissions:
+    """
+    Configuration for calculating change in emissions
+    """
+
     input_file: Path
     """Input file"""
 
@@ -31,12 +33,24 @@ class ConfigDeltaEmissions:
 
 @define
 class ConfigAnthroBaseline:
+    """
+    Configuration for calculating anthropogenic baseline emissions
+    """
+
     input_file: Path
     """Input file"""
 
 
 @define
 class Config:
+    """
+    Configuration class
+
+    Used in all notebooks. This is the key communication class between our
+    configuration and the notebooks and should be used for passing all
+    parameters into the notebooks via papermill.
+    """
+
     output_notebook_dir: Path
     """Notebook output directory"""
 
@@ -63,7 +77,7 @@ def load_config_from_file(config_file: str) -> Config:
     -------
         Loaded configuration
     """
-    with open(config_file, "r") as fh:
+    with open(config_file) as fh:
         config = load_config(fh.read())
 
     return config
@@ -108,6 +122,13 @@ Task parameters to use to support generating config bundles
 
 @define
 class ConfigBundle:
+    """
+    Configuration bundle
+
+    Useful to have everything in one place once we have finished hydrating
+    config, setting paths etc.
+    """
+
     raw_config_file: Path
     """Path to raw configuration on which this bundle is based"""
 
@@ -129,8 +150,8 @@ class ConfigBundle:
 
 
 def get_config_bundle(
-    raw_config_file: os.PathLike,
-    output_root_dir: os.PathLike,
+    raw_config_file: Path,
+    output_root_dir: Path,
     run_id: str,
 ) -> ConfigBundle:
     """
@@ -164,7 +185,7 @@ def get_config_bundle(
     stub = raw_config_file.stem
 
     # Parse placeholders
-    with open(raw_config_file, "r") as fh:
+    with open(raw_config_file) as fh:
         loaded_str = fh.read()
 
     loaded_str_parsed = parse_placeholders(
@@ -176,6 +197,7 @@ def get_config_bundle(
 
     config_hydrated = load_config(loaded_str_parsed)
 
+    #
     config_hydrated_path = output_root_dir / run_id / stub / raw_config_file.name
     config_hydrated_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -282,7 +304,7 @@ def get_notebook_steps(
 
 def gen_crunch_scenario_tasks(
     config_bundle: ConfigBundle, raw_notebooks_dir: Path
-) -> Iterable[dict[str, Any]]:
+) -> Iterator[dict[str, Any]]:
     """
     Generate crunch scenario tasks
 
@@ -302,7 +324,7 @@ def gen_crunch_scenario_tasks(
         config_bundle.config_hydrated, raw_notebooks_dir, stub=config_bundle.stub
     )
 
-    yield gen_run_notebook_tasks(
+    return gen_run_notebook_tasks(
         notebook_steps,
         config_bundle.config_hydrated_path,
     )

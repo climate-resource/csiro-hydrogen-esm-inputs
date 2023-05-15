@@ -6,7 +6,6 @@ from __future__ import annotations
 import logging
 import os.path
 from pathlib import Path
-from typing import Protocol
 
 import jupytext
 import papermill as pm
@@ -116,10 +115,7 @@ class SingleNotebookDirStep:
         -------
             Initialised instance
         """
-        raw_notebook = (
-            raw_notebooks_dir
-            / f"{self.notebook}{self.raw_notebook_ext}"
-        )
+        raw_notebook = raw_notebooks_dir / f"{self.notebook}{self.raw_notebook_ext}"
 
         unexecuted_notebook = (
             output_notebook_dir / f"{self.notebook}{unexecuted_suffix}.ipynb"
@@ -147,13 +143,16 @@ class NotebookExecutionException(Exception):
         super().__init__(self.exc)
 
     def __str__(self):
+        """
+        Get string representation of self
+        """
         return f"{self.filename} failed to execute: {self.exc}"
 
 
 def run_notebook(
     base_notebook: os.PathLike,
-    unexecuted_notebook: os.PathLike,
-    executed_notebook: os.PathLike,
+    unexecuted_notebook: Path,
+    executed_notebook: Path,
     config_file: os.PathLike,
     config_file_parameter_name: str = "config_file",
 ) -> None:

@@ -1,19 +1,12 @@
 """
 doit configuration file
 """
-import datetime
-import glob
 import logging
-import os
-import os.path
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from doit import task_params
 
-from local.pydoit_nb.config_discovery import (
-    glob_config_files,
-    glob_config_files_task_params,
-)
 from local.config import (
     config_task_params,
     gen_crunch_scenario_tasks,
@@ -22,7 +15,10 @@ from local.config import (
     write_config_file_in_output_dir,
 )
 from local.key_info import get_key_info
-
+from local.pydoit_nb.config_discovery import (
+    glob_config_files,
+    glob_config_files_task_params,
+)
 
 logging.basicConfig(level=logging.INFO)
 

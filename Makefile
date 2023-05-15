@@ -22,8 +22,27 @@ help:  ## print short description of each target
 all:  ## compile all the outputs
 	poetry run doit run
 
+.PHONY: checks
+checks:  ## run all the linting checks of the codebase
+	@echo "=== pre-commit ==="; poetry run pre-commit run --all-files || echo "--- pre-commit failed ---" >&2; \
+		echo "=== mypy ==="; MYPYPATH=stubs poetry run mypy src notebooks || echo "--- mypy failed ---" >&2; \
+		echo "======"
+
+.PHONY: black
+black:  ## format the code using black
+	poetry run black dodo.py src notebooks/*.py
+
+.PHONY: ruff-fixes
+ruff-fixes:  ## fix the code using ruff
+	poetry run ruff dodo.py src notebooks/*.py --fix
+
+.PHONY: check-commit-messages
+check-commit-messages:  ## check commit messages
+	poetry run cz check --rev-range dfbc95a1..HEAD
+
 virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
 	# Put virtual environments in the project
 	poetry config virtualenvs.in-project true
 	poetry install --all-extras
 	poetry run jupyter nbextension enable --py widgetsnbextension
+	poetry run pre-commit install

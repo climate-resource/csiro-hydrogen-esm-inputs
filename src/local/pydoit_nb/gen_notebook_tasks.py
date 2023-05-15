@@ -2,7 +2,8 @@
 Utility wrappers around :mod:`pydoit`
 """
 import os
-from typing import Any, Iterable, Protocol
+from collections.abc import Iterable, Iterator
+from typing import Any, Protocol
 
 from local.pydoit_nb.notebooks import run_notebook
 
@@ -32,10 +33,10 @@ class SupportsGenNotebookTasks(Protocol):
 
 
 def gen_run_notebook_tasks(
-    notebook_steps: list[SupportsGenNotebookTasks],
+    notebook_steps: Iterable[SupportsGenNotebookTasks],
     config_file: os.PathLike,
     clean: bool = True,
-) -> Iterable[dict[str, Any]]:
+) -> Iterator[dict[str, Any]]:
     """
     Generate notebook running tasks
 

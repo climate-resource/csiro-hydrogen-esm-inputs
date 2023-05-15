@@ -26,7 +26,7 @@ config = load_config_from_file(config_file)
 config
 
 # %%
-with open(config.delta_emissions.output_file, "r") as fh:
+with open(config.delta_emissions.output_file) as fh:
     loaded = fh.read()
 
 loaded
