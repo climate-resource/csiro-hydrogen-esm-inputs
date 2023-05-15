@@ -1,4 +1,6 @@
-import os
+"""
+Constants from the h2-adjust process
+"""
 from typing import Any
 
 from attrs import define

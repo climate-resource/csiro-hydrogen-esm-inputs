@@ -5,17 +5,28 @@ historical_h2_emissions:
     "Emissions|H2|Biomass burning": Emissions|BC
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-  baseline_h2_emissions_regions: data/processed/{run_id}/historical/baseline_h2_emissions_regions.csv
-  baseline_h2_emissions_countries: data/processed/{run_id}/historical/baseline_h2_emissions_country.csv
-  figure_baseline_by_sector: data/processed/{run_id}/historical/plots/baseline_by-sector.pdf
-  figure_baseline_by_source: data/processed/{run_id}/historical/plots/baseline_by-source.pdf
-  figure_baseline_by_source_and_sector: data/processed/{run_id}/historical/plots/baseline_by-source-sector.pdf
-
+  baseline_h2_emissions_regions: data/runs/{run_id}/historical/baseline_h2_emissions_regions.csv
+  baseline_h2_emissions_countries: data/runs/{run_id}/historical/baseline_h2_emissions_country.csv
+  figure_baseline_by_sector: data/runs/{run_id}/historical/plots/baseline_by-sector.pdf
+  figure_baseline_by_source: data/runs/{run_id}/historical/plots/baseline_by-source.pdf
+  figure_baseline_by_source_and_sector: data/runs/{run_id}/historical/plots/baseline_by-source-sector.pdf
+historical_h2_gridding:
+  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
+  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
+  sector_type: "CEDS9"
+  # TODO: make this non-user specific
+  grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
+  output_directory: data/runs/{run_id}/historical/gridding
+  fast: true
+input4mips_archive:
+  local_archive: data/raw/input4MIPs
+  results_archive: data/runs/{run_id}/results
+  version: 20230515
 anthro_baseline:
-  input_file: data/processed/{run_id}/anthro_baseline.csv
+  input_file: data/runs/{run_id}/anthro_baseline.csv
 
 delta_emissions:
-  input_file: data/processed/{run_id}/delta_emms_input.csv
-  output_file: data/processed/{run_id}/delta_emms_output.csv
-output_final_figure: data/processed/{run_id}/figures/final.pdf
-output_notebook_dir: data/processed/{run_id}/notebooks
+  input_file: data/runs/{run_id}/delta_emms_input.csv
+  output_file: data/runs/{run_id}/delta_emms_output.csv
+output_final_figure: data/runs/{run_id}/figures/final.pdf
+output_notebook_dir: data/runs/{run_id}/notebooks

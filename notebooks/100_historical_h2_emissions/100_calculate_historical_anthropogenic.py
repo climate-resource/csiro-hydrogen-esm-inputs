@@ -24,15 +24,15 @@
 # %%
 import logging
 
-import bookshelf
-import matplotlib.pyplot as plt
+import bookshelf  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 import numpy.testing as npt
 import pandas as pd
 import scmdata
 
 import local.h2_adjust.units  # noqa Support H2 units
-from local.h2_adjust.constants import WORLD_SECTORS
 from local.config import load_config_from_file
+from local.h2_adjust.constants import WORLD_SECTORS
 
 # %%
 logger = logging.getLogger()
@@ -117,7 +117,7 @@ print(anthropogenic_proxy)
 # %%
 
 
-def scale_by_proxy(baseline: pd.DataFrame) -> scmdata.ScmRun:
+def scale_by_proxy(baseline: pd.DataFrame | scmdata.ScmRun) -> scmdata.ScmRun:
     """
     Scale a single value by a proxy timeseries to produce a timeseries
     """
@@ -185,7 +185,6 @@ def calc_sector_weights(values: scmdata.ScmRun) -> scmdata.ScmRun:
     """
     Calculate weights for a given sector
     """
-
     assert len(values) == len(values.get_unique_meta("sector"))
 
     weights = values.timeseries() / values.values.sum(axis=0)
@@ -237,7 +236,12 @@ for v in anthropogenic_proxy:
 
 
 # %%
-def apply_sector_split(emissions):
+def apply_sector_split(emissions: scmdata.ScmRun) -> scmdata.ScmRun:
+    """
+    Split a set of variable into a sectoral breakdown
+
+    The split is calculated using the `anthropogenic_proxy` mapping
+    """
     emissions = scmdata.ScmRun(emissions)
     scale = sector_scales[emissions.get_unique_meta("variable", True)]
 
@@ -287,9 +291,12 @@ rcmip_co_factor.timeseries().sum(axis=0)
 
 
 # %%
-def apply_region_split(emissions):
-    emissions = scmdata.ScmRun(emissions)
+def apply_region_split(emissions: scmdata.ScmRun) -> scmdata.ScmRun:
+    """
+    Split a global emissions timeseries into regions
 
+    The regional breakdown of CO emissions is used as a proxy
+    """
     if emissions.get_unique_meta("sector", True) in WORLD_SECTORS:
         return emissions
 
@@ -307,7 +314,7 @@ def apply_region_split(emissions):
 
 sectoral_regional_emissions = total_sectoral_emissions.groupby(
     ("variable", "sector")
-).map(apply_region_split)
+).apply(apply_region_split)
 sectoral_regional_emissions
 
 # %% [markdown]
@@ -327,7 +334,9 @@ totals.lineplot(hue="sector")
 
 # Create plot directories
 # this assumes that all figures go in the same directory
-config.historical_h2_emissions.figure_baseline_by_sector.parent.mkdir(parents=True, exist_ok=True)
+config.historical_h2_emissions.figure_baseline_by_sector.parent.mkdir(
+    parents=True, exist_ok=True
+)
 plt.savefig(config.historical_h2_emissions.figure_baseline_by_sector)
 
 # %%
@@ -359,6 +368,9 @@ plt.tight_layout()
 plt.savefig(h2_config.figure_baseline_by_source_and_sector)
 
 # %%
-sectoral_regional_emissions.to_csv(h2_config.baseline_h2_emissions_regions)
+sectoral_regional_emissions["scenario"] = scenario
+sectoral_regional_emissions.filter(year=range(1850, 2015 + 1)).to_csv(
+    h2_config.baseline_h2_emissions_regions
+)
 
 # %%

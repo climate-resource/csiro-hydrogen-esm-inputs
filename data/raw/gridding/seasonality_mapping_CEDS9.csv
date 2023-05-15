@@ -1,0 +1,48 @@
+em,sector,year,seasonality_file
+BC,Transportation Sector,2015,TRA_ALL_seasonality
+CH4,Transportation Sector,2015,TRA_ALL_seasonality
+CO,Transportation Sector,2015,TRA_ALL_seasonality
+CO2,Transportation Sector,2015,TRA_ALL_seasonality
+NH3,Transportation Sector,2015,TRA_ALL_seasonality
+NMVOC,Transportation Sector,2015,TRA_ALL_seasonality
+NOx,Transportation Sector,2015,TRA_ALL_seasonality
+OC,Transportation Sector,2015,TRA_ALL_seasonality
+Sulfur,Transportation Sector,2015,TRA_ALL_seasonality
+BC,Energy Sector,2015,ENE_ALL_seasonality
+CH4,Energy Sector,2015,ENE_ALL_seasonality
+CO,Energy Sector,2015,ENE_ALL_seasonality
+CO2,Energy Sector,2015,ENE_ALL_seasonality
+NH3,Energy Sector,2015,ENE_ALL_seasonality
+NMVOC,Energy Sector,2015,ENE_ALL_seasonality
+NOx,Energy Sector,2015,ENE_ALL_seasonality
+OC,Energy Sector,2015,ENE_ALL_seasonality
+Sulfur,Energy Sector,2015,ENE_ALL_seasonality
+BC,International Shipping,2015,SHP_BC_seasonality
+CH4,International Shipping,2015,SHP_VOC_seasonality
+CO,International Shipping,2015,SHP_CO_seasonality
+CO2,International Shipping,2015,SHP_NOx_seasonality
+NH3,International Shipping,2015,SHP_NOx_seasonality
+NMVOC,International Shipping,2015,SHP_VOC_seasonality
+NOx,International Shipping,2015,SHP_NOx_seasonality
+OC,International Shipping,2015,SHP_OC_seasonality
+Sulfur,International Shipping,2015,SHP_Sulfur_seasonality
+BC,Aircraft,2015,AIR_BC_seasonality
+CH4,Aircraft,2015,AIR_NOx_seasonality
+CO,Aircraft,2015,AIR_NOx_seasonality
+CO2,Aircraft,2015,AIR_NOx_seasonality
+NH3,Aircraft,2015,AIR_NOx_seasonality
+NMVOC,Aircraft,2015,AIR_NOx_seasonality
+NOx,Aircraft,2015,AIR_NOx_seasonality
+OC,Aircraft,2015,AIR_BC_seasonality
+Sulfur,Aircraft,2015,AIR_NOx_seasonality
+NH3,Industrial Sector,2015,IND_ALL_seasonality
+NOx,Industrial Sector,2015,IND_ALL_seasonality
+H2,Energy Sector,2015,ENE_ALL_seasonality
+H2,Transportation Sector,2015,TRA_ALL_seasonality
+H2,International Shipping,2015,SHP_CO_seasonality
+H2,Aircraft,2015,AIR_NOx_seasonality
+H2,Agriculture,2015,AGR_ALL_seasonality
+H2,Industrial Sector,2015,IND_ALL_seasonality
+H2,"Residential, Commercial, Other",2015,RCO_ALL_seasonality
+H2,Solvents production and application,2015,SLV_ALL_seasonality
+H2,Waste,2015,WST_ALL_seasonality

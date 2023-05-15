@@ -3,6 +3,7 @@ Utility wrappers around :mod:`pydoit`
 """
 import os
 from collections.abc import Hashable, Iterable, Iterator
+from pathlib import Path
 from typing import Any, Optional, Protocol
 
 from doit.tools import config_changed  # type: ignore
@@ -19,13 +20,13 @@ class SupportsGenNotebookTasks(Protocol):
     name: str
     """Name of the task. This should be unique in the whole workflow"""
 
-    raw_notebook: os.PathLike
+    raw_notebook: os.PathLike[str]
     """Path to raw notebook"""
 
-    unexecuted_notebook: os.PathLike
+    unexecuted_notebook: os.PathLike[str]
     """Path to unexecuted notebook"""
 
-    executed_notebook: os.PathLike
+    executed_notebook: os.PathLike[str]
     """Path to executed notebook"""
 
     configuration: Optional[Hashable]
@@ -38,10 +39,10 @@ class SupportsGenNotebookTasks(Protocol):
     file driving the notebook is modified.
     """
 
-    dependencies: tuple[os.PathLike, ...]
+    dependencies: tuple[Path, ...]
     """Paths on which the notebook depends"""
 
-    targets: tuple[os.PathLike, ...]
+    targets: tuple[os.PathLike[str], ...]
     """Paths which the notebook creates/controls"""
 
 

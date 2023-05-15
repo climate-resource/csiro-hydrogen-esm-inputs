@@ -2,10 +2,11 @@
 Functionality related to timeseries
 """
 import logging
+from typing import Any
 
 import numpy as np
 import scmdata
-from pyam import IamDataFrame
+from pyam import IamDataFrame  # type: ignore
 
 from local.h2_adjust.constants import END_YEAR, START_YEAR
 
@@ -31,7 +32,7 @@ def _apply_extension(extension: dict, run: scmdata.ScmRun) -> scmdata.ScmRun:
     rate = extension.get("rate", 0)
     start_year = max(extension.get("start_year", START_YEAR), filtered["year"].min())
     if start_year not in filtered["year"].tolist():
-        raise ValueError(f"{start_year} not present")
+        raise ValueError(f"{start_year} not present")  # noqa: TRY003
     end_year = extension.get("end_year", END_YEAR)
 
     extrapolated = filtered.interpolate(
@@ -44,22 +45,26 @@ def _apply_extension(extension: dict, run: scmdata.ScmRun) -> scmdata.ScmRun:
 
 
 def extend(
-    data, config=None, method="constant", start_year=START_YEAR, end_year=END_YEAR
+    data: scmdata.ScmRun,
+    config: Any = None,  # TODO: Is this used?
+    method: str = "constant",
+    start_year: int = START_YEAR,
+    end_year: int = END_YEAR,
 ) -> scmdata.ScmRun:
     """
     Extend a timeseries in time
 
     Parameters
     ----------
-    data: scmdata.run.ScmRun
+    data
         Timeseries to extend
-    method: str
+    method
         Default method for extending timeseries. Options are
         * "linear" (Use growth rate from last datapoints)
         * "constant" (Extend using the closest value)
-    start_year: int
+    start_year
         Year which the output timeseries should start
-    end_year: int
+    end_year
         Year which the output timeseries should end (inclusive)
     """
     data = scmdata.ScmRun(data.timeseries().dropna(how="all").dropna(how="all", axis=1))
@@ -89,7 +94,7 @@ def extend(
     return scmdata.run_append(res)
 
 
-def add_world_region(data: scmdata.ScmRun, method="sum"):
+def add_world_region(data: scmdata.ScmRun, method: str = "sum") -> scmdata.ScmRun:
     """
     Recalculate World totals for a given dataset
 

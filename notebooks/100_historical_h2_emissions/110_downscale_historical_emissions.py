@@ -25,17 +25,16 @@
 import os
 import warnings
 
-import bookshelf
-# TODO: remove this dependency
-import domestic_pathways
-import matplotlib.pyplot as plt
-import scmdata.units
+import bookshelf  # type: ignore
+import domestic_pathways  # type: ignore # TODO: remove this dependency
+import matplotlib.pyplot as plt  # type: ignore
+import scmdata
 
+from local.config import load_config_from_file
 from local.h2_adjust.constants import WORLD_SECTORS
 from local.h2_adjust.downscale import custom_region_mapping
 from local.h2_adjust.timeseries import to_pyam
 from local.h2_adjust.units import UNIT_REGISTRY
-from local.config import load_config_from_file
 
 # %% tags=["parameters"]
 config_file: str = "../dev.yaml"  # config file
@@ -58,9 +57,7 @@ HISTORICAL_END_YEAR = 2015
 
 # %%
 input_scenario_raw = (
-    scmdata.ScmRun(
-        str(config.historical_h2_emissions.baseline_h2_emissions_regions)
-    )
+    scmdata.ScmRun(str(config.historical_h2_emissions.baseline_h2_emissions_regions))
     .filter(type="anthropogenic", year=range(1850, HISTORICAL_END_YEAR + 1))
     .drop_meta(["sector_short", "type"])
 )
@@ -187,9 +184,8 @@ for v in variables_to_downscale:
 downscaled_regions_sum = downscaled_regions.process_over("region", "sum")
 downscaled_regions_sum["region"] = "World"
 downscaled_regions_sum = scmdata.ScmRun(downscaled_regions_sum)
-downscaled_regions_sum.filter(variable="*H2*", year=[1850, 2015]).timeseries().unstack(
-    "downscaling"
-).round(3)
+temp = downscaled_regions_sum.filter(variable="*H2*", year=[1850, 2015]).timeseries()
+temp.unstack("downscaling").round(3)  # noqa: PD010
 
 # %%
 results_to_output = scmdata.run_append(

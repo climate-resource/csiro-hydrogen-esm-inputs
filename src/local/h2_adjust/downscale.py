@@ -2,9 +2,9 @@
 Routines for downscaling R5 regions to country timeseries
 """
 
-import domestic_pathways
-import scmdata
-from bookshelf import BookShelf
+import domestic_pathways  # type: ignore
+import scmdata  # type: ignore
+from bookshelf import BookShelf  # type: ignore
 
 from local.h2_adjust.timeseries import to_pyam
 

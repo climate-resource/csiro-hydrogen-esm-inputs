@@ -1,7 +1,7 @@
 """
 Additional project specific units
 """
-from scmdata.units import UNIT_REGISTRY
+from scmdata.units import UNIT_REGISTRY  # type: ignore
 
 if not hasattr(UNIT_REGISTRY, "hydrogen"):
     UNIT_REGISTRY.define("H = [hydrogen] = H2")

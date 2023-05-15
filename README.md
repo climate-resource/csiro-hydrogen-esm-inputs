@@ -36,3 +36,8 @@ poetry run doit run --verbosity 2 display_info crunch_scenarios --run-id myrun
 ```
 
 Running in this way allows pydoit's task checking to only re-run tasks where the dependencies have been updated.
+
+
+### Required data
+
+Not all data required to complete the pipeline can be included in the Git repository

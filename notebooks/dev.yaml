@@ -1,8 +1,31 @@
-output_root_dir: "dev-output"
-output_notebook_dir: "dev-output/notebooks"
+historical_h2_emissions:
+  baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
+  anthropogenic_proxy:
+    "Emissions|H2|Fossil Fuel": Emissions|CO
+    "Emissions|H2|Biomass burning": Emissions|BC
+    "Emissions|H2|Photochemical production|CH4": Emissions|CH4
+    "Emissions|H2|Photochemical production|VOC": Emissions|VOC
+  baseline_h2_emissions_regions: data/processed/dev/historical/baseline_h2_emissions_regions.csv
+  baseline_h2_emissions_countries: data/processed/dev/historical/baseline_h2_emissions_country.csv
+  figure_baseline_by_sector: data/processed/dev/historical/plots/baseline_by-sector.pdf
+  figure_baseline_by_source: data/processed/dev/historical/plots/baseline_by-source.pdf
+  figure_baseline_by_source_and_sector: data/processed/dev/historical/plots/baseline_by-source-sector.pdf
+historical_h2_gridding:
+  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
+  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
+  sector_type: "CEDS9"
+  # TODO: make this non-user specific
+  grid_data_directory: /home/jared/code/uom/aneris/data/processed/gridding
+  output_directory: data/processed/dev/historical/gridding
+input4mips_archive:
+  local_archive: data/raw/input4MIPs
+  generated_data: data/processed/dev/results/input4MIPs
+  version: 20230515
 anthro_baseline:
-  input_file: "dev-output/data/processed/anthro_baseline.csv"
+  input_file: data/processed/dev/anthro_baseline.csv
+
 delta_emissions:
-  input_file: "dev-output/data/processed/delta_emms_input.csv"
-  output_file: "dev-output/data/processed/delta_emms_output.csv"
-output_final_figure: "dev-output/figures/final.pdf"
+  input_file: data/processed/dev/delta_emms_input.csv
+  output_file: data/processed/dev/delta_emms_output.csv
+output_final_figure: data/processed/dev/figures/final.pdf
+output_notebook_dir: data/processed/dev/notebooks
