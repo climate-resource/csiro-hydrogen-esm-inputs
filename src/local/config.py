@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Iterator
+from typing import TYPE_CHECKING, Any, Iterable
 from pathlib import Path
-from typing import Any
 
 from attrs import define
 
@@ -42,6 +42,38 @@ class ConfigAnthroBaseline:
 
 
 @define
+class HistoricalH2Emissions:
+    """
+    Configuration for calculating the historical H2 emissions
+    """
+
+    baseline_source: Path
+    """Source file for baseline H2 emissions"""
+
+    anthropogenic_proxy: dict[str, str]
+    """
+    Proxy to provide the sectoral and regional information for a given source of H2 emissions
+    
+    Keys represent a mechanism of H2 emissions (variables defined by the study into baseline emissions
+    :attr:`baseline_source`, for example "Emissions|H2|Biomass burning".
+    
+    The values map to a CEDs variable from which the regional and sectoral information will be 
+    sourced.  
+    """
+
+    # Data
+    baseline_anthropogenic_emissions: Path
+    """
+    Calculated baseline H2 emissions, by gas, by sector and by region
+    """
+
+    # Figures
+    figure_baseline_by_sector: Path
+    figure_baseline_by_source: Path
+    figure_baseline_by_source_and_sector: Path
+
+
+@define
 class Config:
     """
     Configuration class
@@ -53,6 +85,9 @@ class Config:
 
     output_notebook_dir: Path
     """Notebook output directory"""
+
+    historical_h2_emissions: HistoricalH2Emissions
+    """Configuration for calculating the baseline H2 emissions from existing industries"""
 
     delta_emissions: ConfigDeltaEmissions
     """Configuration for calculating the change in emissions"""
@@ -263,7 +298,23 @@ def get_notebook_steps(
     -------
         Notebook steps to run
     """
+    historical_baseline_emissions = [
+        SingleNotebookDirStep(
+            name="calculate baseline historical emissions",
+            notebook="100_historical_h2_emissions/100_calculate_historical_anthropogenic",
+            raw_notebook_ext=".py",
+            dependencies=(config.historical_h2_emissions.baseline_source,),
+            targets=(
+                config.historical_h2_emissions.baseline_anthropogenic_emissions,
+                config.historical_h2_emissions.figure_baseline_by_source,
+                config.historical_h2_emissions.figure_baseline_by_sector,
+                config.historical_h2_emissions.figure_baseline_by_source_and_sector,
+            ),
+        ),
+    ]
+
     single_dir_steps = [
+        *historical_baseline_emissions,
         SingleNotebookDirStep(
             name="make input files",
             notebook="000_make_input_files",
@@ -288,6 +339,7 @@ def get_notebook_steps(
             dependencies=(config.delta_emissions.output_file,),
             targets=(config.output_final_figure,),
         ),
+        # H2 Historical
     ]
 
     out = [

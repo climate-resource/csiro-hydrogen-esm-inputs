@@ -1,0 +1,10 @@
+model,scenario,unit,region,variable,type,2020
+Patterson,,Tg H2/yr,World,Emissions|H2|Fossil Fuel,anthropogenic,17
+Patterson,,Tg H2/yr,World,Emissions|H2|Biomass burning,anthropogenic,13.5
+Patterson,,Tg H2/yr,World,Emissions|H2|Biomass burning,natural,1.5
+Patterson,,Tg H2/yr,World,Emissions|H2|Photochemical production|CH4,anthropogenic,14
+Patterson,,Tg H2/yr,World,Emissions|H2|Photochemical production|CH4,natural,9.8
+Patterson,,Tg H2/yr,World,Emissions|H2|Photochemical production|VOC,anthropogenic,1.7
+Patterson,,Tg H2/yr,World,Emissions|H2|Photochemical production|VOC,natural,11.8
+Patterson,,Tg H2/yr,World|Ocean,Emissions|H2|N2 Fixation,natural,5
+Patterson,,Tg H2/yr,World|Land,Emissions|H2|N2 Fixation,natural,3
