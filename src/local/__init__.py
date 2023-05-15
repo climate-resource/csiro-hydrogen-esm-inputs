@@ -1,7 +1,7 @@
 """
 Local
 
-Local tools (mainly interfaces) for this application
+Local tools for this application
 """
 import importlib.metadata
 

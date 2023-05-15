@@ -1,14 +1,22 @@
 """
 Serialisation
+
+This is currently specific to how we have set this project up. There are
+probably general patterns we could go with, but this is so little code I'm not
+sure it's worth making general pattern assumptions yet.
 """
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import cattrs.preconf.pyyaml
 
 converter_yaml = cattrs.preconf.pyyaml.make_converter()
 """Yaml serializer"""
+
+converter_yaml.register_unstructure_hook(Path, lambda p: str(p))
+converter_yaml.register_structure_hook(Path, lambda p, _: Path(p))
 
 
 def parse_placeholders(in_str: str, **kwargs: Any) -> str:
