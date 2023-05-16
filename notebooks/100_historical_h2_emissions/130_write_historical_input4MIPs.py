@@ -37,6 +37,7 @@ from local.h2_adjust.outputs import (
     GriddedEmissionsDataset,
     Input4MIPsMetadata,
 )
+from local.pydoit_nb.checklist import generate_directory_checklist
 
 xr.set_options(keep_attrs=True)  # type: ignore
 logging.basicConfig(level=logging.INFO)
@@ -259,9 +260,16 @@ def write_anthro_AIR(slice_filename: str, output_variable: str, title: str) -> N
 jobs = []
 
 
-all_files = config.historical_h2_gridding.output_directory.glob("*.nc")
+# Use agriculture as a placeholder
+# Other sectors are also read when generating the output files
+non_aircraft_files = config.historical_h2_gridding.output_directory.glob(
+    "*Agriculture*.nc"
+)
+aircraft_files = config.historical_h2_gridding.output_directory.glob("*Aircraft*.nc")
 
-for slice_filename in sorted(all_files):
+# %%
+
+for slice_filename in sorted(list(non_aircraft_files) + list(aircraft_files)):
     fname = str(slice_filename)
     if "Aircraft" in fname:
         jobs.append(
@@ -283,10 +291,18 @@ for slice_filename in sorted(all_files):
         )
 len(jobs)
 
-# %%
 
 # %%
-n_jobs = 5
-Parallel(n_jobs=n_jobs)(delayed(f)(*args) for f, *args in [jobs[-1]])
+n_jobs = 4
+Parallel(n_jobs=n_jobs)(delayed(f)(*args) for f, *args in jobs)
 
 # %%
+
+generate_directory_checklist(
+    config.input4mips_archive.results_archive
+    / "input4MIPs"
+    / "CMIP6"
+    / "CMIP"
+    / "CR"
+    / "CR-historical"
+)

@@ -29,6 +29,7 @@ from aneris.gridding import Gridder  # type: ignore
 
 import local.h2_adjust.units  # noqa
 from local.config import load_config_from_file
+from local.pydoit_nb.checklist import generate_directory_checklist
 
 logger = logging.getLogger("grid_historical_emissions")
 logging.basicConfig(level=logging.INFO)
@@ -86,3 +87,5 @@ gridded_emissions = gridder.grid(
 )
 
 # %%
+
+generate_directory_checklist(output_dir)

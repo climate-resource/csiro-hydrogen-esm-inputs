@@ -40,4 +40,46 @@ Running in this way allows pydoit's task checking to only re-run tasks where the
 
 ### Required data
 
-Not all data required to complete the pipeline can be included in the Git repository
+Not all data required to complete the pipeline can be included in the Git repository.
+
+For the gridding step, a range of proxies and seasonality data are needed. These
+can be obtained by downloading the results from
+[Feng et al. 2020](https://zenodo.org/record/2538194) (this can take
+some time so start with that). While that is downloading, install `R` so that
+`Rscript` is available on your `PATH`. This step is OS specific, but for MacOS
+we recommend using `brew`.
+
+The `aneris` repository with the feng gridding module then needs to be cloned and setup.
+In this case we are creating a local virtual environment instead of having to setup
+`aneris`'s complete conda development environment.
+
+```bash
+git clone git@github.com:lewisjared/aneris.git
+cd aneris
+git checkout feng
+python -m venv venv
+source venv/bin/activate
+pip install pyreadr xarray pandas numpy joblib
+```
+
+Once `aneris` and the outputs from `Feng et al. 2020` have been downloaded and extracted to
+`data/raw/emissions_downscaling_archive` inside the aneris repository, the processing
+notebook can be run.
+
+The `notebooks/gridding/010_prepare_input_data.py` notebook preprocesses the
+required data from `Feng et al` into a set of data that can be easily read
+by Python.
+
+The results of this preprocessing should be available in `data/processed/gridding`.
+This directory is the `historical_h2_gridding.grid_data_directory` configuration
+variable (TODO: figure out how to make this non-user-specific) and contains the
+following subdirectories:
+
+```bash
+data/processed
+└── gridding
+    ├── masks
+    ├── proxies
+    ├── seasonality
+    └── seasonality-temp
+```

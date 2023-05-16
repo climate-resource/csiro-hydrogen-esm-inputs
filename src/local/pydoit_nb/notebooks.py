@@ -24,19 +24,19 @@ class NotebookStep:
     name: str
     """Name of the task. This should be unique in the whole workflow"""
 
-    raw_notebook: os.PathLike
+    raw_notebook: os.PathLike[str]
     """Path to raw notebook"""
 
-    unexecuted_notebook: os.PathLike
+    unexecuted_notebook: os.PathLike[str]
     """Path to unexecuted notebook"""
 
-    executed_notebook: os.PathLike
+    executed_notebook: os.PathLike[str]
     """Path to executed notebook"""
 
-    dependencies: tuple[os.PathLike, ...]
+    dependencies: tuple[Path, ...]
     """Paths on which the notebook depends"""
 
-    targets: tuple[os.PathLike, ...]
+    targets: tuple[Path, ...]
     """Paths which the notebook creates/controls"""
 
     configuration: Hashable | None
@@ -82,12 +82,12 @@ class SingleNotebookDirStep:
     Typically we use jupytext and papermill so this will be `.py` or `.md`
     """
 
-    dependencies: tuple[os.PathLike, ...]
+    dependencies: tuple[Path, ...]
     """
     Paths to the files on which the notebooks outputs depend
     """
 
-    targets: tuple[os.PathLike, ...]
+    targets: tuple[Path, ...]
     """
     Paths this notebook creates
     """

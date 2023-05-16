@@ -13,6 +13,7 @@ from typing import Any, Literal
 
 from attrs import define
 
+from local.pydoit_nb.checklist import get_checklist_file
 from local.pydoit_nb.gen_notebook_tasks import gen_run_notebook_tasks
 from local.pydoit_nb.notebooks import NotebookStep, SingleNotebookDirStep
 from local.serialization import converter_yaml, parse_placeholders
@@ -381,6 +382,7 @@ def get_notebook_steps(
     """
     results_dir = (
         config.input4mips_archive.results_archive
+        / "input4MIPs"
         / "CMIP6"
         / "CMIP"
         / "CR"
@@ -422,15 +424,19 @@ def get_notebook_steps(
             dependencies=(
                 config.historical_h2_emissions.baseline_h2_emissions_countries,
             ),
-            targets=(*config.historical_h2_gridding.output_directory.rglob("*"),),
+            targets=(
+                get_checklist_file(config.historical_h2_gridding.output_directory),
+            ),
         ),
         SingleNotebookDirStep(
             name="write historical input4MIPS results",
             notebook="100_historical_h2_emissions/130_write_historical_input4MIPs",
             raw_notebook_ext=".py",
             configuration=(config.input4mips_archive,),
-            dependencies=(*config.historical_h2_gridding.output_directory.rglob("*"),),
-            targets=(*results_dir.rglob("*"),),
+            dependencies=(
+                get_checklist_file(config.historical_h2_gridding.output_directory),
+            ),
+            targets=(get_checklist_file(results_dir),),
         ),
     ]
 

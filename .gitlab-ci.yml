@@ -9,6 +9,7 @@ image: python:3.9
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
 
 cache:
   key:
@@ -16,11 +17,14 @@ cache:
       - poetry.lock
     prefix: python-3.9-
   paths:
-    - .cache/pip
+    - .cache
 
 before_script:
   - python -V
   - pip install poetry
+  - poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
+  - poetry config http-basic.git-lewisjarednz-domestic_pathways gitlab-ci-token $CI_JOB_TOKEN
+  - poetry config installer.max-workers 5
   - poetry config virtualenvs.create true
   - poetry config virtualenvs.in-project true
 

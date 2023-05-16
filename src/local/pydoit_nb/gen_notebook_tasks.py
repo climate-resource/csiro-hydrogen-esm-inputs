@@ -1,10 +1,12 @@
 """
 Utility wrappers around :mod:`pydoit`
 """
+from __future__ import annotations
+
 import os
 from collections.abc import Hashable, Iterable, Iterator
 from pathlib import Path
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 
 from doit.tools import config_changed  # type: ignore
 
@@ -29,7 +31,7 @@ class SupportsGenNotebookTasks(Protocol):
     executed_notebook: os.PathLike[str]
     """Path to executed notebook"""
 
-    configuration: Optional[Hashable]
+    configuration: Hashable | None
     """
     Configuration used by the notebook.
 
@@ -42,7 +44,7 @@ class SupportsGenNotebookTasks(Protocol):
     dependencies: tuple[Path, ...]
     """Paths on which the notebook depends"""
 
-    targets: tuple[os.PathLike[str], ...]
+    targets: tuple[Path, ...]
     """Paths which the notebook creates/controls"""
 
 

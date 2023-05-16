@@ -1027,7 +1027,7 @@ tqdm = "*"
 
 [package.source]
 type = "git"
-url = "ssh://git@gitlab.com/lewisjarednz/domestic_pathways.git"
+url = "https://gitlab.com/lewisjarednz/domestic_pathways.git"
 reference = "custom-registry"
 resolved_reference = "dcf2320b1e2d72d526b9b5efddd68d108f3e19aa"
 
@@ -4524,4 +4524,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "4c9d939f1f8bcf572c6cc565e81e64979746735fbe096f702a0c30bd55003af5"
+content-hash = "bf688d363d2ca5745111c09384ce1352ef7e5f3dfab7713797e16b067f74f7d7"
