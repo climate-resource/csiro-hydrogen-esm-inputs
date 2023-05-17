@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 import os.path
+from collections.abc import Hashable
 from pathlib import Path
 
 import jupytext
@@ -37,6 +38,16 @@ class NotebookStep:
 
     targets: tuple[os.PathLike, ...]
     """Paths which the notebook creates/controls"""
+
+    configuration: Hashable | None
+    """
+    Configuration used by the notebook.
+
+    If any of the configuration changes then the notebook will be triggered.
+
+    If nothing is provided, then the notebook will be run whenever the configuration
+    file driving the notebook is modified.
+    """
 
 
 @define
@@ -79,6 +90,11 @@ class SingleNotebookDirStep:
     targets: tuple[os.PathLike, ...]
     """
     Paths this notebook creates
+    """
+
+    configuration: Hashable | None = None
+    """
+    Configuration used by the notebook.
     """
 
     def to_notebook_step(
@@ -129,6 +145,7 @@ class SingleNotebookDirStep:
             executed_notebook=executed_notebook,
             dependencies=self.dependencies,
             targets=self.targets,
+            configuration=self.configuration,
         )
 
 
