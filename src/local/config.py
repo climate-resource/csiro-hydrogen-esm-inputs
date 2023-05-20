@@ -6,7 +6,6 @@ application
 """
 from __future__ import annotations
 
-import datetime
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
@@ -237,6 +236,93 @@ class ConfigBaselineH2Emissions:
 
 
 @define
+class ConfigMAGICCRuns:
+    """
+    Configuration for running MAGICC to produce updated concentration projections
+    """
+
+    n_cfgs_to_run: int
+    """
+    Number of configurations to run
+
+    Should be 600 for a production run
+    """
+
+    output_file: Path
+    """Where to save the output of the MAGICC runs"""
+
+    ar6_probabilistic_distribution_file: Path
+    """
+    Path to the AR6 probabilistic distribution file
+
+    This file isn't tracked by Git.
+
+    TODO: add download instructions to README
+    """
+
+    test_scenario: Path
+    """
+    Path to test scenario
+
+    TODO: delete this once we hook everything up together, use
+    ``config.emissions.complete_scenario`` instead
+    """
+
+    magicc_executable_path: Path
+    """Path to the MAGICC executable"""
+
+    magicc_worker_root_dir: Path
+    """Root directory for MAGICC workers"""
+
+    magicc_worker_number: int
+    """Number of MAGICC workers to use"""
+
+
+@define
+class RCMIPConfig:
+    """
+    RCMIP paths
+
+    Should all be replaced by bookshelf in future
+    """
+
+    concentrations_path: Path
+    """Path to concentrations file"""
+
+
+@define
+class CMIP6ConcentrationsConfig:
+    """CMIP6 paths and other configuration"""
+
+    root_raw_data_dir: Path
+    """Root directory for raw data"""
+
+    concentration_scenario_ids: list[str]
+    """Scenarios to process"""
+
+    concentration_variables: list[str]
+    """Variables to process"""
+
+
+@define
+class ConcentrationGriddingConfig:
+    """Concentration gridding config"""
+
+    cmip6_seasonality_and_latitudinal_gradient_path: Path
+    """Path to CMIP6 seasonality and latitudinal gradients"""
+
+    interim_gridded_output_dir: Path
+    """
+    Path to interim gridded output
+
+    From these we write the input4MIPs style files
+    """
+
+    gridded_output_dir: Path
+    """Path to gridded output, written in input4MIPs style"""
+
+
+@define
 class Config:
     """
     Configuration class
@@ -282,6 +368,18 @@ class Config:
     projected_gridding: ConfigGridding
     """Configuration for the gridding of the the modified projected emissions"""
 
+    magicc_runs: ConfigMAGICCRuns
+    """Configuration for running MAGICC"""
+
+    rcmip: RCMIPConfig
+    """Configuration of RCMIP paths"""
+
+    cmip6_concentrations: CMIP6ConcentrationsConfig
+    """Configuration of CMIP6 concentrations requirements"""
+
+    concentration_gridding: ConcentrationGriddingConfig
+    """Config for concentration gridding"""
+
 
 def load_config_from_file(config_file: str) -> Config:
     """
@@ -318,6 +416,10 @@ def load_config(config: str) -> Config:
     return converter_yaml.loads(config, Config)
 
 
+# Hmmm somehow passing doesn't work perfectly to allow e.g.
+# ``poetry run doit run "crunch_scenarios:Run MAGICC to project concentrations_ssp119-low" --run-id zn-test``
+# In this case, the default run-id is used. I think it is because the
+# parameters are passed to the subtask, not the task
 config_task_params: list[dict[str, Any]] = [
     {
         "name": "output_root_dir",
@@ -328,7 +430,8 @@ config_task_params: list[dict[str, Any]] = [
     },
     {
         "name": "run_id",
-        "default": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+        # TODO: revert this to "default": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+        "default": "zn-test",
         "type": str,
         "long": "run-id",
         "help": "id for the outputs",
@@ -665,6 +768,81 @@ def get_notebook_steps(
                 get_checklist_file(config.projected_gridding.output_directory),
             ),
             targets=(get_checklist_file(projected_emissions_dir),),
+        ),
+        SingleNotebookDirStep(
+            name="run MAGICC to project concentrations",
+            notebook="300_projected_concentrations/310_run-magicc-for-scenarios",
+            raw_notebook_ext=".py",
+            configuration=(config.magicc_runs,),
+            dependencies=(
+                config.magicc_runs.test_scenario,
+                # TODO: switch to
+                # config.emissions.complete_scenario,
+            ),
+            targets=(config.magicc_runs.output_file,),
+        ),
+        SingleNotebookDirStep(
+            name="compare MAGICC projections against CMIP6 concentrations",
+            notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6_concentrations",
+            raw_notebook_ext=".py",
+            configuration=(config.rcmip.concentrations_path,),
+            dependencies=(config.magicc_runs.output_file,),
+            targets=(),
+        ),
+        SingleNotebookDirStep(
+            name="download required CMIP6 concentrations",
+            notebook="300_projected_concentrations/320_download-cmip6-data",
+            raw_notebook_ext=".py",
+            configuration=(config.cmip6_concentrations,),
+            dependencies=(),
+            targets=(
+                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="extract grids from CMIP6 concentrations",
+            notebook="300_projected_concentrations/321_extract-grids-from-cmip6",
+            raw_notebook_ext=".py",
+            configuration=(
+                config.cmip6_concentrations.concentration_scenario_ids,
+                config.cmip6_concentrations.concentration_variables,
+            ),
+            dependencies=(
+                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
+            ),
+            targets=(
+                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="create gridded concentration projections",
+            notebook="300_projected_concentrations/322_projection-gridding",
+            raw_notebook_ext=".py",
+            configuration=(config.cmip6_concentrations.concentration_variables,),
+            dependencies=(
+                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
+                config.rcmip.concentrations_path,
+                config.magicc_runs.output_file,
+            ),
+            targets=(
+                get_checklist_file(
+                    config.concentration_gridding.interim_gridded_output_dir
+                ),
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="write concentration input4MIPs style files",
+            notebook="300_projected_concentrations/330_write-input4MIPs-files",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=(
+                get_checklist_file(
+                    config.concentration_gridding.interim_gridded_output_dir
+                ),
+            ),
+            targets=(
+                get_checklist_file(config.concentration_gridding.gridded_output_dir),
+            ),
         ),
     ]
 

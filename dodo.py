@@ -76,4 +76,6 @@ def task_crunch_scenarios(
     #   the logic related to putting notebooks in the right place, handling
     #   splitting of executed and unexecuted notebooks etc.
     for config_bundle in config_bundles:
-        yield gen_crunch_scenario_tasks(config_bundle, raw_notebooks_dir.absolute())
+        yield from gen_crunch_scenario_tasks(
+            config_bundle, raw_notebooks_dir.absolute()
+        )

@@ -1,6 +1,6 @@
 name: ssp119-low
 ssp_scenario: ssp119
-output_notebook_dir: data/runs/{run_id}/notebooks
+output_notebook_dir: "{output_root_dir}/{run_id}/ssp119-low/notebooks"
 
 emissions:
   cleaning_operations:
@@ -107,3 +107,34 @@ projected_gridding:
   grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
   output_directory: data/runs/{run_id}/ssp119-low/gridding
   fast: true
+
+magicc_runs:
+  n_cfgs_to_run: 5
+  output_file: "{output_root_dir}/{run_id}/ssp119-low/data/interim/magicc-output/magicc-concentration-projections.nc"
+  ar6_probabilistic_distribution_file: data/raw/magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
+  test_scenario: data/raw/test-complete-scenario/emissions_complete_CR-IMAGE_ssp119_low.csv
+  # this probably belongs in an environment variable if we're perfectly honest
+  # because it's platform dependent, @jared what do you think?
+  magicc_executable_path: data/raw/magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc-darwin-arm64
+  magicc_worker_root_dir: ~/Desktop
+  magicc_worker_number: 4
+
+rcmip:
+  # TODO: put this in bookshelf
+  concentrations_path: data/raw/rcmip/rcmip-concentrations-annual-means-v5-1-0.csv
+
+cmip6_concentrations:
+  root_raw_data_dir: data/raw/cmip6-concentrations
+  concentration_scenario_ids:
+    - IMAGE-ssp119
+    - IMAGE-ssp126
+    - MESSAGE-GLOBIOM-ssp245
+    - REMIND-MAGPIE-ssp534-over
+  concentration_variables:
+    - mole-fraction-of-carbon-dioxide-in-air
+    - mole-fraction-of-methane-in-air
+
+concentration_gridding:
+  cmip6_seasonality_and_latitudinal_gradient_path: "{output_root_dir}/{run_id}/ssp119-low/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc"
+  interim_gridded_output_dir: "{output_root_dir}/{run_id}/ssp119-low/data/interim/gridded-concentration-projections"
+  gridded_output_dir: "{output_root_dir}/{run_id}/ssp119-low/data/processed/input4MIPs-gridded-concentration-projections"

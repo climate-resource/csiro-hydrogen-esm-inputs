@@ -1,5 +1,8 @@
 # Data
 data/runs
+data/raw/cmip6-concentrations
+data/raw/rcmip
+data/raw/magicc-bits-and-pieces
 output-bundles
 notebooks/dev-output
 

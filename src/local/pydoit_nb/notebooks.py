@@ -48,6 +48,10 @@ class NotebookStep:
     If nothing is provided, then the notebook will be run whenever the configuration
     file driving the notebook is modified.
     """
+    # It looks like this solves a problem that even the original authors
+    # hadn't thought about because they just suggest using forget here
+    # https://pydoit.org/cmd-other.html#forget (although they also talk about
+    # non-file dependencies elsewhere so maybe these are just out of date docs)
 
 
 @define
