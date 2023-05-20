@@ -22,6 +22,12 @@ class SupportsGenNotebookTasks(Protocol):
     name: str
     """Name of the task. This should be unique in the whole workflow"""
 
+    stub: str
+    """Stub. The combination of name and stub should be unique in the whole workflow"""
+
+    doc: str
+    """Longer description of the step"""
+
     raw_notebook: os.PathLike[str]
     """Path to raw notebook"""
 
@@ -76,9 +82,18 @@ def gen_run_notebook_tasks(
             *step.dependencies,
             step.raw_notebook,  # Make sure the task also re-runs if the raw notebook changes
         )
+        # https://pydoit.org/tasks.html?highlight=doc#avoiding-empty-sub-tasks
+        base_task = {
+            "basename": step.name,
+            "name": None,
+            "doc": step.doc,
+        }
+        yield {**base_task}
 
         task = {
-            "name": step.name,
+            **base_task,
+            "name": step.stub,
+            "doc": f"{step.doc} for config {step.stub}",
             "actions": [
                 (
                     run_notebook,

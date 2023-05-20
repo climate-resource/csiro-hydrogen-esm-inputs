@@ -6,6 +6,7 @@ application
 """
 from __future__ import annotations
 
+import datetime
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
@@ -430,8 +431,7 @@ config_task_params: list[dict[str, Any]] = [
     },
     {
         "name": "run_id",
-        # TODO: revert this to "default": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
-        "default": "zn-test",
+        "default": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
         "type": str,
         "long": "run-id",
         "help": "id for the outputs",
@@ -603,9 +603,10 @@ def get_notebook_steps(
     )
 
     # TODO: refactor into separate file
-    historical_baseline_emissions = [
+    historical_baseline_emissions_steps = [
         SingleNotebookDirStep(
             name="calculate baseline historical emissions",
+            doc="calculate baseline historical emissions",
             notebook="100_historical_h2_emissions/100_calculate_historical_anthropogenic",
             raw_notebook_ext=".py",
             configuration=(
@@ -622,6 +623,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="downscale historical H2 regional emissions to countries",
+            doc="downscale historical H2 regional emissions to countries",
             notebook="100_historical_h2_emissions/110_downscale_historical_emissions",
             raw_notebook_ext=".py",
             configuration=(),  # No extra configuration dependencies
@@ -632,6 +634,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="grid historical H2 emissions",
+            doc="grid historical H2 emissions",
             notebook="100_historical_h2_emissions/120_grid_historical_emissions",
             raw_notebook_ext=".py",
             configuration=(config.historical_h2_gridding,),
@@ -644,6 +647,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="write historical input4MIPS results",
+            doc="write historical input4MIPS results",
             notebook="100_historical_h2_emissions/130_write_historical_input4MIPs",
             raw_notebook_ext=".py",
             configuration=(config.input4mips_archive,),
@@ -655,9 +659,10 @@ def get_notebook_steps(
     ]
 
     # Projected Emissions steps
-    projected_emissions = [
+    projected_emissions_steps = [
         SingleNotebookDirStep(
             name="create the input emissions scenario",
+            doc="create the input emissions scenario",
             notebook="200_projected_h2_emissions/200_make_input_scenario",
             raw_notebook_ext=".py",
             configuration=(
@@ -671,6 +676,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="extend input data to cover target period",
+            doc="extend input data to cover target period",
             notebook="200_projected_h2_emissions/201_extend_timeseries",
             raw_notebook_ext=".py",
             configuration=(config.delta_emissions.extensions,),
@@ -691,6 +697,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="calculate delta emissions from H2 usage",
+            doc="calculate delta emissions from H2 usage",
             notebook="200_projected_h2_emissions/210_calculate_delta_emissions",
             raw_notebook_ext=".py",
             configuration=(),
@@ -708,6 +715,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="calculate baseline projected emissions",
+            doc="calculate baseline projected emissions",
             notebook="200_projected_h2_emissions/220_calculate_baseline_anthropogenic",
             raw_notebook_ext=".py",
             configuration=(config.projected_h2_emissions,),
@@ -721,6 +729,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="merge projected emissions to form a scenario",
+            doc="merge projected emissions to form a scenario",
             notebook="200_projected_h2_emissions/230_merge_emissions",
             raw_notebook_ext=".py",
             configuration=(
@@ -743,6 +752,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="downscale projected H2 regional emissions to countries",
+            doc="downscale projected H2 regional emissions to countries",
             notebook="200_projected_h2_emissions/240_downscale_projected_emissions",
             raw_notebook_ext=".py",
             configuration=(
@@ -753,6 +763,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="grid projected H2 emissions",
+            doc="grid projected H2 emissions",
             notebook="200_projected_h2_emissions/250_grid_projected_emissions",
             raw_notebook_ext=".py",
             configuration=(config.projected_gridding,),
@@ -761,6 +772,7 @@ def get_notebook_steps(
         ),
         SingleNotebookDirStep(
             name="write projected input4MIPS results",
+            doc="write projected input4MIPS results",
             notebook="200_projected_h2_emissions/260_write_projected_input4MIPs",
             raw_notebook_ext=".py",
             configuration=(config.input4mips_archive,),
@@ -769,8 +781,12 @@ def get_notebook_steps(
             ),
             targets=(get_checklist_file(projected_emissions_dir),),
         ),
+    ]
+
+    concentration_gridding_steps = [
         SingleNotebookDirStep(
-            name="run MAGICC to project concentrations",
+            name="MAGICC run",
+            doc="run MAGICC to project concentrations",
             notebook="300_projected_concentrations/310_run-magicc-for-scenarios",
             raw_notebook_ext=".py",
             configuration=(config.magicc_runs,),
@@ -782,15 +798,17 @@ def get_notebook_steps(
             targets=(config.magicc_runs.output_file,),
         ),
         SingleNotebookDirStep(
-            name="compare MAGICC projections against CMIP6 concentrations",
-            notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6_concentrations",
+            name="MAGICC - CMIP6 comparison",
+            doc="compare MAGICC projections against CMIP6 concentrations",
+            notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6",
             raw_notebook_ext=".py",
             configuration=(config.rcmip.concentrations_path,),
             dependencies=(config.magicc_runs.output_file,),
             targets=(),
         ),
         SingleNotebookDirStep(
-            name="download required CMIP6 concentrations",
+            name="Download CMIP6 concentrations",
+            doc="download required CMIP6 concentrations",
             notebook="300_projected_concentrations/320_download-cmip6-data",
             raw_notebook_ext=".py",
             configuration=(config.cmip6_concentrations,),
@@ -800,7 +818,8 @@ def get_notebook_steps(
             ),
         ),
         SingleNotebookDirStep(
-            name="extract grids from CMIP6 concentrations",
+            name="Extract CMIP6 grids",
+            doc="extract grids from CMIP6 concentrations",
             notebook="300_projected_concentrations/321_extract-grids-from-cmip6",
             raw_notebook_ext=".py",
             configuration=(
@@ -815,7 +834,8 @@ def get_notebook_steps(
             ),
         ),
         SingleNotebookDirStep(
-            name="create gridded concentration projections",
+            name="Grided projections",
+            doc="create gridded concentration projections",
             notebook="300_projected_concentrations/322_projection-gridding",
             raw_notebook_ext=".py",
             configuration=(config.cmip6_concentrations.concentration_variables,),
@@ -831,7 +851,8 @@ def get_notebook_steps(
             ),
         ),
         SingleNotebookDirStep(
-            name="write concentration input4MIPs style files",
+            name="Write input4MIPs concentrations",
+            doc="write concentration input4MIPs style files",
             notebook="300_projected_concentrations/330_write-input4MIPs-files",
             raw_notebook_ext=".py",
             configuration=(),
@@ -846,22 +867,24 @@ def get_notebook_steps(
         ),
     ]
 
-    single_dir_steps = [*historical_baseline_emissions, *projected_emissions]
-
     out = [
         sds.to_notebook_step(
             raw_notebooks_dir=raw_notebooks_dir,
             output_notebook_dir=config.output_notebook_dir,
             stub=stub,
         )
-        for sds in single_dir_steps
+        for sds in [
+            *historical_baseline_emissions_steps,
+            *projected_emissions_steps,
+            *concentration_gridding_steps,
+        ]
     ]
 
     return out
 
 
 def gen_crunch_scenario_tasks(
-    config_bundle: ConfigBundle, raw_notebooks_dir: Path
+    config_bundle: ConfigBundle, raw_notebooks_dir: Path, params
 ) -> Iterator[dict[str, Any]]:
     """
     Generate crunch scenario tasks
@@ -882,7 +905,7 @@ def gen_crunch_scenario_tasks(
         config_bundle.config_hydrated, raw_notebooks_dir, stub=config_bundle.stub
     )
 
-    return gen_run_notebook_tasks(
+    yield from gen_run_notebook_tasks(
         notebook_steps,
         config_bundle.config_hydrated_path,
     )

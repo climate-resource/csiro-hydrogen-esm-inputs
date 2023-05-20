@@ -22,7 +22,13 @@ class NotebookStep:
     """
 
     name: str
-    """Name of the task. This should be unique in the whole workflow"""
+    """Name of the task"""
+
+    stub: str
+    """Stub. The combination of name and stub should be unique in the whole workflow"""
+
+    doc: str
+    """Longer description of the step"""
 
     raw_notebook: os.PathLike[str]
     """Path to raw notebook"""
@@ -65,6 +71,9 @@ class SingleNotebookDirStep:
 
     name: str
     """Name of the step"""
+
+    doc: str
+    """Longer description of the step"""
 
     notebook: str
     """
@@ -143,7 +152,9 @@ class SingleNotebookDirStep:
         executed_notebook = output_notebook_dir / f"{self.notebook}.ipynb"
 
         return NotebookStep(
-            name=f"{self.name}_{stub}",
+            name=self.name,
+            stub=stub,
+            doc=self.doc,
             raw_notebook=raw_notebook,
             unexecuted_notebook=unexecuted_notebook,
             executed_notebook=executed_notebook,
