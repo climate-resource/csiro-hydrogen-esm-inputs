@@ -23,7 +23,11 @@ from pathlib import Path
 
 from spaemis.config import DownscalingScenarioConfig, converter
 
-from local.config import ConfigSpatialEmissionsScalerTemplate, load_config_from_file
+from local.config import (
+    ConfigSpatialEmissions,
+    ConfigSpatialEmissionsScalerTemplate,
+    load_config_from_file,
+)
 from local.serialization import parse_placeholders
 
 logger = logging.getLogger("200_run_projection")
@@ -31,10 +35,20 @@ logging.basicConfig(level=logging.INFO)
 
 # %% tags=["parameters"]
 config_file: str = "../dev.yaml"  # config file
+name: str = "ssp119_australia"
 
 # %%
 config = load_config_from_file(config_file)
-spaemis_config = config.spatial_emissions
+
+
+# %%
+def find_config_match(iterable: list[ConfigSpatialEmissions]):
+    """Get the first spatial emissions config with a matching name"""
+    return next(run_config for run_config in iterable if run_config.name == name)
+
+
+spaemis_config = find_config_match(config.spatial_emissions)
+spaemis_config
 
 
 # %%
@@ -54,7 +68,7 @@ def prepare_scaler_template(
 
 
 scalers = [
-    prepare_scaler_template(template, **spaemis_config.template_replacements)
+    prepare_scaler_template(template, **spaemis_config.scalar_template_replacements)
     for template in spaemis_config.scaler_templates
 ]
 templated_config = {**spaemis_config.configuration_template}

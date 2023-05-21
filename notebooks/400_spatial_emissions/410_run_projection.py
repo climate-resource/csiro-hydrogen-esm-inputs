@@ -26,6 +26,7 @@ dotenv.load_dotenv()
 
 # %%
 import logging
+import os
 
 import xarray as xr
 from spaemis.config import load_config
@@ -33,38 +34,50 @@ from spaemis.input_data import database
 from spaemis.inventory import clip_region, load_inventory, write_inventory_csvs
 from spaemis.project import calculate_point_sources, calculate_projections
 
-from local.config import load_config_from_file
+from local.config import ConfigSpatialEmissions, load_config_from_file
 
 logger = logging.getLogger("200_run_projection")
 logging.basicConfig(level=logging.INFO)
 
 # %% tags=["parameters"]
 config_file: str = "../dev.yaml"  # config file
+name: str = "ssp119_australia"
 
 # %%
 config = load_config_from_file(config_file)
-downscaling_config = load_config(str(config.spatial_emissions.downscaling_config))
+
+
+def find_config_match(iterable: list[ConfigSpatialEmissions]) -> ConfigSpatialEmissions:
+    """Get the first spatial emissions config with a matching name"""
+    return next(run_config for run_config in iterable if run_config.name == name)
+
+
+spaemis_config = find_config_match(config.spatial_emissions)
+
+# %%
+downscaling_config = load_config(str(spaemis_config.downscaling_config))
+downscaling_config
 
 # %%
 # Setup input4MIPs directory
-database.register_path(config.input4mips_archive.results_archive)
-database.register_path(config.input4mips_archive.local_archive)
+database.register_path(str(config.input4mips_archive.results_archive))
+database.register_path(str(config.input4mips_archive.local_archive))
 assert len(database.paths)
+database.paths
 
+# Set up the proxy data directory
+os.environ.setdefault("SPAEMIS_PROXY_DIRECTORY", str(spaemis_config.proxy_directory))
 # %%
 inventory = load_inventory(
     downscaling_config.inventory.name,
     downscaling_config.inventory.year,
     data_directory=str(
-        config.spatial_emissions.inventory_directory
+        spaemis_config.inventory_directory
         / downscaling_config.inventory.name
         / str(downscaling_config.inventory.year)
     ),
 )
 inventory
-
-# %%
-inventory.data["CO"].sel(sector="industry").plot(robust=True)
 
 # %%
 dataset = calculate_projections(downscaling_config, inventory, timeseries={})
@@ -91,10 +104,13 @@ point_sources = calculate_point_sources(downscaling_config, inventory)
 point_sources
 
 # %%
-_show_variable_sums(point_sources)
+
+if len(point_sources):
+    _show_variable_sums(point_sources)
 
 # %%
-point_sources["H2"].sel(sector="industry").plot()
+if len(point_sources):
+    point_sources["H2"].sel(sector="industry").plot()
 
 # %%
 # Align and merge point sources
@@ -122,12 +138,12 @@ for variable in merged.data_vars:
 
 # %%
 logger.info("Writing output dataset as netcdf")
-merged.to_netcdf(config.spatial_emissions.netcdf_output)
+merged.to_netcdf(spaemis_config.netcdf_output)
 
 # %%
 logger.info("Writing CSV files")
 for year in downscaling_config.timeslices:
-    target_dir = config.spatial_emissions.csv_output_directory / str(year)
+    target_dir = spaemis_config.csv_output_directory / str(year)
     data_to_write = merged.sel(year=year)
 
     target_dir.mkdir(exist_ok=True, parents=True)

@@ -53,6 +53,9 @@ class SupportsGenNotebookTasks(Protocol):
     targets: tuple[Path, ...]
     """Paths which the notebook creates/controls"""
 
+    notebook_parameters: dict[str, str]
+    """Additional parameters to pass to the notebook"""
+
 
 def gen_run_notebook_tasks(
     notebook_steps: Iterable[SupportsGenNotebookTasks],
@@ -90,6 +93,12 @@ def gen_run_notebook_tasks(
         }
         yield {**base_task}
 
+        # These are the parameters that are passed to a notebook
+        notebook_parameters = {
+            "config_file": str(config_file),
+            **step.notebook_parameters,
+        }
+
         task = {
             **base_task,
             "name": step.stub,
@@ -102,7 +111,7 @@ def gen_run_notebook_tasks(
                         "base_notebook": step.raw_notebook,
                         "unexecuted_notebook": step.unexecuted_notebook,
                         "executed_notebook": step.executed_notebook,
-                        "config_file": config_file,
+                        "notebook_parameters": notebook_parameters,
                     },
                 )
             ],

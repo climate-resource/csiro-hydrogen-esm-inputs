@@ -140,33 +140,34 @@ concentration_gridding:
   gridded_output_dir: ../dev-output/ssp119-low/data/processed/input4MIPs-gridded-concentration-projections
 
 spatial_emissions:
-  configuration_template:
-    name: ssp119_australia
+  - name: ssp119_australia
+    configuration_template:
+      name: ssp119_australia
+      inventory:
+        name: australia
+        year: 2016
 
-    inventory:
-      name: australia
-      year: 2016
+      timeslices:
+        - 2020
+        - 2040
+        - 2060
+        - 2080
+        - 2100
 
-    timeslices:
-      - 2020
-      - 2040
-      - 2060
-      - 2080
-      - 2100
-
-    input_timeseries:
-    scalers:
-      default_scaler:
-        name: constant
-  scaler_templates:
-    - input_file: ../../data/raw/spaemis/templates/template_australia_H2_scalers.yaml
-      output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_H2_scalers.yaml
-    - input_file: ../../data/raw/spaemis/templates/template_australia_scalers.csv
-      output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_scalers.csv
-  template_replacements:
-    cr_h2_scenario: CR-IMAGE-ssp119-low
-    ssp_scenario: IAMC-IMAGE-ssp119-1-1
-  downscaling_config: ../dev-output/ssp119-low/data/processed/spaemis/config.yaml
-  inventory_directory: ../../../spaemis/data/raw/inventories
-  netcdf_output: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia/{run_id}_ssp119_australia_projections.nc"
-  csv_output_directory: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia
+      input_timeseries:
+      scalers:
+        default_scaler:
+          name: constant
+    scaler_templates:
+      - input_file: ../../data/raw/spaemis/templates/template_australia_H2_scalers.yaml
+        output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_H2_scalers.yaml
+      - input_file: ../../data/raw/spaemis/templates/template_australia_scalers.csv
+        output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_scalers.csv
+    scalar_template_replacements:
+      cr_h2_scenario: CR-IMAGE-ssp119-low
+      ssp_scenario: IAMC-IMAGE-ssp119-1-1
+    downscaling_config: ../dev-output/ssp119-low/data/processed/spaemis/config.yaml
+    inventory_directory: ../../../spaemis/data/raw/inventories
+    proxy_directory: ../../data/raw/spaemis/proxies
+    netcdf_output: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia/{run_id}_ssp119_australia_projections.nc"
+    csv_output_directory: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia

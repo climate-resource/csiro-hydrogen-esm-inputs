@@ -7,6 +7,7 @@ application
 from __future__ import annotations
 
 import datetime
+import itertools
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
@@ -333,7 +334,10 @@ class ConfigSpatialEmissionsScalerTemplate:
     May contain placeholders
     """
     output_file: Path
-    """Processed template file without any placeholders"""
+    """Processed template file without any placeholders
+
+    This file will later be used to generate the complete configuration used
+    """
 
 
 @define
@@ -342,6 +346,9 @@ class ConfigSpatialEmissions:
     Configuration for the calculation of regional emissions
     """
 
+    name: str
+    """Name of the spatial emission run"""
+
     configuration_template: dict[str, Any]
     """Base configuration
 
@@ -349,15 +356,28 @@ class ConfigSpatialEmissions:
     will be ignored."""
 
     scaler_templates: list[ConfigSpatialEmissionsScalerTemplate]
-    """Template files containing information about the scalers used"""
+    """Template files containing information about the scalers used
 
-    template_replacements: dict[str, str]
+    These files may include placeholders (e.g. {ssp_scenario}) which are replaced
+    when read in
+    """
+
+    scalar_template_replacements: dict[str, str]
+    """Replacements to be applied to each scalar template file
+
+    These replacements are shared for all template files"""
 
     downscaling_config: Path
     """Path to the generated configuration file
 
     This file will be able to be read in as a :class:`spaemis.config.DownscalingScenarioConfig`
     object.
+    """
+
+    proxy_directory: Path
+    """Path to the proxy data
+
+    Used for the population proxy
     """
 
     inventory_directory: Path
@@ -428,7 +448,7 @@ class Config:
     concentration_gridding: ConcentrationGriddingConfig
     """Config for concentration gridding"""
 
-    spatial_emissions: ConfigSpatialEmissions
+    spatial_emissions: list[ConfigSpatialEmissions]
     """Config for spatial emissions"""
 
 
@@ -917,32 +937,42 @@ def get_notebook_steps(
         ),
     ]
 
-    spatial_emissions_steps = [
-        SingleNotebookDirStep(
-            name="spaemis - generate scaler configuration",
-            doc="Combines different templates for scalers together",
-            notebook="400_spatial_emissions/400_generate_configuration",
-            raw_notebook_ext=".py",
-            configuration=(config.spatial_emissions),
-            dependencies=tuple(
-                template.input_file
-                for template in config.spatial_emissions.scaler_templates
-            ),
-            targets=(config.spatial_emissions.downscaling_config,),
-        ),
-        SingleNotebookDirStep(
-            name="spaemis - calculate projections for a region",
-            doc="Calculate emissions for a given region",
-            notebook="400_spatial_emissions/410_run_projection",
-            raw_notebook_ext=".py",
-            configuration=(),
-            dependencies=(config.spatial_emissions.downscaling_config,),
-            targets=(
-                get_checklist_file(config.spatial_emissions.csv_output_directory),
-                config.spatial_emissions.netcdf_output,
-            ),
-        ),
-    ]
+    # Iterate over the spatial emissions setups to run
+    spatial_emissions_steps = itertools.chain(
+        *(
+            (
+                SingleNotebookDirStep(
+                    name=f"spaemis - {spatial_emis_region.name} - generate scaler configuration",
+                    doc="Combines different templates for scalers together",
+                    notebook="400_spatial_emissions/400_generate_configuration",
+                    raw_notebook_ext=".py",
+                    configuration=(spatial_emis_region,),
+                    dependencies=tuple(
+                        template.input_file
+                        for template in spatial_emis_region.scaler_templates
+                    ),
+                    targets=(spatial_emis_region.downscaling_config,),
+                    notebook_suffix=spatial_emis_region.name,
+                    notebook_parameters={"name": spatial_emis_region.name},
+                ),
+                SingleNotebookDirStep(
+                    name=f"spaemis - {spatial_emis_region.name} - calculate projections for a region",
+                    doc="Calculate emissions for a given region",
+                    notebook="400_spatial_emissions/410_run_projection",
+                    raw_notebook_ext=".py",
+                    configuration=(),
+                    dependencies=(spatial_emis_region.downscaling_config,),
+                    targets=(
+                        get_checklist_file(spatial_emis_region.csv_output_directory),
+                        spatial_emis_region.netcdf_output,
+                    ),
+                    notebook_suffix=spatial_emis_region.name,
+                    notebook_parameters={"name": spatial_emis_region.name},
+                ),
+            )
+            for spatial_emis_region in config.spatial_emissions
+        )
+    )
     out = [
         sds.to_notebook_step(
             raw_notebooks_dir=raw_notebooks_dir,

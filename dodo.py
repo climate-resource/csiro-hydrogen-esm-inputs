@@ -134,13 +134,3 @@ def task_generate_notebook_tasks(
             raw_notebooks_dir.absolute(),
             [*glob_config_files_task_params, *config_task_params],
         )
-
-
-# This setup can be run with control in the intended way with e.g.
-# ``poetry run doit run --verbosity 2 generate_notebook_tasks --run-id zn-test-1 "Write input4MIPs*"``
-# The trick seems to have been making `generate_notebook_tasks` also a task so
-# that pydoit would parse the command-line as we wanted. This setup allows
-# pydoit to realise that --run-id is an argument for the generation step only,
-# which probably also tells us that we should split up the getting config
-# bundles step into its own task, upon which others can depend (see also note
-# above about using create_after)

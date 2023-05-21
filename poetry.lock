@@ -364,18 +364,18 @@ tests = ["coverage", "jupytext", "matplotlib", "moto[s3]", "notebook", "papermil
 
 [[package]]
 name = "boto3"
-version = "1.26.137"
+version = "1.26.138"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.137-py3-none-any.whl", hash = "sha256:b6d729beec0462ac1ae4a83a0fb04a62061a9f1f406d3151b45345daa9d1a5bc"},
-    {file = "boto3-1.26.137.tar.gz", hash = "sha256:cac699fc46b43c10ca12aa6ea087c0b979613c5e3570aea11d86891652cb581e"},
+    {file = "boto3-1.26.138-py3-none-any.whl", hash = "sha256:d47a68a0ca6599e8711c7da670fbac24085d9d50cfb4f761204f154d2b6fae26"},
+    {file = "boto3-1.26.138.tar.gz", hash = "sha256:f0a78f94a7140b60960898fd86677e4e73cc96bd7f3e5c64fc5cc1818d04c7b8"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.137,<1.30.0"
+botocore = ">=1.29.138,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -384,14 +384,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.137"
+version = "1.29.138"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.137-py3-none-any.whl", hash = "sha256:5921a15c0a2a438f5ba9de4189d846f31d3770c690b0ffb237da5069444f2ba5"},
-    {file = "botocore-1.29.137.tar.gz", hash = "sha256:1909fe368c08b4879d52ac1e3963f8bfcbebe3a84366c3f2000a45bd4510b027"},
+    {file = "botocore-1.29.138-py3-none-any.whl", hash = "sha256:3d145f30d10a9c712acee48e7ce906c9456bb25fe50d477c9312c702ccfa50d1"},
+    {file = "botocore-1.29.138.tar.gz", hash = "sha256:31edc237088c104f7a05887646bbec31d7459dd2e108fd90cbffa315902817e2"},
 ]
 
 [package.dependencies]
@@ -2454,26 +2454,26 @@ test = ["coverage", "nbval", "pytest", "pytest-cov", "pytest-jupyter", "pytest-p
 
 [[package]]
 name = "nbclient"
-version = "0.7.4"
+version = "0.8.0"
 description = "A client library for executing notebooks. Formerly nbconvert's ExecutePreprocessor."
 category = "main"
 optional = false
-python-versions = ">=3.7.0"
+python-versions = ">=3.8.0"
 files = [
-    {file = "nbclient-0.7.4-py3-none-any.whl", hash = "sha256:c817c0768c5ff0d60e468e017613e6eae27b6fa31e43f905addd2d24df60c125"},
-    {file = "nbclient-0.7.4.tar.gz", hash = "sha256:d447f0e5a4cfe79d462459aec1b3dc5c2e9152597262be8ee27f7d4c02566a0d"},
+    {file = "nbclient-0.8.0-py3-none-any.whl", hash = "sha256:25e861299e5303a0477568557c4045eccc7a34c17fc08e7959558707b9ebe548"},
+    {file = "nbclient-0.8.0.tar.gz", hash = "sha256:f9b179cd4b2d7bca965f900a2ebf0db4a12ebff2f36a711cb66861e4ae158e55"},
 ]
 
 [package.dependencies]
 jupyter-client = ">=6.1.12"
 jupyter-core = ">=4.12,<5.0.0 || >=5.1.0"
 nbformat = ">=5.1"
-traitlets = ">=5.3"
+traitlets = ">=5.4"
 
 [package.extras]
 dev = ["pre-commit"]
 docs = ["autodoc-traits", "mock", "moto", "myst-parser", "nbclient[test]", "sphinx (>=1.7)", "sphinx-book-theme", "sphinxcontrib-spelling"]
-test = ["flaky", "ipykernel", "ipython", "ipywidgets", "nbconvert (>=7.0.0)", "pytest (>=7.0)", "pytest-asyncio", "pytest-cov (>=4.0)", "testpath", "xmltodict"]
+test = ["flaky", "ipykernel (>=6.19.3)", "ipython", "ipywidgets", "nbconvert (>=7.0.0)", "pytest (>=7.0)", "pytest-asyncio", "pytest-cov (>=4.0)", "testpath", "xmltodict"]
 
 [[package]]
 name = "nbconvert"
@@ -3916,14 +3916,14 @@ test = ["boto3 (>=1.2.4)", "hypothesis", "packaging", "pytest (>=2.8.2)", "pytes
 
 [[package]]
 name = "requests"
-version = "2.30.0"
+version = "2.31.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "requests-2.30.0-py3-none-any.whl", hash = "sha256:10e94cc4f3121ee6da529d358cdaeaff2f1c409cd377dbc72b825852f2f7e294"},
-    {file = "requests-2.30.0.tar.gz", hash = "sha256:239d7d4458afcb28a692cdd298d87542235f4ca8d36d03a15bfc128a6559a2f4"},
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
+    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
 ]
 
 [package.dependencies]
@@ -4324,34 +4324,30 @@ files = [
 
 [[package]]
 name = "spaemis"
-version = "0.1.0"
+version = "0.2.1"
 description = "Produce a coherent set of emissions for regional air quality modelling"
 category = "main"
 optional = false
-python-versions = ">=3.10, <3.12"
-files = []
-develop = false
+python-versions = ">=3.10,<3.12"
+files = [
+    {file = "spaemis-0.2.1-py3-none-any.whl", hash = "sha256:0e9ec290bbc210458fc1f66439c336cb4de7dafcfa3d549acda3cba112502cd9"},
+    {file = "spaemis-0.2.1.tar.gz", hash = "sha256:83e2e129b18ad03db087595b079c4c3500d4df974be73a735e208eb910a420a1"},
+]
 
 [package.dependencies]
-cattrs = "^22.2.0"
-geopandas = "^0.13.0"
-netcdf4 = "^1.6.3"
-pooch = "^1.7.0"
-pyyaml = "^6.0"
-rioxarray = "^0.14.1"
-scipy = "^1.10.1"
-scmdata = "^0.15.0"
-typing-extensions = "^4.5.0"
-xarray = "^2023.5.0"
+cattrs = ">=22.2.0,<23.0.0"
+geopandas = ">=0.13.0,<0.14.0"
+netcdf4 = ">=1.6.3,<2.0.0"
+pooch = ">=1.7.0,<2.0.0"
+pyyaml = ">=6.0,<7.0"
+rioxarray = ">=0.14.1,<0.15.0"
+scipy = ">=1.10.1,<2.0.0"
+scmdata = ">=0.15.0,<0.16.0"
+typing-extensions = ">=4.5.0,<5.0.0"
+xarray = ">=2023.5.0,<2024.0.0"
 
 [package.extras]
 notebooks = ["jupytext (==1.14.5)", "matplotlib (>=3.7.1,<4.0.0)", "notebook (>=6.5.3,<7.0.0)", "papermill", "python-dotenv", "seaborn"]
-
-[package.source]
-type = "git"
-url = "git@github.com:climate-resource/spaemis.git"
-reference = "HEAD"
-resolved_reference = "7cc440dffe2c6e546ab49817adc580a16c03b80c"
 
 [[package]]
 name = "sqlalchemy"
@@ -5005,4 +5001,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "18257882b76869e29cde49c0269127f64a254a47f3506975c2dd35b3064e8e78"
+content-hash = "68cfa3b26562b7c6445646f461a6919e6bb4c3b4b14da43968052254ec3c2792"

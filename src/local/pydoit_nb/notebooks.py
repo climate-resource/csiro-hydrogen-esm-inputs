@@ -59,6 +59,9 @@ class NotebookStep:
     # https://pydoit.org/cmd-other.html#forget (although they also talk about
     # non-file dependencies elsewhere so maybe these are just out of date docs)
 
+    notebook_parameters: dict[str, str]
+    """Additional parameter values to pass to the notebook"""
+
 
 @define
 class SingleNotebookDirStep:
@@ -110,6 +113,12 @@ class SingleNotebookDirStep:
     Configuration used by the notebook.
     """
 
+    notebook_suffix: str = ""
+    """Suffix to add to the resulting notebooks"""
+
+    notebook_parameters: dict[str, str] | None = None
+    """Additional parameter values to pass to the notebook"""
+
     def to_notebook_step(
         self,
         stub: str,
@@ -147,9 +156,12 @@ class SingleNotebookDirStep:
         raw_notebook = raw_notebooks_dir / f"{self.notebook}{self.raw_notebook_ext}"
 
         unexecuted_notebook = (
-            output_notebook_dir / f"{self.notebook}{unexecuted_suffix}.ipynb"
+            output_notebook_dir
+            / f"{self.notebook}{self.notebook_suffix}{unexecuted_suffix}.ipynb"
         )
-        executed_notebook = output_notebook_dir / f"{self.notebook}.ipynb"
+        executed_notebook = (
+            output_notebook_dir / f"{self.notebook}{self.notebook_suffix}.ipynb"
+        )
 
         return NotebookStep(
             name=self.name,
@@ -161,6 +173,7 @@ class SingleNotebookDirStep:
             dependencies=self.dependencies,
             targets=self.targets,
             configuration=self.configuration,
+            notebook_parameters=self.notebook_parameters or {},
         )
 
 
@@ -185,8 +198,7 @@ def run_notebook(
     base_notebook: os.PathLike,
     unexecuted_notebook: Path,
     executed_notebook: Path,
-    config_file: os.PathLike,
-    config_file_parameter_name: str = "config_file",
+    notebook_parameters: dict[str, str] | None = None,
 ) -> None:
     """
     Run a notebook
@@ -194,8 +206,6 @@ def run_notebook(
     This loads the notebook ``base_notebook`` using jupytext, then writes it
     as an ``.ipynb`` file to ``unexecuted_notebook``. It then runs this
     unexecuted notebook with papermill, writing it to ``executed_notebook``.
-    The ``config_file`` is parsed to the notebook as a parameter with name
-    ``"config_file"`` via papermill.
 
     Parameters
     ----------
@@ -208,15 +218,20 @@ def run_notebook(
     executed_notebook
         Where to write the executed notebook
 
-    config_file
-        Config file to use when running the notebooks
+    notebook_parameters
+        Parameters to pass to the target notebook
 
-    config_file_parameter_name
-        Parameter name to use when passing ``config_file`` to the notebook
-        while running with papermill
+        These parameters will replace the contents of a cell tagged "parameters".
+        See the
+        `papermill documentation <https://papermill.readthedocs.io/en/latest/usage-parameterize.html#designate-parameters-for-a-cell>`_
+        for more information about parameterizing a notebook.
+
     """
     LOGGER.info("Reading raw notebook with jupytext: %s", base_notebook)
     notebook_jupytext = jupytext.read(base_notebook)
+
+    if notebook_parameters is None:
+        notebook_parameters = {}
 
     LOGGER.info("Writing unexecuted notebook: %s", unexecuted_notebook)
     unexecuted_notebook.parent.mkdir(parents=True, exist_ok=True)
@@ -232,7 +247,7 @@ def run_notebook(
         pm.execute_notebook(
             unexecuted_notebook,
             executed_notebook,
-            parameters={config_file_parameter_name: str(config_file)},
+            parameters=notebook_parameters,
         )
     except Exception as exc:
         raise NotebookExecutionException(exc, unexecuted_notebook) from exc
