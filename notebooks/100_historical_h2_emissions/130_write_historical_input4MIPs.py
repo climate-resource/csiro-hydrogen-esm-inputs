@@ -15,17 +15,17 @@
 # %% [markdown]
 # # Convert to input4MIPs format
 #
-# In the previous step we gridded our updated timeseries. CSIRO needs a complete set of
-# emissions, not just the sectors we updated.
+# Converts the historical H2 emissions to an input4MIPs style file.
+# Each file contains a single variable (always H2 in this case) with a number of
+# sectors.
 #
-# This step writes a set of emissions scenario outputs which conform with the existing
-# input4MIPs data. We take output from the existing set of input4MIPs where we didn't
-# make any changes.
+# The dataset is split into several timeslices for memory reasons
+# Each timeslice is processed separetely. The slices are defined,
+# by the previous gridding step
 
 
 # %%
 import logging
-from collections.abc import Iterable
 
 import xarray as xr
 from joblib import Parallel, delayed  # type: ignore
@@ -33,9 +33,10 @@ from joblib import Parallel, delayed  # type: ignore
 from local import __version__
 from local.config import load_config_from_file
 from local.h2_adjust.outputs import (
-    GriddedAircraftEmissionsDataset,
-    GriddedEmissionsDataset,
-    Input4MIPsMetadata,
+    SupportsWriteSlice,
+    find_gridded_slice,
+    write_anthropogenic_AIR_slice,
+    write_anthropogenic_slice,
 )
 from local.pydoit_nb.checklist import generate_directory_checklist
 
@@ -48,63 +49,10 @@ config_file: str = "../dev.yaml"  # config file
 # %%
 config = load_config_from_file(config_file)
 
-# %%
-SECTOR_MAP = [
-    "Agriculture",
-    "Energy Sector",
-    "Industrial Sector",
-    "Transportation Sector",
-    "Residential, Commercial, Other",
-    "Solvents production and application",
-    "Waste",
-    "International Shipping",
-    # "Negative CO2 Emissions", # CO2 also includes this additional sector, but we aren't regridding that here
-]
-LEVELS = [
-    0.305,
-    0.915,
-    1.525,
-    2.135,
-    2.745,
-    3.355,
-    3.965,
-    4.575,
-    5.185,
-    5.795,
-    6.405,
-    7.015,
-    7.625,
-    8.235,
-    8.845,
-    9.455,
-    10.065,
-    10.675,
-    11.285,
-    11.895,
-    12.505,
-    13.115,
-    13.725,
-    14.335,
-    14.945,
-]
-
 
 # %%
-def read_da(fname: str) -> xr.DataArray:
-    """
-    Read in a data array from disk
+gridded_data_directory = config.historical_h2_gridding.output_directory
 
-    Verifies that the latitude dimension is increasing
-    """
-    da = xr.load_dataarray(fname)
-
-    # input4MIPs flipped the lat axis compared to the proxies
-    da = da.reindex(lat=list(reversed(da.lat)))
-    assert da.lat[0] < da.lat[-1]
-    return da
-
-
-# %%
 common_meta = dict(
     contact="Jared Lewis (jared.lewis@climate-resource.com)",
     dataset_category="emissions",
@@ -122,173 +70,67 @@ common_meta = dict(
 )
 
 
-def check_dims(a: xr.DataArray, b: xr.DataArray, dimensions: Iterable[str]) -> None:
-    """
-    Check that a subset of dimension of a xarray are consistent
-
-    Parameters
-    ----------
-    a
-        Item A
-    b
-        Item B
-    dimensions
-        Dimensions to check
-    """
-    assert a.shape == b.shape
-
-    for d in dimensions:
-        xr.testing.assert_allclose(a[d], b[d])
-
-
-def write_anthro(slice_filename: str, output_variable: str, title: str) -> None:
-    """
-    Write an anthropogenic emissions dataset in the Input4MIPs style
-
-    Parameters
-    ----------
-    slice_filename
-        Name of the existing file
-    output_variable
-        Name of the output variable
-    title
-        Title of the file
-
-        Added to the files metadata
-    """
-    example_file = read_da(slice_filename)
-    variable_id = f"{output_variable}_em_anthro"
-
-    ds = GriddedEmissionsDataset.create_empty(
-        time=example_file.time,
-        lat=example_file.lat,
-        lon=example_file.lon,
-        sectors=SECTOR_MAP,
-        version=config.input4mips_archive.version,
-        metadata=Input4MIPsMetadata(
-            title=title,
-            variable_id=variable_id,
-            **common_meta,
-        ),
-    )
-    ds.root_data_dir = str(config.input4mips_archive.results_archive)
-    ds.data[variable_id].attrs.update(
-        {
-            "units": "kg m-2 s-1",
-            "cell_methods": "time: mean",
-            "long_name": f"{output_variable} Anthropogenic Emissions",
-        }
-    )
-
-    for sector_idx, sector in enumerate(SECTOR_MAP):
-        new_data = read_da(slice_filename.replace("Agriculture", sector))
-
-        if new_data is not None:
-            check_dims(
-                ds.data[variable_id].isel(sector=sector_idx).drop(("sector",)),  # type: ignore
-                new_data,
-                ("lat", "lon", "time"),
-            )
-            # This will explode if not lined up correctly
-            ds.data[variable_id][:, sector_idx] = new_data[:]
-
-    # These sizes come from the input4MIPs data
-    ds.data[variable_id].encoding.update(
-        {"chunksizes": {"time": 1, "sector": 4, "lat": 180, "lon": 360}}
-    )
-    ds.write_slice(ds.data)
-
-
-def write_anthro_AIR(slice_filename: str, output_variable: str, title: str) -> None:
-    """
-    Write an aircraft anthropogenic emissions dataset in the Input4MIPs style
-
-    The aircraft files have an additional "levels" dimension
-
-    Parameters
-    ----------
-    slice_filename
-        Name of the existing file
-    output_variable
-        Name of the output variable
-    title
-        Title of the file
-
-        Added to the files metadata
-    """
-    data = read_da(slice_filename)
-    variable_id = f"{output_variable}_em_AIR_anthro"
-
-    ds = GriddedAircraftEmissionsDataset.create_empty(
-        time=data.time,
-        lat=data.lat,
-        lon=data.lon,
-        levels=LEVELS,
-        version=config.input4mips_archive.version,
-        metadata=Input4MIPsMetadata(
-            title=title,
-            variable_id=variable_id,
-            **common_meta,
-        ),
-    )
-    ds.root_data_dir = str(config.input4mips_archive.results_archive)
-    ds.data[variable_id].attrs.update(
-        {
-            "units": "kg m-2 s-1",
-            "cell_methods": "time: mean",
-            "long_name": f"{output_variable} Anthropogenic Emissions",
-        }
-    )
-    del ds.data["level_bounds"]
-
-    updated_data = data.transpose(*ds.dimensions)
-    check_dims(
-        ds.data[variable_id],
-        updated_data,
-        ("level", "lat", "lon", "time"),
-    )
-
-    ds.data[variable_id][:] = updated_data[:]
-    # These sizes come from the input4MIPs data
-    ds.data[variable_id].encoding.update(
-        {"chunksizes": {"time": 1, "level": 13, "lat": 180, "lon": 360}}
-    )
-    ds.write_slice(ds.data)
-
-
 # %%
 jobs = []
 
 
 # Use agriculture as a placeholder
 # Other sectors are also read when generating the output files
-non_aircraft_files = config.historical_h2_gridding.output_directory.glob(
-    "*Agriculture*.nc"
-)
-aircraft_files = config.historical_h2_gridding.output_directory.glob("*Aircraft*.nc")
+non_aircraft_files = gridded_data_directory.glob("*Agriculture*.nc")
+aircraft_files = gridded_data_directory.glob("*Aircraft*.nc")
+
+
+def process_slice(func: SupportsWriteSlice, year_slice: str, title: str) -> None:
+    """
+    Generate a historical input4MIPs data slice
+    """
+    # Checks that there is a single matching slice
+    example_file = find_gridded_slice(
+        "H2",
+        "Energy Sector",
+        slice_years=year_slice,
+        gridded_data_directory=gridded_data_directory,
+    )
+
+    if example_file is None:
+        return
+    func(
+        example_file,
+        "H2",
+        version=config.input4mips_archive.version,
+        years_slice=year_slice,
+        common_meta={**common_meta, "title": title},
+        root_data_directory=config.input4mips_archive.results_archive,
+        gridded_data_directory=gridded_data_directory,
+        baseline=None,
+    )
+
 
 # %%
+for slice_path in non_aircraft_files:
+    # Emissions_H2_Agriculture_Patterson_historical_190001-192512.nc
+    year_slice = slice_path.stem.split("_")[-1]
 
-for slice_filename in sorted(list(non_aircraft_files) + list(aircraft_files)):
-    fname = str(slice_filename)
-    if "Aircraft" in fname:
-        jobs.append(
-            (
-                write_anthro_AIR,
-                fname,
-                "H2",
-                "Historical anthropogenic aircraft emissions of H2 prepared for CSIRO",
-            )
+    jobs.append(
+        (
+            process_slice,
+            write_anthropogenic_slice,
+            year_slice,
+            "Historical anthropogenic emissions of H2 prepared for CSIRO",
         )
-    else:
-        jobs.append(
-            (
-                write_anthro,
-                fname,
-                "H2",
-                "Historical anthropogenic emissions of H2 prepared for CSIRO",
-            )
+    )
+
+for slice_path in aircraft_files:
+    year_slice = slice_path.stem.split("_")[-1]
+    jobs.append(
+        (
+            process_slice,
+            write_anthropogenic_AIR_slice,
+            year_slice,
+            "Historical anthropogenic aircraft emissions of H2 prepared for CSIRO",
         )
+    )
+
 len(jobs)
 
 

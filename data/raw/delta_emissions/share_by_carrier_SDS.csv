@@ -1,0 +1,21 @@
+variable,carrier,sector,region,model,scenario,comment,source,unit,2030,2040,2050
+Share by Carrier|H2,H2,Total,World,IEA NZE 2021 and WEO 2021,SDS,,IEA WEO 2021,%,84,76,64
+Share by Carrier|H2|Energy Sector,H2,Energy Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,94,83,72
+Share by Carrier|H2|International Shipping,H2,International Shipping,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,1,3,4
+Share by Carrier|H2|Aircraft,H2,Aircraft,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|H2|Transportation Sector,H2,Transportation Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,5,14,24
+Share by Carrier|NH3,NH3,Total,World,IEA NZE 2021 and WEO 2021,SDS,,IEA WEO 2021,%,8,14,26
+Share by Carrier|NH3|Energy Sector,NH3,Energy Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,43,41,30
+Share by Carrier|NH3|International Shipping,NH3,International Shipping,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,57,59,70
+Share by Carrier|NH3|Aircraft,NH3,Aircraft,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|NH3|Transportation Sector,NH3,Transportation Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|CH4,CH4,Total,World,IEA NZE 2021 and WEO 2021,SDS,,IEA WEO 2021,%,0,0,0
+Share by Carrier|CH4|Energy Sector,CH4,Energy Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,99,96,96
+Share by Carrier|CH4|International Shipping,CH4,International Shipping,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,1,4,4
+Share by Carrier|CH4|Aircraft,CH4,Aircraft,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|CH4|Transportation Sector,CH4,Transportation Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|Synthetic Fuels,Synthetic Fuels,Total,World,IEA NZE 2021 and WEO 2021,SDS,,IEA WEO 2021,%,8,10,10
+Share by Carrier|Synthetic Fuels|Energy Sector,Synthetic Fuels,Energy Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,12,5,2
+Share by Carrier|Synthetic Fuels|International Shipping,Synthetic Fuels,International Shipping,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,0,0,0
+Share by Carrier|Synthetic Fuels|Aircraft,Synthetic Fuels,Aircraft,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,78,89,92
+Share by Carrier|Synthetic Fuels|Transportation Sector,Synthetic Fuels,Transportation Sector,World,IEA NZE 2021 and WEO 2021,SDS,,"IEA NZE 2021 Fig 2_19 and Fig 3_08, and Table 2.7",% carrier,10,6,6

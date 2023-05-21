@@ -13,6 +13,7 @@ from typing import Any, Literal
 
 from attrs import define
 
+from local.h2_adjust.timeseries import TimeseriesExtension
 from local.pydoit_nb.checklist import get_checklist_file
 from local.pydoit_nb.gen_notebook_tasks import gen_run_notebook_tasks
 from local.pydoit_nb.notebooks import NotebookStep, SingleNotebookDirStep
@@ -83,33 +84,126 @@ class ConfigInput4MIPs:
 
 
 @define
+class Rename:
+    """
+    Configuration for a renaming operation
+
+    Akin to a :func:`scmdata.ScmRun.set_meta`
+    """
+
+    dimension: str
+    """Dimension to affect"""
+    target: str
+    """Existing value
+
+    To select the entire column use '*'
+    """
+    to: str
+    """New value"""
+
+
+@define
+class TimeseriesOperation:
+    """
+    Operation to apply to a set of timeseries
+
+    This includes filtering to select data, renaming metadata values and
+    adding additional metadat
+    """
+
+    input_file: Path
+    """Timeseries file"""
+
+    filters: dict[str, Any]
+    """Arguments to pass to :func:`scmdata.ScmRun.filter`"""
+    renames: list[Rename] = []
+    """Metadata to update in the filtered metadata"""
+
+
+@define
+class ConfigEmissions:
+    """
+    Configuration representing the merged set of emissions
+    """
+
+    cleaning_operations: list[TimeseriesOperation]
+    """Operations to apply to `raw_scenario` to prepare it"""
+
+    metadata: dict[str, str]
+    """Additional dimensions to update for the cleaned set of timeseries"""
+
+    input_scenario: Path
+    """
+    Input emissions scenario
+
+    This is the raw scenario after the cleaning operations have been performed
+    """
+
+    complete_scenario: Path
+    """
+    A complete set of emissions including H2
+
+    This is the key output from D2
+    """
+
+    magicc_scenario: Path
+    """
+    Emissions scenario formatted for use by MAGICC
+    """
+
+    complete_scenario_countries: Path
+
+    figure_by_sector: Path
+    figure_by_sector_only_modified: Path
+    figure_vs_rcmip: Path
+
+
+@define
+class ConfigDataEmissionsInputs:
+    """
+    Input files for calculating the change in emissions
+
+    # TODO: Document what exactually is expected in these files
+    """
+
+    share_by_carrier: Path
+    """Shares of each carrier fuel"""
+    leakage_rates: Path
+    """Leakage rate for each sector/gas"""
+
+    emissions_intensities_production: Path
+    """Emissions intensities from the production of an H2 Fuel source"""
+    emissions_intensities_combustion: Path
+    """Emissions intensities from the combustion of H2-related fuels"""
+
+
+@define
 class ConfigDeltaEmissions:
     """
     Configuration for calculating change in emissions
     """
 
-    input_file: Path
-    """Input file"""
+    inputs: ConfigDataEmissionsInputs
+    """Raw input files"""
+    clean: ConfigDataEmissionsInputs
+    """Clean and extended files"""
 
-    output_file: Path
-    """Output file"""
+    energy_by_carrier: Path
 
+    extensions: list[TimeseriesExtension]
 
-@define
-class ConfigAnthroBaseline:
-    """
-    Configuration for calculating anthropogenic baseline emissions
-    """
-
-    input_file: Path
-    """Input file"""
+    delta_emissions_complete: Path
+    delta_emissions_totals: Path
 
 
 @define
-class ConfigHistoricalH2Emissions:
+class ConfigBaselineH2Emissions:
     """
     Configuration for calculating the historical H2 emissions
     """
+
+    scenario: str
+    """SSP scenario from the RCMIP emissions dataset that is used for scaling"""
 
     baseline_source: Path
     """Source file for baseline H2 emissions"""
@@ -152,10 +246,18 @@ class Config:
     parameters into the notebooks via papermill.
     """
 
+    name: str
+    ssp_scenario: str
+
     output_notebook_dir: Path
     """Notebook output directory"""
 
-    historical_h2_emissions: ConfigHistoricalH2Emissions
+    emissions: ConfigEmissions
+    """
+    Configuration related to the emissions scenarios
+    """
+
+    historical_h2_emissions: ConfigBaselineH2Emissions
     """Configuration for calculating the baseline H2 emissions from existing industries"""
 
     historical_h2_gridding: ConfigGridding
@@ -174,11 +276,11 @@ class Config:
     delta_emissions: ConfigDeltaEmissions
     """Configuration for calculating the change in emissions"""
 
-    anthro_baseline: ConfigAnthroBaseline
-    """Configuration for calculating the change in anthropogenic baseline"""
+    projected_h2_emissions: ConfigBaselineH2Emissions
+    """Configuration for calculating the baseline H2 emissions from existing industries"""
 
-    output_final_figure: Path
-    """Output file for final figure"""
+    projected_gridding: ConfigGridding
+    """Configuration for the gridding of the the modified projected emissions"""
 
 
 def load_config_from_file(config_file: str) -> Config:
@@ -380,7 +482,7 @@ def get_notebook_steps(
     -------
         Notebook steps to run
     """
-    results_dir = (
+    historical_emissions_dir = (
         config.input4mips_archive.results_archive
         / "input4MIPs"
         / "CMIP6"
@@ -388,6 +490,15 @@ def get_notebook_steps(
         / "CR"
         / "CR-historical"
     )
+    projected_emissions_dir = (
+        config.input4mips_archive.results_archive
+        / "input4MIPs"
+        / "CMIP6"
+        / "ScenarioMIP"
+        / "CR"
+        / f"CR-{config.name}"
+    )
+
     # TODO: refactor into separate file
     historical_baseline_emissions = [
         SingleNotebookDirStep(
@@ -436,14 +547,128 @@ def get_notebook_steps(
             dependencies=(
                 get_checklist_file(config.historical_h2_gridding.output_directory),
             ),
-            targets=(get_checklist_file(results_dir),),
+            targets=(get_checklist_file(historical_emissions_dir),),
         ),
     ]
 
-    single_dir_steps = [
-        # H2 Historical
-        *historical_baseline_emissions,
+    # Projected Emissions steps
+    projected_emissions = [
+        SingleNotebookDirStep(
+            name="create the input emissions scenario",
+            notebook="200_projected_h2_emissions/200_make_input_scenario",
+            raw_notebook_ext=".py",
+            configuration=(
+                config.emissions.cleaning_operations,
+                config.emissions.metadata,
+            ),
+            dependencies=tuple(
+                set(op.input_file for op in config.emissions.cleaning_operations)
+            ),
+            targets=(config.emissions.input_scenario,),
+        ),
+        SingleNotebookDirStep(
+            name="extend input data to cover target period",
+            notebook="200_projected_h2_emissions/201_extend_timeseries",
+            raw_notebook_ext=".py",
+            configuration=(config.delta_emissions.extensions,),
+            dependencies=(
+                config.emissions.input_scenario,
+                config.delta_emissions.inputs.share_by_carrier,
+                config.delta_emissions.inputs.emissions_intensities_production,
+                config.delta_emissions.inputs.emissions_intensities_combustion,
+                config.delta_emissions.inputs.leakage_rates,
+            ),
+            targets=(
+                config.delta_emissions.energy_by_carrier,
+                config.delta_emissions.clean.share_by_carrier,
+                config.delta_emissions.clean.emissions_intensities_production,
+                config.delta_emissions.clean.emissions_intensities_combustion,
+                config.delta_emissions.clean.leakage_rates,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="calculate delta emissions from H2 usage",
+            notebook="200_projected_h2_emissions/210_calculate_delta_emissions",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=(
+                config.delta_emissions.energy_by_carrier,
+                config.delta_emissions.clean.share_by_carrier,
+                config.delta_emissions.clean.emissions_intensities_production,
+                config.delta_emissions.clean.emissions_intensities_combustion,
+                config.delta_emissions.clean.leakage_rates,
+            ),
+            targets=(
+                config.delta_emissions.delta_emissions_complete,
+                config.delta_emissions.delta_emissions_totals,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="calculate baseline projected emissions",
+            notebook="200_projected_h2_emissions/220_calculate_baseline_anthropogenic",
+            raw_notebook_ext=".py",
+            configuration=(config.projected_h2_emissions,),
+            dependencies=(config.projected_h2_emissions.baseline_source,),
+            targets=(
+                config.projected_h2_emissions.baseline_h2_emissions_regions,
+                config.projected_h2_emissions.figure_baseline_by_source,
+                config.projected_h2_emissions.figure_baseline_by_sector,
+                config.projected_h2_emissions.figure_baseline_by_source_and_sector,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="merge projected emissions to form a scenario",
+            notebook="200_projected_h2_emissions/230_merge_emissions",
+            raw_notebook_ext=".py",
+            configuration=(
+                config.name,
+                config.ssp_scenario,
+            ),
+            dependencies=(
+                config.emissions.input_scenario,
+                config.delta_emissions.delta_emissions_complete,
+                config.projected_h2_emissions.baseline_h2_emissions_regions,
+            ),
+            targets=(
+                config.emissions.complete_scenario,
+                config.emissions.magicc_scenario,
+                # Figures
+                config.emissions.figure_by_sector,
+                config.emissions.figure_by_sector_only_modified,
+                config.emissions.figure_vs_rcmip,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="downscale projected H2 regional emissions to countries",
+            notebook="200_projected_h2_emissions/240_downscale_projected_emissions",
+            raw_notebook_ext=".py",
+            configuration=(
+                config.historical_h2_emissions.baseline_h2_emissions_countries,
+            ),
+            dependencies=(config.emissions.complete_scenario,),
+            targets=(config.emissions.complete_scenario_countries,),
+        ),
+        SingleNotebookDirStep(
+            name="grid projected H2 emissions",
+            notebook="200_projected_h2_emissions/250_grid_projected_emissions",
+            raw_notebook_ext=".py",
+            configuration=(config.projected_gridding,),
+            dependencies=(config.emissions.complete_scenario_countries,),
+            targets=(get_checklist_file(config.projected_gridding.output_directory),),
+        ),
+        SingleNotebookDirStep(
+            name="write projected input4MIPS results",
+            notebook="200_projected_h2_emissions/260_write_projected_input4MIPs",
+            raw_notebook_ext=".py",
+            configuration=(config.input4mips_archive,),
+            dependencies=(
+                get_checklist_file(config.projected_gridding.output_directory),
+            ),
+            targets=(get_checklist_file(projected_emissions_dir),),
+        ),
     ]
+
+    single_dir_steps = [*historical_baseline_emissions, *projected_emissions]
 
     out = [
         sds.to_notebook_step(

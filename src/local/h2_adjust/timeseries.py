@@ -5,7 +5,9 @@ import logging
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import scmdata
+from attrs import define
 from pyam import IamDataFrame  # type: ignore
 
 from local.h2_adjust.constants import END_YEAR, START_YEAR
@@ -13,13 +15,31 @@ from local.h2_adjust.constants import END_YEAR, START_YEAR
 logger = logging.getLogger(__name__)
 
 
-# TODO: type extension
-def _apply_extension(extension: dict, run: scmdata.ScmRun) -> scmdata.ScmRun:
+@define
+class TimeseriesExtension:
+    """
+    Extend a set of timeseries using a rate of change
+    """
+
+    filters: dict[str, Any]
+    """Filter arguments for the timeseries to be extended"""
+    rate: float
+    """Annual percentage change to apply to the timeseries
+
+    0 is no change. Negative decreases, positive increases
+    """
+    start_year: int
+    """Start year of the extension"""
+    end_year: int
+    """When to stop applying the extension"""
+
+
+def _apply_extension(
+    extension: TimeseriesExtension, run: scmdata.ScmRun
+) -> scmdata.ScmRun:
     # Try filter
     try:
-        filtered: scmdata.ScmRun = run.filter(
-            **extension["filters"], log_if_empty=False
-        )
+        filtered: scmdata.ScmRun = run.filter(**extension.filters, log_if_empty=False)
     except ValueError:
         # Invalid filters provided. Skip this extension
         filtered = scmdata.ScmRun()
@@ -29,24 +49,26 @@ def _apply_extension(extension: dict, run: scmdata.ScmRun) -> scmdata.ScmRun:
     logger.info(f"Extending using {extension}")
 
     # Apply rate extension
-    rate = extension.get("rate", 0)
-    start_year = max(extension.get("start_year", START_YEAR), filtered["year"].min())
+    start_year = max(
+        extension.start_year,
+        filtered["year"].min(),
+    )
     if start_year not in filtered["year"].tolist():
         raise ValueError(f"{start_year} not present")  # noqa: TRY003
-    end_year = extension.get("end_year", END_YEAR)
+    end_year = extension.end_year
 
     extrapolated = filtered.interpolate(
         np.arange(str(start_year), str(end_year + 1), dtype="datetime64[Y]"),
         extrapolation_type="constant",
     ).timeseries()
 
-    extrapolated.iloc[0, 1:] = extrapolated.iloc[0, 0:-1] * (1 + rate)
+    extrapolated.iloc[0, 1:] = extrapolated.iloc[0, 0:-1] * (1 + extension.rate)
     return scmdata.ScmRun(extrapolated)
 
 
 def extend(
     data: scmdata.ScmRun,
-    config: Any = None,  # TODO: Is this used?
+    extensions: list[TimeseriesExtension],
     method: str = "constant",
     start_year: int = START_YEAR,
     end_year: int = END_YEAR,
@@ -58,6 +80,8 @@ def extend(
     ----------
     data
         Timeseries to extend
+    extensions
+        Custom extensions to apply to a subset of data
     method
         Default method for extending timeseries. Options are
         * "linear" (Use growth rate from last datapoints)
@@ -67,17 +91,13 @@ def extend(
     end_year
         Year which the output timeseries should end (inclusive)
     """
+    res = []
     data = scmdata.ScmRun(data.timeseries().dropna(how="all").dropna(how="all", axis=1))
     ts = data.timeseries()
-    res = []
 
-    if config:
-        extensions = config["config"].get("extensions")
-    else:
-        extensions = []
-
-    def _extend(df, extensions):
+    def _extend(df: pd.DataFrame) -> scmdata.ScmRun:
         clean_run = scmdata.ScmRun(df.dropna(how="all").dropna(how="all", axis=1))
+        assert len(clean_run) == 1  # noqa: S101
 
         for extension in extensions:
             clean_run = _apply_extension(extension, clean_run)
@@ -89,7 +109,7 @@ def extend(
         )
 
     for i in range(len(data)):
-        res.append(_extend(ts.iloc[[i]], extensions))
+        res.append(_extend(ts.iloc[[i]]))
 
     return scmdata.run_append(res)
 

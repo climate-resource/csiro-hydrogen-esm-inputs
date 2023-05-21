@@ -39,10 +39,10 @@ config_file: str = "notebooks/dev.yaml"  # config file
 
 # %%
 config = load_config_from_file(config_file)
-
+grid_config = config.historical_h2_gridding
 
 # %%
-output_dir = config.historical_h2_gridding.output_directory
+output_dir = grid_config.output_directory
 output_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -51,10 +51,10 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 # %%
 historical_emissions = scmdata.ScmRun(
-    str(config.historical_h2_emissions.baseline_h2_emissions_countries)
+    config.historical_h2_emissions.baseline_h2_emissions_countries
 )
 
-if config.historical_h2_gridding.fast:
+if grid_config.fast:
     logger.warning(
         "Fast mode enabled. Only processing a subset of years. DO NOT USE IN PRODUCTION"
     )
@@ -65,10 +65,10 @@ historical_emissions.get_unique_meta("sector")
 
 # %%
 gridder = Gridder(
-    grid_dir=str(config.historical_h2_gridding.grid_data_directory),
-    proxy_definition_file=str(config.historical_h2_gridding.proxy_mapping),
-    seasonality_mapping_file=str(config.historical_h2_gridding.seasonality_mapping),
-    sector_type=config.historical_h2_gridding.sector_type,
+    grid_dir=str(grid_config.grid_data_directory),
+    proxy_definition_file=str(grid_config.proxy_mapping),
+    seasonality_mapping_file=str(grid_config.seasonality_mapping),
+    sector_type=grid_config.sector_type,
 )
 
 gridded_emissions = gridder.grid(

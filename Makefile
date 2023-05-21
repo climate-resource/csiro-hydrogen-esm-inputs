@@ -30,11 +30,11 @@ checks:  ## run all the linting checks of the codebase
 
 .PHONY: black
 black:  ## format the code using black
-	poetry run black dodo.py src notebooks/*.py
+	poetry run black dodo.py src notebooks
 
 .PHONY: ruff-fixes
 ruff-fixes:  ## fix the code using ruff
-	poetry run ruff dodo.py src notebooks/*.py --fix
+	poetry run ruff dodo.py src notebooks --fix
 
 .PHONY: check-commit-messages
 check-commit-messages:  ## check commit messages

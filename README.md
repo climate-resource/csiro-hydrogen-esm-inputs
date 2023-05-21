@@ -83,3 +83,9 @@ data/processed
     ├── seasonality
     └── seasonality-temp
 ```
+
+If input4MIPs data are available they will be included in
+the gridded results for sectors that have not been modified.
+If no-data are available these non-modified sectors will be set to
+nan.
+TODO: write the list of variables and sources that should be downloaded.s

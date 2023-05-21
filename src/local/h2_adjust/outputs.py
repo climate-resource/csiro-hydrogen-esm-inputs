@@ -6,7 +6,8 @@ import os
 import uuid
 from collections.abc import Iterable, Sequence
 from datetime import datetime
-from typing import Any
+from pathlib import Path
+from typing import Any, Protocol
 
 import numpy as np
 import xarray as xr
@@ -52,6 +53,108 @@ optional_attributes = [
     "table_id",
     "table_info",
 ]
+
+SECTOR_MAP = [
+    "Agriculture",
+    "Energy Sector",
+    "Industrial Sector",
+    "Transportation Sector",
+    "Residential, Commercial, Other",
+    "Solvents production and application",
+    "Waste",
+    "International Shipping",
+    # "Negative CO2 Emissions", # CO2 also includes this additional sector, but we aren't regridding that here
+]
+LEVELS = [
+    0.305,
+    0.915,
+    1.525,
+    2.135,
+    2.745,
+    3.355,
+    3.965,
+    4.575,
+    5.185,
+    5.795,
+    6.405,
+    7.015,
+    7.625,
+    8.235,
+    8.845,
+    9.455,
+    10.065,
+    10.675,
+    11.285,
+    11.895,
+    12.505,
+    13.115,
+    13.725,
+    14.335,
+    14.945,
+]
+
+
+def _load_slice(filename: str | Path) -> xr.DataArray:
+    da = xr.load_dataarray(filename)
+
+    # input4MIPs flipped the lat axis compared to the proxies
+    da = da.reindex(lat=list(reversed(da.lat)))
+    assert da.lat[0] < da.lat[-1]  # noqa
+    return da
+
+
+def find_gridded_slice(
+    variable: str, sector: str, slice_years: str, gridded_data_directory: Path
+) -> xr.DataArray | None:
+    """
+    Get a single slice of gridded data
+
+    Parameters
+    ----------
+    variable
+        Variable name
+    sector
+        Sector
+    slice_years
+        Filter for the years that a dataset covers
+
+    gridded_data_directory
+        Directory containing the preprocessed gridded files
+
+    Returns
+    -------
+        If found the loaded slice
+    """
+    matches = list(
+        gridded_data_directory.rglob(f"Emissions_{variable}_{sector}*_{slice_years}.nc")
+    )
+
+    if len(matches) > 1:
+        raise ValueError(f"More than one match exists: {matches}")  # noqa
+    if matches:
+        return _load_slice(matches[0])
+    logger.info(f"No matching existing file found {variable}/{sector}")
+
+    return None
+
+
+def check_dims(a: xr.DataArray, b: xr.DataArray, dimensions: Iterable[str]) -> None:
+    """
+    Check that a subset of dimension of a xarray are consistent
+
+    Parameters
+    ----------
+    a
+        Item A
+    b
+        Item B
+    dimensions
+        Dimensions to check
+    """
+    assert a.shape == b.shape  # noqa
+
+    for d in dimensions:
+        xr.testing.assert_allclose(a[d], b[d])
 
 
 @define
@@ -336,3 +439,201 @@ class GriddedAircraftEmissionsDataset(Input4MIPsDataset):
         da.name = metadata.variable_id
 
         return cls(da.to_dataset(), metadata, version)
+
+
+class SupportsWriteSlice(Protocol):
+    """
+    Interface for writing a slice of data in the input4MIPs form
+    """
+
+    def __call__(  # noqa: PLR0913, D102
+        self,
+        example_da: xr.DataArray,
+        output_variable: str,
+        version: str,
+        years_slice: str,
+        common_meta: dict[str, str],
+        root_data_directory: Path,
+        gridded_data_directory: Path,
+        baseline: xr.Dataset | None = None,
+    ) -> None:
+        ...
+
+
+def write_anthropogenic_slice(  # noqa: PLR0913
+    example_da: xr.DataArray,
+    output_variable: str,
+    version: str,
+    years_slice: str,
+    common_meta: dict[str, str],
+    root_data_directory: Path,
+    gridded_data_directory: Path,
+    baseline: xr.Dataset | None = None,
+) -> None:
+    """
+    Write an anthropogenic emissions dataset in the Input4MIPs style
+
+    Parameters
+    ----------
+    example_da
+    output_variable
+        Variable Identifier
+    version
+        Version identifier for the data release
+    years_slice
+        Used to differentate between a varable with multiple timeslices
+
+        #TODO: remove the need for this and gridded_data_directory by using
+        dependency injection
+    common_meta
+        Metadata to add to the
+    root_data_directory
+        Where to write the output data
+    gridded_data_directory
+        Where the gridded data are located
+    baseline
+        Existing dataset used to infill any missing sectors
+    """
+    variable_id = f"{output_variable}_em_anthro"
+
+    ds = GriddedEmissionsDataset.create_empty(
+        time=example_da.time,
+        lat=example_da.lat,
+        lon=example_da.lon,
+        sectors=SECTOR_MAP,
+        version=version,
+        metadata=Input4MIPsMetadata(
+            variable_id=variable_id,
+            **common_meta,
+        ),
+    )
+    ds.root_data_dir = str(root_data_directory)
+    ds.data[variable_id].attrs.update(
+        {
+            "units": "kg m-2 s-1",
+            "cell_methods": "time: mean",
+            "long_name": f"{output_variable} Anthropogenic Emissions",
+        }
+    )
+
+    if baseline is not None:
+        logger.info(f"Using baseline for {variable_id}")
+        check_dims(
+            ds.data[variable_id],
+            baseline[variable_id],
+            ("lat", "sector", "lon", "time"),
+        )
+        ds.data[variable_id][:] = baseline[variable_id][:]
+
+    for sector_idx, sector in enumerate(SECTOR_MAP):
+        new_data = find_gridded_slice(
+            output_variable,
+            sector,
+            years_slice,
+            gridded_data_directory=gridded_data_directory,
+        )
+
+        if new_data is not None:
+            check_dims(
+                ds.data[variable_id].isel(sector=sector_idx).drop(("sector",)),  # type: ignore
+                new_data,
+                ("lat", "lon", "time"),
+            )
+            # This will explode if not lined up correctly
+            ds.data[variable_id][:, sector_idx] = new_data[:]
+
+    # These sizes come from the input4MIPs data
+    ds.data[variable_id].encoding.update(
+        {"chunksizes": {"time": 1, "sector": 4, "lat": 180, "lon": 360}}
+    )
+    ds.write_slice(ds.data)
+
+
+def write_anthropogenic_AIR_slice(  # noqa: PLR0913
+    example_da: xr.DataArray,
+    output_variable: str,
+    version: str,
+    years_slice: str,
+    common_meta: dict[str, str],
+    root_data_directory: Path,
+    gridded_data_directory: Path,
+    baseline: xr.Dataset | None = None,
+) -> None:
+    """
+    Write an aircraft anthropogenic emissions dataset in the Input4MIPs style
+
+    Parameters
+    ----------
+    example_da
+    output_variable
+        Variable Identifier
+    version
+        Version identifier for the data release
+    years_slice
+        Used to differentiate between a variable with multiple timeslices
+
+        #TODO: remove the need for this and gridded_data_directory by using
+        dependency injection
+    common_meta
+        Metadata to add to the
+    root_data_directory
+        Where to write the output data
+    gridded_data_directory
+        Where the gridded data are located
+    baseline
+        Existing dataset used to infill any missing sectors
+    """
+    variable_id = f"{output_variable}_em_AIR_anthro"
+
+    ds = GriddedAircraftEmissionsDataset.create_empty(
+        time=example_da.time,
+        lat=example_da.lat,
+        lon=example_da.lon,
+        levels=LEVELS,
+        version=version,
+        metadata=Input4MIPsMetadata(
+            variable_id=variable_id,
+            **common_meta,
+        ),
+    )
+    ds.root_data_dir = str(root_data_directory)
+    ds.data[variable_id].attrs.update(
+        {
+            "units": "kg m-2 s-1",
+            "cell_methods": "time: mean",
+            "long_name": f"{output_variable} Anthropogenic Emissions",
+        }
+    )
+    del ds.data["level_bounds"]
+
+    if baseline is not None:
+        logger.info(f"Using baseline for {variable_id}")
+        check_dims(
+            ds.data[variable_id], baseline[variable_id], ("level", "lat", "lon", "time")
+        )
+
+        # Override the level dimension. There might be floating point errors which cause xr to explode
+        baseline["level"] = ds.data.level
+        assert ds.data[variable_id].shape == baseline[variable_id].shape  # noqa
+        ds.data[variable_id][:] = baseline[variable_id][:]
+
+    updated_data = find_gridded_slice(
+        output_variable,
+        "Aircraft",
+        years_slice,
+        gridded_data_directory=gridded_data_directory,
+    )
+    if updated_data is not None:
+        updated_data = updated_data.transpose(*ds.dimensions)
+        check_dims(
+            ds.data[variable_id],
+            updated_data,
+            ("level", "lat", "lon", "time"),
+        )
+
+        ds.data[variable_id][:] = updated_data[:]
+    # These sizes come from the input4MIPs data
+    ds.data[variable_id].encoding.update(
+        {"chunksizes": {"time": 1, "level": 13, "lat": 180, "lon": 360}}
+    )
+    ds.write_slice(ds.data)

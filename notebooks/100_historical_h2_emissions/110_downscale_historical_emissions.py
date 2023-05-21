@@ -185,7 +185,7 @@ downscaled_regions_sum = downscaled_regions.process_over("region", "sum")
 downscaled_regions_sum["region"] = "World"
 downscaled_regions_sum = scmdata.ScmRun(downscaled_regions_sum)
 temp = downscaled_regions_sum.filter(variable="*H2*", year=[1850, 2015]).timeseries()
-temp.unstack("downscaling").round(3)  # noqa: PD010
+temp.unstack("downscaling").round(3)
 
 # %%
 results_to_output = scmdata.run_append(

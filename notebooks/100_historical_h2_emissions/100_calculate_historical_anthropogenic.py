@@ -49,7 +49,7 @@ config = load_config_from_file(config_file)
 
 # %%
 plt.rcParams["figure.figsize"] = (12, 8)
-h2_config = config.historical_h2_emissions
+baseline_config = config.historical_h2_emissions
 
 # %% [markdown]
 # # Load data
@@ -66,7 +66,7 @@ ceds_book = shelf.load("ceds", version="v2016_07_26")
 # These are only used until 2015
 proxy_emissions = (
     rcmip_book.timeseries("magicc")
-    .filter(scenario="ssp245", region="World", year=range(1850, 2101))
+    .filter(scenario=baseline_config.scenario, region="World", year=range(1850, 2101))
     .resample("AS")
 ).drop_meta(["activity_id", "mip_era"])
 proxy_emissions.get_unique_meta("variable")
@@ -100,7 +100,7 @@ ceds_data_global.get_unique_meta("variable")
 # Baseline values to scale
 # These are formatted as a scmrun with a single year. The year is used to calculate
 # the ratio used to scale
-baseline_values = scmdata.ScmRun(str(h2_config.baseline_source))
+baseline_values = scmdata.ScmRun(str(baseline_config.baseline_source))
 # We only support scaling from a single annual value
 year_to_scale = int(baseline_values["year"].unique()[0])
 year_to_scale
@@ -112,13 +112,11 @@ year_to_scale
 
 # The proxy timeseries used to scale the anthropogenic baseline H2 emissions
 # CEDs data used to split up sectors
-anthropogenic_proxy = h2_config.anthropogenic_proxy
+anthropogenic_proxy = baseline_config.anthropogenic_proxy
 print(anthropogenic_proxy)
 
 
 # %%
-
-
 def scale_by_proxy(baseline: pd.DataFrame | scmdata.ScmRun) -> scmdata.ScmRun:
     """
     Scale a single value by a proxy timeseries to produce a timeseries
@@ -336,10 +334,8 @@ totals.lineplot(hue="sector")
 
 # Create plot directories
 # this assumes that all figures go in the same directory
-config.historical_h2_emissions.figure_baseline_by_sector.parent.mkdir(
-    parents=True, exist_ok=True
-)
-plt.savefig(config.historical_h2_emissions.figure_baseline_by_sector)
+baseline_config.figure_baseline_by_sector.parent.mkdir(parents=True, exist_ok=True)
+plt.savefig(baseline_config.figure_baseline_by_sector)
 
 # %%
 fig = plt.figure(figsize=(12, 8))
@@ -356,7 +352,7 @@ totals = totals.append(
 
 totals.lineplot(hue="source")
 
-plt.savefig(h2_config.figure_baseline_by_source)
+plt.savefig(baseline_config.figure_baseline_by_source)
 
 # %%
 axs = plt.figure(figsize=(12, 8 * 4)).subplots(4)
@@ -367,12 +363,12 @@ for i, source in enumerate(sectoral_emissions.groupby("source")):
     source.lineplot(ax=ax, hue="sector")
 
 plt.tight_layout()
-plt.savefig(h2_config.figure_baseline_by_source_and_sector)
+plt.savefig(baseline_config.figure_baseline_by_source_and_sector)
 
 # %%
 sectoral_regional_emissions["scenario"] = scenario
 sectoral_regional_emissions.filter(year=range(1850, 2015 + 1)).to_csv(
-    h2_config.baseline_h2_emissions_regions
+    baseline_config.baseline_h2_emissions_regions
 )
 
 # %%
