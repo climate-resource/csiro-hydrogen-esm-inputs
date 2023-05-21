@@ -1,0 +1,111 @@
+variable,sector,scaler_name,scaler_variable_id,scaler_source_id,scaler_sector
+CO,AGS,relative_change,CO-em-anthro,{ssp_scenario},Agriculture
+CO,AWB,relative_change,CO-em-anthro,{ssp_scenario},Agriculture
+CO,CHE,relative_change,CO-em-anthro,{ssp_scenario},Solvents production and application
+CO,ENE,relative_change,CO-em-anthro,{ssp_scenario},Energy Sector
+CO,FFF,relative_change,CO-em-anthro,{ssp_scenario},Energy Sector
+CO,FOO_PAP,relative_change,CO-em-anthro,{ssp_scenario},Agriculture
+CO,IND,relative_change,CO-em-anthro,{ssp_scenario},Industrial Sector
+CO,IRO,relative_change,CO-em-anthro,{ssp_scenario},Industrial Sector
+CO,MNM,relative_change,CO-em-anthro,{ssp_scenario},Agriculture
+CO,NEU,relative_change,CO-em-anthro,{ssp_scenario},Industrial Sector
+CO,NFE,relative_change,CO-em-anthro,{ssp_scenario},Industrial Sector
+CO,NMM,relative_change,CO-em-anthro,{ssp_scenario},Industrial Sector
+CO,PRU_SOL,relative_change,CO-em-anthro,{ssp_scenario},Solvents production and application
+CO,RCO,relative_change,CO-em-anthro,{ssp_scenario},"Residential, Commercial, Other"
+CO,REF_TRF,relative_change,CO-em-anthro,{ssp_scenario},Energy Sector
+CO,SWD_INC,relative_change,CO-em-anthro,{ssp_scenario},Waste
+CO,SWD_LDF,relative_change,CO-em-anthro,{ssp_scenario},Waste
+CO,TNR_Other,relative_change,CO-em-anthro,{ssp_scenario},Transportation Sector
+CO,TNR_Ship,relative_change,CO-em-anthro,{ssp_scenario},International Shipping
+CO,TRO_RES,relative_change,CO-em-anthro,{ssp_scenario},Transportation Sector
+CO,TRO_noRES,relative_change,CO-em-anthro,{ssp_scenario},Transportation Sector
+CO,WWT,relative_change,CO-em-anthro,{ssp_scenario},Waste
+NOx,AGS,relative_change,NOx-em-anthro,{cr_h2_scenario},Agriculture
+NOx,AWB,relative_change,NOx-em-anthro,{cr_h2_scenario},Agriculture
+NOx,CHE,relative_change,NOx-em-anthro,{cr_h2_scenario},Solvents production and application
+NOx,ENE,relative_change,NOx-em-anthro,{cr_h2_scenario},Energy Sector
+NOx,FFF,relative_change,NOx-em-anthro,{cr_h2_scenario},Energy Sector
+NOx,FOO_PAP,relative_change,NOx-em-anthro,{cr_h2_scenario},Agriculture
+NOx,IND,relative_change,NOx-em-anthro,{cr_h2_scenario},Industrial Sector
+NOx,IRO,relative_change,NOx-em-anthro,{cr_h2_scenario},Industrial Sector
+NOx,MNM,relative_change,NOx-em-anthro,{cr_h2_scenario},Agriculture
+NOx,NEU,relative_change,NOx-em-anthro,{cr_h2_scenario},Industrial Sector
+NOx,NFE,relative_change,NOx-em-anthro,{cr_h2_scenario},Industrial Sector
+NOx,NMM,relative_change,NOx-em-anthro,{cr_h2_scenario},Industrial Sector
+NOx,PRU_SOL,relative_change,NOx-em-anthro,{cr_h2_scenario},Solvents production and application
+NOx,RCO,relative_change,NOx-em-anthro,{cr_h2_scenario},"Residential, Commercial, Other"
+NOx,REF_TRF,relative_change,NOx-em-anthro,{cr_h2_scenario},Energy Sector
+NOx,SWD_INC,relative_change,NOx-em-anthro,{cr_h2_scenario},Waste
+NOx,SWD_LDF,relative_change,NOx-em-anthro,{cr_h2_scenario},Waste
+NOx,TNR_Other,relative_change,NOx-em-anthro,{cr_h2_scenario},Transportation Sector
+NOx,TNR_Ship,relative_change,NOx-em-anthro,{cr_h2_scenario},International Shipping
+NOx,TRO_RES,relative_change,NOx-em-anthro,{cr_h2_scenario},Transportation Sector
+NOx,TRO_noRES,relative_change,NOx-em-anthro,{cr_h2_scenario},Transportation Sector
+NOx,WWT,relative_change,NOx-em-anthro,{cr_h2_scenario},Waste
+SO2,AGS,relative_change,SO2-em-anthro,{ssp_scenario},Agriculture
+SO2,AWB,relative_change,SO2-em-anthro,{ssp_scenario},Agriculture
+SO2,CHE,relative_change,SO2-em-anthro,{ssp_scenario},Solvents production and application
+SO2,ENE,relative_change,SO2-em-anthro,{ssp_scenario},Energy Sector
+SO2,FFF,relative_change,SO2-em-anthro,{ssp_scenario},Energy Sector
+SO2,FOO_PAP,relative_change,SO2-em-anthro,{ssp_scenario},Agriculture
+SO2,IND,relative_change,SO2-em-anthro,{ssp_scenario},Industrial Sector
+SO2,IRO,relative_change,SO2-em-anthro,{ssp_scenario},Industrial Sector
+SO2,MNM,relative_change,SO2-em-anthro,{ssp_scenario},Agriculture
+SO2,NEU,relative_change,SO2-em-anthro,{ssp_scenario},Industrial Sector
+SO2,NFE,relative_change,SO2-em-anthro,{ssp_scenario},Industrial Sector
+SO2,NMM,relative_change,SO2-em-anthro,{ssp_scenario},Industrial Sector
+SO2,PRU_SOL,relative_change,SO2-em-anthro,{ssp_scenario},Solvents production and application
+SO2,RCO,relative_change,SO2-em-anthro,{ssp_scenario},"Residential, Commercial, Other"
+SO2,REF_TRF,relative_change,SO2-em-anthro,{ssp_scenario},Energy Sector
+SO2,SWD_INC,relative_change,SO2-em-anthro,{ssp_scenario},Waste
+SO2,SWD_LDF,relative_change,SO2-em-anthro,{ssp_scenario},Waste
+SO2,TNR_Other,relative_change,SO2-em-anthro,{ssp_scenario},Transportation Sector
+SO2,TNR_Ship,relative_change,SO2-em-anthro,{ssp_scenario},International Shipping
+SO2,TRO_RES,relative_change,SO2-em-anthro,{ssp_scenario},Transportation Sector
+SO2,TRO_noRES,relative_change,SO2-em-anthro,{ssp_scenario},Transportation Sector
+SO2,WWT,relative_change,SO2-em-anthro,{ssp_scenario},Waste
+PM10,AGS,relative_change,BC-em-anthro,{ssp_scenario},Agriculture
+PM10,AWB,relative_change,BC-em-anthro,{ssp_scenario},Agriculture
+PM10,CHE,relative_change,BC-em-anthro,{ssp_scenario},Solvents production and application
+PM10,ENE,relative_change,BC-em-anthro,{ssp_scenario},Energy Sector
+PM10,FFF,relative_change,BC-em-anthro,{ssp_scenario},Energy Sector
+PM10,FOO_PAP,relative_change,BC-em-anthro,{ssp_scenario},Agriculture
+PM10,IND,relative_change,BC-em-anthro,{ssp_scenario},Industrial Sector
+PM10,IRO,relative_change,BC-em-anthro,{ssp_scenario},Industrial Sector
+PM10,MNM,relative_change,BC-em-anthro,{ssp_scenario},Agriculture
+PM10,NEU,relative_change,BC-em-anthro,{ssp_scenario},Industrial Sector
+PM10,NFE,relative_change,BC-em-anthro,{ssp_scenario},Industrial Sector
+PM10,NMM,relative_change,BC-em-anthro,{ssp_scenario},Industrial Sector
+PM10,PRU_SOL,relative_change,BC-em-anthro,{ssp_scenario},Solvents production and application
+PM10,RCO,relative_change,BC-em-anthro,{ssp_scenario},"Residential, Commercial, Other"
+PM10,REF_TRF,relative_change,BC-em-anthro,{ssp_scenario},Energy Sector
+PM10,SWD_INC,relative_change,BC-em-anthro,{ssp_scenario},Waste
+PM10,SWD_LDF,relative_change,BC-em-anthro,{ssp_scenario},Waste
+PM10,TNR_Other,relative_change,BC-em-anthro,{ssp_scenario},Transportation Sector
+PM10,TNR_Ship,relative_change,BC-em-anthro,{ssp_scenario},International Shipping
+PM10,TRO_RES,relative_change,BC-em-anthro,{ssp_scenario},Transportation Sector
+PM10,TRO_noRES,relative_change,BC-em-anthro,{ssp_scenario},Transportation Sector
+PM10,WWT,relative_change,BC-em-anthro,{ssp_scenario},Waste
+NMVOC,AGS,relative_change,VOC-em-anthro,{ssp_scenario},Agriculture
+NMVOC,AWB,relative_change,VOC-em-anthro,{ssp_scenario},Agriculture
+NMVOC,CHE,relative_change,VOC-em-anthro,{ssp_scenario},Solvents production and application
+NMVOC,ENE,relative_change,VOC-em-anthro,{ssp_scenario},Energy Sector
+NMVOC,FFF,relative_change,VOC-em-anthro,{ssp_scenario},Energy Sector
+NMVOC,FOO_PAP,relative_change,VOC-em-anthro,{ssp_scenario},Agriculture
+NMVOC,IND,relative_change,VOC-em-anthro,{ssp_scenario},Industrial Sector
+NMVOC,IRO,relative_change,VOC-em-anthro,{ssp_scenario},Industrial Sector
+NMVOC,MNM,relative_change,VOC-em-anthro,{ssp_scenario},Agriculture
+NMVOC,NEU,relative_change,VOC-em-anthro,{ssp_scenario},Industrial Sector
+NMVOC,NFE,relative_change,VOC-em-anthro,{ssp_scenario},Industrial Sector
+NMVOC,NMM,relative_change,VOC-em-anthro,{ssp_scenario},Industrial Sector
+NMVOC,PRU_SOL,relative_change,VOC-em-anthro,{ssp_scenario},Solvents production and application
+NMVOC,RCO,relative_change,VOC-em-anthro,{ssp_scenario},"Residential, Commercial, Other"
+NMVOC,REF_TRF,relative_change,VOC-em-anthro,{ssp_scenario},Energy Sector
+NMVOC,SWD_INC,relative_change,VOC-em-anthro,{ssp_scenario},Waste
+NMVOC,SWD_LDF,relative_change,VOC-em-anthro,{ssp_scenario},Waste
+NMVOC,TNR_Other,relative_change,VOC-em-anthro,{ssp_scenario},Transportation Sector
+NMVOC,TNR_Ship,relative_change,VOC-em-anthro,{ssp_scenario},International Shipping
+NMVOC,TRO_RES,relative_change,VOC-em-anthro,{ssp_scenario},Transportation Sector
+NMVOC,TRO_noRES,relative_change,VOC-em-anthro,{ssp_scenario},Transportation Sector
+NMVOC,WWT,relative_change,VOC-em-anthro,{ssp_scenario},Waste

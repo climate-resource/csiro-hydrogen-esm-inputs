@@ -159,7 +159,7 @@ class ConfigEmissions:
 
 
 @define
-class ConfigDataEmissionsInputs:
+class ConfigDeltaEmissionsInputs:
     """
     Input files for calculating the change in emissions
 
@@ -183,9 +183,9 @@ class ConfigDeltaEmissions:
     Configuration for calculating change in emissions
     """
 
-    inputs: ConfigDataEmissionsInputs
+    inputs: ConfigDeltaEmissionsInputs
     """Raw input files"""
-    clean: ConfigDataEmissionsInputs
+    clean: ConfigDeltaEmissionsInputs
     """Clean and extended files"""
 
     energy_by_carrier: Path
@@ -324,6 +324,53 @@ class ConcentrationGriddingConfig:
 
 
 @define
+class ConfigSpatialEmissionsScalerTemplate:
+    """Template files containing information about the scalers used"""
+
+    input_file: Path
+    """Input template file
+
+    May contain placeholders
+    """
+    output_file: Path
+    """Processed template file without any placeholders"""
+
+
+@define
+class ConfigSpatialEmissions:
+    """
+    Configuration for the calculation of regional emissions
+    """
+
+    configuration_template: dict[str, Any]
+    """Base configuration
+
+    Any fields not present in :class:`spaemis.config.DownscalingScenarioConfig`
+    will be ignored."""
+
+    scaler_templates: list[ConfigSpatialEmissionsScalerTemplate]
+    """Template files containing information about the scalers used"""
+
+    template_replacements: dict[str, str]
+
+    downscaling_config: Path
+    """Path to the generated configuration file
+
+    This file will be able to be read in as a :class:`spaemis.config.DownscalingScenarioConfig`
+    object.
+    """
+
+    inventory_directory: Path
+    """Path to the inventory data"""
+
+    netcdf_output: Path
+    """NetCDF output for all years, sectors and gases"""
+
+    csv_output_directory: Path
+    """CSV files matching the inventroy format"""
+
+
+@define
 class Config:
     """
     Configuration class
@@ -380,6 +427,9 @@ class Config:
 
     concentration_gridding: ConcentrationGriddingConfig
     """Config for concentration gridding"""
+
+    spatial_emissions: ConfigSpatialEmissions
+    """Config for spatial emissions"""
 
 
 def load_config_from_file(config_file: str) -> Config:
@@ -867,6 +917,32 @@ def get_notebook_steps(
         ),
     ]
 
+    spatial_emissions_steps = [
+        SingleNotebookDirStep(
+            name="spaemis - generate scaler configuration",
+            doc="Combines different templates for scalers together",
+            notebook="400_spatial_emissions/400_generate_configuration",
+            raw_notebook_ext=".py",
+            configuration=(config.spatial_emissions),
+            dependencies=tuple(
+                template.input_file
+                for template in config.spatial_emissions.scaler_templates
+            ),
+            targets=(config.spatial_emissions.downscaling_config,),
+        ),
+        SingleNotebookDirStep(
+            name="spaemis - calculate projections for a region",
+            doc="Calculate emissions for a given region",
+            notebook="400_spatial_emissions/410_run_projection",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=(config.spatial_emissions.downscaling_config,),
+            targets=(
+                get_checklist_file(config.spatial_emissions.csv_output_directory),
+                config.spatial_emissions.netcdf_output,
+            ),
+        ),
+    ]
     out = [
         sds.to_notebook_step(
             raw_notebooks_dir=raw_notebooks_dir,
@@ -877,6 +953,7 @@ def get_notebook_steps(
             *historical_baseline_emissions_steps,
             *projected_emissions_steps,
             *concentration_gridding_steps,
+            *spatial_emissions_steps,
         ]
     ]
 

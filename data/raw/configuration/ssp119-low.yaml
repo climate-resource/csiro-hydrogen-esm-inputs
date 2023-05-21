@@ -54,7 +54,8 @@ historical_h2_gridding:
   fast: true
 
 input4mips_archive:
-  local_archive: data/raw/input4MIPs
+  # TODO: THis should also be an environment variable
+  local_archive: ../spaemis/data/processed/input4MIPs
   results_archive: data/runs/{run_id}/results
   version: 20230515
 
@@ -138,3 +139,35 @@ concentration_gridding:
   cmip6_seasonality_and_latitudinal_gradient_path: "{output_root_dir}/{run_id}/ssp119-low/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc"
   interim_gridded_output_dir: "{output_root_dir}/{run_id}/ssp119-low/data/interim/gridded-concentration-projections"
   gridded_output_dir: "{output_root_dir}/{run_id}/ssp119-low/data/processed/input4MIPs-gridded-concentration-projections"
+
+spatial_emissions:
+  configuration_template:
+    name: ssp119_australia
+
+    inventory:
+      name: australia
+      year: 2016
+
+    timeslices:
+      - 2020
+      - 2040
+      - 2060
+      - 2080
+      - 2100
+
+    input_timeseries:
+    scalers:
+      default_scaler:
+        name: constant
+  scaler_templates:
+    - input_file: data/raw/spaemis/templates/template_australia_H2_scalers.yaml
+      output_file: "{output_root_dir}/{run_id}/ssp119-low/data/processed/spaemis/template_australia_H2_scalers.yaml"
+    - input_file: data/raw/spaemis/templates/template_australia_scalers.csv
+      output_file: ".{output_root_dir}/{run_id}/ssp119-low/data/processed/spaemis/template_australia_scalers.csv"
+  template_replacements:
+    cr_h2_scenario: CR-IMAGE-ssp119-low
+    ssp_scenario: IAMC-IMAGE-ssp119-1-1
+  downscaling_config: "{output_root_dir}/{run_id}/ssp119-low/data/processed/spaemis/config.yaml"
+  inventory_directory: ../spaemis/data/raw/inventories
+  netcdf_output: "{output_root_dir}/{run_id}/ssp119-low/data/processed/spaemis/results/ssp119_australia/{run_id}_ssp119_australia_projections.nc"
+  csv_output_directory: "{output_root_dir}/{run_id}/ssp119-low/data/processed/spaemis/results/ssp119_australia"
