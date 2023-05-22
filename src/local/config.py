@@ -12,6 +12,8 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
 
+import deepmerge
+import yaml
 from attrs import define
 
 from local.h2_adjust.timeseries import TimeseriesExtension
@@ -487,10 +489,30 @@ def load_config(config: str) -> Config:
     return converter_yaml.loads(config, Config)
 
 
-# Hmmm somehow passing doesn't work perfectly to allow e.g.
-# ``poetry run doit run "crunch_scenarios:Run MAGICC to project concentrations_ssp119-low" --run-id zn-test``
-# In this case, the default run-id is used. I think it is because the
-# parameters are passed to the subtask, not the task
+def load_config_fragment(filename: Path) -> dict[str, Any]:
+    """
+    Load a configuration fragment
+
+    This configuration fragment may be a subset of a complete :class:`Config`
+    and may also include some placeholders that will be filled in later.
+
+    Parameters
+    ----------
+    filename
+        Filename containing the configuration fragment
+
+        This file must be in YAML format
+
+    Returns
+    -------
+        Fragment of a :class:`Config` object
+    """
+    with open(filename) as fh:
+        resp = fh.read()
+
+    return yaml.safe_load(resp)
+
+
 config_task_params: list[dict[str, Any]] = [
     {
         "name": "output_root_dir",
@@ -545,6 +567,7 @@ def get_config_bundle(
     raw_config_file: Path,
     output_root_dir: Path,
     run_id: str,
+    common_config_file: Path,
 ) -> ConfigBundle:
     """
     Get config bundle from config file
@@ -576,20 +599,43 @@ def get_config_bundle(
     # In theory you could inject whatever logic you wanted here to get the stub
     stub = raw_config_file.stem
 
-    # Parse placeholders
-    with open(raw_config_file) as fh:
-        loaded_str = fh.read()
-
-    loaded_str_parsed = parse_placeholders(
-        loaded_str,
+    placeholders = dict(
         output_root_dir=output_root_dir,
         run_id=run_id,
         stub=stub,
     )
 
-    config_hydrated = load_config(loaded_str_parsed)
+    scenario_specific_config = load_config_fragment(raw_config_file)
+    base_config = load_config_fragment(common_config_file)
 
-    #
+    # Keeping the variable rename for clarity as the merge is performed in place
+    # The values from scenario_specific_config are used in case of a conflict
+    scenario_config_with_placeholders = base_config
+    deepmerge.always_merger.merge(
+        scenario_config_with_placeholders, scenario_specific_config
+    )
+
+    # Extract any top-level string parameters to use as additional placeholders
+    # This doesn't resolve recursively so each additional parameter cannot contain placeholders
+    scenario_placeholders = {
+        key: value
+        for key, value in scenario_config_with_placeholders.items()
+        if isinstance(value, str) and "{" not in value and "}" not in value
+    }
+
+    # Replace any placeholders
+    # Convert back to a string temporarily for the placeholder replacement
+    # Preferences the placeholders from the CLI over values from config
+    scenario_config_str = parse_placeholders(
+        yaml.safe_dump(scenario_config_with_placeholders),
+        **scenario_placeholders,
+        **placeholders,
+    )
+
+    # Structure the configuration
+    # Any missing values will cause an exception
+    config_hydrated = load_config(scenario_config_str)
+
     config_hydrated_path = output_root_dir / run_id / stub / raw_config_file.name
     config_hydrated_path.parent.mkdir(parents=True, exist_ok=True)
 

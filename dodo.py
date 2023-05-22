@@ -95,8 +95,13 @@ def get_show_config_tasks(
         *notebook_step_task_params,
     ]
 )
-def task_generate_notebook_tasks(
-    configdir, configglob, output_root_dir, run_id, raw_notebooks_dir
+def task_generate_notebook_tasks(  # noqa: PLR0913
+    configdir,
+    configglob,
+    output_root_dir,
+    run_id,
+    raw_notebooks_dir,
+    common_configuration,
 ) -> Iterable[dict[str, Any]]:
     """
     Generate notebook tasks
@@ -108,7 +113,12 @@ def task_generate_notebook_tasks(
     # - also implements logic related to where to write things in and out,
     #   how to combine stub and raw names etc.
     config_bundles = [
-        get_config_bundle(cf, output_root_dir=output_root_dir, run_id=run_id)
+        get_config_bundle(
+            cf,
+            output_root_dir=output_root_dir,
+            run_id=run_id,
+            common_config_file=configdir / common_configuration,
+        )
         for cf in config_files
     ]
 

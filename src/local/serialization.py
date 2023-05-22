@@ -8,7 +8,6 @@ sure it's worth making general pattern assumptions yet.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import cattrs.preconf.pyyaml
 
@@ -19,7 +18,7 @@ converter_yaml.register_unstructure_hook(Path, lambda p: str(p))
 converter_yaml.register_structure_hook(Path, lambda p, _: Path(p))
 
 
-def parse_placeholders(in_str: str, **kwargs: Any) -> str:
+def parse_placeholders(in_str: str, **kwargs: str | float | int) -> str:
     """
     Parse placeholders in a raw string
 

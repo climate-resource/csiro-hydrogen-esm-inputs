@@ -17,10 +17,17 @@ glob_config_files_task_params: list[dict[str, Any]] = [
     },
     {
         "name": "configglob",
-        "default": "*.yaml",
+        "default": "scenarios/*.yaml",
         "type": str,
         "long": "configglob",
         "help": "Glob to use when looking for configuration files",
+    },
+    {
+        "name": "common_configuration",
+        "default": "common.yaml",
+        "type": str,
+        "long": "common_configuration",
+        "help": "Common configuration shared by all configurations",
     },
 ]
 """
