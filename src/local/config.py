@@ -264,14 +264,6 @@ class ConfigMAGICCRuns:
     TODO: add download instructions to README
     """
 
-    test_scenario: Path
-    """
-    Path to test scenario
-
-    TODO: delete this once we hook everything up together, use
-    ``config.emissions.complete_scenario`` instead
-    """
-
     magicc_executable_path: Path
     """Path to the MAGICC executable"""
 
@@ -906,11 +898,7 @@ def get_notebook_steps(
             notebook="300_projected_concentrations/310_run-magicc-for-scenarios",
             raw_notebook_ext=".py",
             configuration=(config.magicc_runs,),
-            dependencies=(
-                config.magicc_runs.test_scenario,
-                # TODO: switch to
-                # config.emissions.complete_scenario,
-            ),
+            dependencies=(config.emissions.magicc_scenario,),
             targets=(config.magicc_runs.output_file,),
         ),
         SingleNotebookDirStep(

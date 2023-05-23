@@ -96,9 +96,7 @@ run_cfgs = [
 # ## Input emissions
 
 # %%
-# TODO: switch to this
-# scmdata.ScmRun(str(config.emissions.complete_scenario))
-scenarios = scmdata.ScmRun(str(config.magicc_runs.test_scenario)).filter(
+scenarios = scmdata.ScmRun(config.emissions.magicc_scenario).filter(
     variable=["Emissions|H2"], keep=False
 )
 scenarios
