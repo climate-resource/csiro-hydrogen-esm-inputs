@@ -1,4 +1,4 @@
-name: ssp119-low
+name: ssp119-med
 ssp_scenario: ssp119
 
 emissions:
@@ -19,7 +19,7 @@ emissions:
           to: Baseline Emissions
           dimension: variable
   metadata:
-    assumptions: low
+    assumptions: med
 
 delta_emissions:
   inputs:
@@ -35,7 +35,7 @@ delta_emissions:
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2100
+      end_year: 2050
       rate: -0.04
 
 historical_h2_emissions:
