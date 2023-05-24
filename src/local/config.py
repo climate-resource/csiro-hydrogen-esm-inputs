@@ -12,7 +12,6 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
 
-import deepmerge
 import yaml
 from attrs import define
 
@@ -21,6 +20,10 @@ from local.pydoit_nb.checklist import get_checklist_file
 from local.pydoit_nb.gen_notebook_tasks import gen_run_notebook_tasks
 from local.pydoit_nb.notebooks import NotebookStep, SingleNotebookDirStep
 from local.serialization import converter_yaml, parse_placeholders
+from local.pydoit_nb.config_discovery import (
+    merge_config_fragments,
+    load_config_fragment,
+)
 
 
 @define
@@ -446,65 +449,6 @@ class Config:
     """Config for spatial emissions"""
 
 
-def load_config_from_file(config_file: str) -> Config:
-    """
-    Load config from disk
-
-    Parameters
-    ----------
-    config_file
-        Configuration file
-
-    Returns
-    -------
-        Loaded configuration
-    """
-    with open(config_file) as fh:
-        config = load_config(fh.read())
-
-    return config
-
-
-def load_config(config: str) -> Config:
-    """
-    Load config from a string
-
-    Parameters
-    ----------
-    config
-        Configuration string
-
-    Returns
-    -------
-        Loaded configuration
-    """
-    return converter_yaml.loads(config, Config)
-
-
-def load_config_fragment(filename: Path) -> dict[str, Any]:
-    """
-    Load a configuration fragment
-
-    This configuration fragment may be a subset of a complete :class:`Config`
-    and may also include some placeholders that will be filled in later.
-
-    Parameters
-    ----------
-    filename
-        Filename containing the configuration fragment
-
-        This file must be in YAML format
-
-    Returns
-    -------
-        Fragment of a :class:`Config` object
-    """
-    with open(filename) as fh:
-        resp = fh.read()
-
-    return yaml.safe_load(resp)
-
-
 config_task_params: list[dict[str, Any]] = [
     {
         "name": "output_root_dir",
@@ -555,6 +499,41 @@ class ConfigBundle:
     """Stub to identify this particular set of hydrated config, separate from all others"""
 
 
+def load_config_from_file(config_file: str) -> Config:
+    """
+    Load config from disk
+
+    Parameters
+    ----------
+    config_file
+        Configuration file
+
+    Returns
+    -------
+        Loaded configuration
+    """
+    with open(config_file) as fh:
+        config = load_config(fh.read())
+
+    return config
+
+
+def load_config(config: str) -> Config:
+    """
+    Load config from a string
+
+    Parameters
+    ----------
+    config
+        Configuration string
+
+    Returns
+    -------
+        Loaded configuration
+    """
+    return converter_yaml.loads(config, Config)
+
+
 def get_config_bundle(
     raw_config_file: Path,
     output_root_dir: Path,
@@ -570,16 +549,33 @@ def get_config_bundle(
     This function will be custom for each application as it implements all the
     specific choices about placeholders, hydration and config creation.
 
+    .. note:
+        The common and scenario configurations are merged using a recursive,
+        deep merge. If the same set of configuration value is present in both
+        sets of configuration the value from the scenario takes precendence.
+
+
     Parameters
     ----------
     raw_config_file
         Raw config file
+
+        This file will contain any scenario specific configuration.
+
+        These scenario specific configuration are merged with the common configuration
+        to form a complete set of configuration. These values take precedence
+        over the common configuration.
+
 
     output_root_dir
         Root directory for outputs
 
     run_id
         ID to use for the outputs
+
+    common_config_file
+        YAML file containing a fragment of configuration which is common for all
+        sets of configuration.
 
     Returns
     -------
@@ -600,11 +596,10 @@ def get_config_bundle(
     scenario_specific_config = load_config_fragment(raw_config_file)
     base_config = load_config_fragment(common_config_file)
 
-    # Keeping the variable rename for clarity as the merge is performed in place
     # The values from scenario_specific_config are used in case of a conflict
-    scenario_config_with_placeholders = base_config
-    deepmerge.always_merger.merge(
-        scenario_config_with_placeholders, scenario_specific_config
+    # Note that this modifies base_config in place as well
+    scenario_config_with_placeholders = merge_config_fragments(
+        base_config, scenario_specific_config
     )
 
     # Extract any top-level string parameters to use as additional placeholders
