@@ -1,62 +1,38 @@
 """
-Tools to help with config discovery
+Tools to help with config discovery and handling
 """
 from __future__ import annotations
 
 from collections.abc import Iterable
 from pathlib import Path
-import yaml
 from typing import Any
-import deepmerge
 
-glob_config_files_task_params: list[dict[str, Any]] = [
-    {
-        "name": "configdir",
-        "default": Path("data") / "raw" / "configuration",
-        "type": Path,
-        "long": "configdir",
-        "help": "Path from which to load configuration",
-    },
-    {
-        "name": "configglob",
-        "default": "scenarios/*.yaml",
-        "type": str,
-        "long": "configglob",
-        "help": "Glob to use when looking for configuration files",
-    },
-    {
-        "name": "common_configuration",
-        "default": "common.yaml",
-        "type": str,
-        "long": "common_configuration",
-        "help": "Common configuration shared by all configurations",
-    },
-]
-"""
-Task parameters to use when discovering files with glob
-"""
+import deepmerge  # type: ignore
+import yaml
+
+ConfigFragment = dict[str, Any]
 
 
-def glob_config_files(configdir: Path, configglob: str) -> Iterable[Path]:
+def glob_config_files(config_directory: Path, config_glob: str) -> Iterable[Path]:
     """
     Glob config files within a directory
 
     Parameters
     ----------
-    configdir
+    config_directory
         Directory in which to look
 
-    configglob
+    config_glob
         Glob to apply
 
     Returns
     -------
         Found files that match the glob
     """
-    return configdir.glob(configglob)
+    return config_directory.glob(config_glob)
 
 
-def load_config_fragment(filename: Path) -> dict[str, Any]:
+def load_config_fragment(filename: Path) -> ConfigFragment:
     """
     Load a configuration fragment
 
@@ -81,8 +57,8 @@ def load_config_fragment(filename: Path) -> dict[str, Any]:
 
 
 def merge_config_fragments(
-    base: dict[str, Any], *fragments: dict[str, Any]
-) -> dict[str, Any]:
+    base: ConfigFragment, *fragments: ConfigFragment
+) -> ConfigFragment:
     """
     Merge together multiple fragments
 

@@ -135,7 +135,7 @@ len(jobs)
 
 
 # %%
-n_jobs = 4
+n_jobs = 2
 Parallel(n_jobs=n_jobs)(delayed(f)(*args) for f, *args in jobs)
 
 # %%

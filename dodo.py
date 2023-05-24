@@ -1,6 +1,8 @@
 """
 doit configuration file
 """
+from __future__ import annotations
+
 import logging
 from collections.abc import Iterable
 from typing import Any
@@ -9,39 +11,21 @@ from doit import task_params
 
 from local.config import (
     ConfigBundle,
-    config_task_params,
-    gen_crunch_scenario_tasks,
     get_config_bundle,
-    notebook_step_task_params,
     write_config_file_in_output_dir,
 )
-from local.key_info import get_key_info
+from local.parameters import (
+    config_files_task_params,
+    config_task_params,
+    notebook_step_task_params,
+)
 from local.pydoit_nb.config_discovery import (
     glob_config_files,
-    glob_config_files_task_params,
 )
+from local.steps import gen_crunch_historical_tasks, gen_crunch_scenario_tasks
 
 logging.basicConfig(level=logging.INFO)
-
-
-def display_key_info() -> None:
-    """
-    Display the project's key information
-    """
-    print("----")
-    print(get_key_info())
-    print("----")
-
-
-def task_display_info() -> dict[str, Any]:
-    """
-    Task to display key information
-    """
-    return {
-        "actions": [display_key_info],
-        "verbosity": 2,
-        "uptodate": [False],
-    }
+logger = logging.getLogger("dodo")
 
 
 def print_config_bundle(cb: ConfigBundle) -> None:
@@ -90,37 +74,41 @@ def get_show_config_tasks(
 
 @task_params(
     [
-        *glob_config_files_task_params,
+        *config_files_task_params,
         *config_task_params,
         *notebook_step_task_params,
     ]
 )
 def task_generate_notebook_tasks(  # noqa: PLR0913
     configdir,
-    configglob,
+    configglob_scenarios,
     output_root_dir,
     run_id,
     raw_notebooks_dir,
     common_configuration,
 ) -> Iterable[dict[str, Any]]:
     """
-    Generate notebook tasks
+    Generate tasks based on notebooks
     """
     # Discovery: find all the config files to use
-    config_files = glob_config_files(configdir, configglob)
+    config_files = glob_config_files(configdir, configglob_scenarios)
 
     # Hydration: parse the config files and fill all the placeholders
-    # - also implements logic related to where to write things in and out,
     #   how to combine stub and raw names etc.
     config_bundles = [
         get_config_bundle(
             cf,
             output_root_dir=output_root_dir,
             run_id=run_id,
-            common_config_file=configdir / common_configuration,
+            common_config_file=common_configuration,
         )
         for cf in config_files
     ]
+
+    if not config_bundles:
+        logger.warning("No scenario configuration files found")
+        # Early return if no files are found
+        return
 
     # Serialise hydrated config back to disk
     # #3: If we ever want to optimise, but probably unnecessary
@@ -128,19 +116,18 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
 
     yield from get_show_config_tasks(config_bundles)
 
-    # This might be able to be split if we used calc_dep or create_after
-    # cleverly (might work with create_after as we can pre-calculate creates
-    # based on the notebook names (which are passed to pydoit as basenames,
-    # leaving name to hold onto the stubs), although I don't know whether that
-    # will actually work because I don't really understand the name handling)
+    yield from gen_crunch_historical_tasks(
+        config_bundles,
+        raw_notebooks_dir.absolute(),
+        # I think Jared might have had the idea to also make the tasks
+        # uptodate depend on the value of the input params, but I don't think
+        # it was implemented
+    )
 
-    # Generate tasks based on notebooks: tell pydoit what to run
-    # - gen_crunch_scenario_tasks and therein get_notebook_steps implements
-    #   the logic related to putting notebooks in the right place, handling
-    #   splitting of executed and unexecuted notebooks etc.
-    for config_bundle in config_bundles:
-        yield from gen_crunch_scenario_tasks(
-            config_bundle,
-            raw_notebooks_dir.absolute(),
-            [*glob_config_files_task_params, *config_task_params],
-        )
+    yield from gen_crunch_scenario_tasks(
+        config_bundles,
+        raw_notebooks_dir.absolute(),
+        # I think Jared might have had the idea to also make the tasks
+        # uptodate depend on the value of the input params, but I don't think
+        # it was implemented
+    )

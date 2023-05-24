@@ -10,12 +10,14 @@ from pathlib import Path
 
 import jupytext
 import papermill as pm
-from attrs import define
+from attrs import define, frozen
+
+from local.serialization import FrozenDict
 
 LOGGER = logging.getLogger(__name__)
 
 
-@define
+@frozen
 class NotebookStep:
     """
     A step which runs a single notebook that has dependencies and targets
@@ -59,7 +61,7 @@ class NotebookStep:
     # https://pydoit.org/cmd-other.html#forget (although they also talk about
     # non-file dependencies elsewhere so maybe these are just out of date docs)
 
-    notebook_parameters: dict[str, str]
+    notebook_parameters: FrozenDict[str, str]
     """Additional parameter values to pass to the notebook"""
 
 
@@ -162,6 +164,7 @@ class SingleNotebookDirStep:
         executed_notebook = (
             output_notebook_dir / f"{self.notebook}{self.notebook_suffix}.ipynb"
         )
+        notebook_parameters = FrozenDict(self.notebook_parameters or {})
 
         return NotebookStep(
             name=self.name,
@@ -173,7 +176,7 @@ class SingleNotebookDirStep:
             dependencies=self.dependencies,
             targets=self.targets,
             configuration=self.configuration,
-            notebook_parameters=self.notebook_parameters or {},
+            notebook_parameters=notebook_parameters,
         )
 
 

@@ -11,7 +11,7 @@ from typing import Any, Protocol
 from doit.tools import config_changed  # type: ignore
 
 from local.pydoit_nb.notebooks import run_notebook
-from local.serialization import converter_yaml
+from local.serialization import FrozenDict, converter_yaml
 
 
 class SupportsGenNotebookTasks(Protocol):
@@ -37,6 +37,12 @@ class SupportsGenNotebookTasks(Protocol):
     executed_notebook: os.PathLike[str]
     """Path to executed notebook"""
 
+    dependencies: tuple[Path, ...]
+    """Paths on which the notebook depends"""
+
+    targets: tuple[Path, ...]
+    """Paths which the notebook creates/controls"""
+
     configuration: Hashable | None
     """
     Configuration used by the notebook.
@@ -47,13 +53,7 @@ class SupportsGenNotebookTasks(Protocol):
     file driving the notebook is modified.
     """
 
-    dependencies: tuple[Path, ...]
-    """Paths on which the notebook depends"""
-
-    targets: tuple[Path, ...]
-    """Paths which the notebook creates/controls"""
-
-    notebook_parameters: dict[str, str]
+    notebook_parameters: FrozenDict[str, str]
     """Additional parameters to pass to the notebook"""
 
 

@@ -6,27 +6,21 @@ application
 """
 from __future__ import annotations
 
-import datetime
-import itertools
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from attrs import define
+from attrs import frozen
 
 from local.h2_adjust.timeseries import TimeseriesExtension
-from local.pydoit_nb.checklist import get_checklist_file
-from local.pydoit_nb.gen_notebook_tasks import gen_run_notebook_tasks
-from local.pydoit_nb.notebooks import NotebookStep, SingleNotebookDirStep
-from local.serialization import converter_yaml, parse_placeholders
 from local.pydoit_nb.config_discovery import (
-    merge_config_fragments,
     load_config_fragment,
+    merge_config_fragments,
 )
+from local.serialization import FrozenDict, converter_yaml, parse_placeholders
 
 
-@define
+@frozen
 class ConfigGridding:
     """
     Configuration for gridding a set of emissions
@@ -67,7 +61,7 @@ class ConfigGridding:
     """
 
 
-@define
+@frozen
 class ConfigInput4MIPs:
     """
     Configuration for handling a local archive of input4MIPs data
@@ -89,7 +83,7 @@ class ConfigInput4MIPs:
     """
 
 
-@define
+@frozen
 class Rename:
     """
     Configuration for a renaming operation
@@ -108,7 +102,7 @@ class Rename:
     """New value"""
 
 
-@define
+@frozen
 class TimeseriesOperation:
     """
     Operation to apply to a set of timeseries
@@ -120,13 +114,13 @@ class TimeseriesOperation:
     input_file: Path
     """Timeseries file"""
 
-    filters: dict[str, Any]
+    filters: FrozenDict[str, Any]
     """Arguments to pass to :func:`scmdata.ScmRun.filter`"""
     renames: list[Rename] = []
     """Metadata to update in the filtered metadata"""
 
 
-@define
+@frozen
 class ConfigEmissions:
     """
     Configuration representing the merged set of emissions
@@ -135,7 +129,7 @@ class ConfigEmissions:
     cleaning_operations: list[TimeseriesOperation]
     """Operations to apply to `raw_scenario` to prepare it"""
 
-    metadata: dict[str, str]
+    metadata: FrozenDict[str, str]
     """Additional dimensions to update for the cleaned set of timeseries"""
 
     input_scenario: Path
@@ -164,7 +158,7 @@ class ConfigEmissions:
     figure_vs_rcmip: Path
 
 
-@define
+@frozen
 class ConfigDeltaEmissionsInputs:
     """
     Input files for calculating the change in emissions
@@ -183,7 +177,7 @@ class ConfigDeltaEmissionsInputs:
     """Emissions intensities from the combustion of H2-related fuels"""
 
 
-@define
+@frozen
 class ConfigDeltaEmissions:
     """
     Configuration for calculating change in emissions
@@ -202,7 +196,7 @@ class ConfigDeltaEmissions:
     delta_emissions_totals: Path
 
 
-@define
+@frozen
 class ConfigBaselineH2Emissions:
     """
     Configuration for calculating the historical H2 emissions
@@ -214,7 +208,7 @@ class ConfigBaselineH2Emissions:
     baseline_source: Path
     """Source file for baseline H2 emissions"""
 
-    anthropogenic_proxy: dict[str, str]
+    anthropogenic_proxy: FrozenDict[str, str]
     """
     Proxy to provide the sectoral and regional information for a given source of H2 emissions
 
@@ -242,7 +236,7 @@ class ConfigBaselineH2Emissions:
     figure_baseline_by_source_and_sector: Path
 
 
-@define
+@frozen
 class ConfigMAGICCRuns:
     """
     Configuration for running MAGICC to produce updated concentration projections
@@ -277,7 +271,7 @@ class ConfigMAGICCRuns:
     """Number of MAGICC workers to use"""
 
 
-@define
+@frozen
 class RCMIPConfig:
     """
     RCMIP paths
@@ -289,21 +283,21 @@ class RCMIPConfig:
     """Path to concentrations file"""
 
 
-@define
+@frozen
 class CMIP6ConcentrationsConfig:
     """CMIP6 paths and other configuration"""
 
     root_raw_data_dir: Path
     """Root directory for raw data"""
 
-    concentration_scenario_ids: list[str]
+    concentration_scenario_ids: tuple[str, ...]
     """Scenarios to process"""
 
-    concentration_variables: list[str]
+    concentration_variables: tuple[str, ...]
     """Variables to process"""
 
 
-@define
+@frozen
 class ConcentrationGriddingConfig:
     """Concentration gridding config"""
 
@@ -321,7 +315,7 @@ class ConcentrationGriddingConfig:
     """Path to gridded output, written in input4MIPs style"""
 
 
-@define
+@frozen
 class ConfigSpatialEmissionsScalerTemplate:
     """Template files containing information about the scalers used"""
 
@@ -337,7 +331,7 @@ class ConfigSpatialEmissionsScalerTemplate:
     """
 
 
-@define
+@frozen
 class ConfigSpatialEmissions:
     """
     Configuration for the calculation of regional emissions
@@ -346,7 +340,7 @@ class ConfigSpatialEmissions:
     name: str
     """Name of the spatial emission run"""
 
-    configuration_template: dict[str, Any]
+    configuration_template: FrozenDict[str, Any]
     """Base configuration
 
     Any fields not present in :class:`spaemis.config.DownscalingScenarioConfig`
@@ -359,7 +353,7 @@ class ConfigSpatialEmissions:
     when read in
     """
 
-    scalar_template_replacements: dict[str, str]
+    scalar_template_replacements: FrozenDict[str, str]
     """Replacements to be applied to each scalar template file
 
     These replacements are shared for all template files"""
@@ -387,7 +381,7 @@ class ConfigSpatialEmissions:
     """CSV files matching the inventroy format"""
 
 
-@define
+@frozen
 class Config:
     """
     Configuration class
@@ -399,6 +393,9 @@ class Config:
 
     name: str
     ssp_scenario: str
+
+    historical_notebook_dir: Path
+    """Directory to store the templated historical notebooks"""
 
     output_notebook_dir: Path
     """Notebook output directory"""
@@ -449,28 +446,7 @@ class Config:
     """Config for spatial emissions"""
 
 
-config_task_params: list[dict[str, Any]] = [
-    {
-        "name": "output_root_dir",
-        "default": Path("output-bundles"),
-        "type": Path,
-        "long": "output-root-dir",
-        "help": "Root directory for outputs",
-    },
-    {
-        "name": "run_id",
-        "default": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
-        "type": str,
-        "long": "run-id",
-        "help": "id for the outputs",
-    },
-]
-"""
-Task parameters to use to support generating config bundles
-"""
-
-
-@define
+@frozen
 class ConfigBundle:
     """
     Configuration bundle
@@ -647,401 +623,3 @@ def write_config_file_in_output_dir(cb: ConfigBundle) -> None:
     """
     with open(cb.config_hydrated_path, "w") as fh:
         fh.write(converter_yaml.dumps(cb.config_hydrated))
-
-
-notebook_step_task_params: list[dict[str, Any]] = [
-    {
-        "name": "raw_notebooks_dir",
-        "default": Path("notebooks"),
-        "type": str,
-        "long": "raw-notebooks-dir",
-        "help": "Raw notebook directory",
-    },
-]
-"""
-Task parameters to use to support generating notebook steps
-"""
-
-
-def get_notebook_steps(
-    config: Config, raw_notebooks_dir: Path, stub: str
-) -> list[NotebookStep]:
-    """
-    Get notebook steps
-
-    This essentially defines the configuration of our entire workflow
-
-    Parameters
-    ----------
-    config
-        Hydrated configuration from which targets and dependencies can be
-        taken
-
-    raw_notebooks_dir
-        Where raw notebooks live
-
-    stub
-        Stub to identify this particular set of hydrated config, separate from
-        all others
-
-    Returns
-    -------
-        Notebook steps to run
-    """
-    historical_emissions_dir = (
-        config.input4mips_archive.results_archive
-        / "input4MIPs"
-        / "CMIP6"
-        / "CMIP"
-        / "CR"
-        / "CR-historical"
-    )
-    projected_emissions_dir = (
-        config.input4mips_archive.results_archive
-        / "input4MIPs"
-        / "CMIP6"
-        / "ScenarioMIP"
-        / "CR"
-        / f"CR-{config.name}"
-    )
-
-    # TODO: refactor into separate file
-    historical_baseline_emissions_steps = [
-        SingleNotebookDirStep(
-            name="calculate baseline historical emissions",
-            doc="calculate baseline historical emissions",
-            notebook="100_historical_h2_emissions/100_calculate_historical_anthropogenic",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.historical_h2_emissions.baseline_source,
-                config.historical_h2_emissions.anthropogenic_proxy,
-            ),
-            dependencies=(config.historical_h2_emissions.baseline_source,),
-            targets=(
-                config.historical_h2_emissions.baseline_h2_emissions_regions,
-                config.historical_h2_emissions.figure_baseline_by_source,
-                config.historical_h2_emissions.figure_baseline_by_sector,
-                config.historical_h2_emissions.figure_baseline_by_source_and_sector,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="downscale historical H2 regional emissions to countries",
-            doc="downscale historical H2 regional emissions to countries",
-            notebook="100_historical_h2_emissions/110_downscale_historical_emissions",
-            raw_notebook_ext=".py",
-            configuration=(),  # No extra configuration dependencies
-            dependencies=(
-                config.historical_h2_emissions.baseline_h2_emissions_regions,
-            ),
-            targets=(config.historical_h2_emissions.baseline_h2_emissions_countries,),
-        ),
-        SingleNotebookDirStep(
-            name="grid historical H2 emissions",
-            doc="grid historical H2 emissions",
-            notebook="100_historical_h2_emissions/120_grid_historical_emissions",
-            raw_notebook_ext=".py",
-            configuration=(config.historical_h2_gridding,),
-            dependencies=(
-                config.historical_h2_emissions.baseline_h2_emissions_countries,
-            ),
-            targets=(
-                get_checklist_file(config.historical_h2_gridding.output_directory),
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="write historical input4MIPS results",
-            doc="write historical input4MIPS results",
-            notebook="100_historical_h2_emissions/130_write_historical_input4MIPs",
-            raw_notebook_ext=".py",
-            configuration=(config.input4mips_archive,),
-            dependencies=(
-                get_checklist_file(config.historical_h2_gridding.output_directory),
-            ),
-            targets=(get_checklist_file(historical_emissions_dir),),
-        ),
-    ]
-
-    # Projected Emissions steps
-    projected_emissions_steps = [
-        SingleNotebookDirStep(
-            name="create the input emissions scenario",
-            doc="create the input emissions scenario",
-            notebook="200_projected_h2_emissions/200_make_input_scenario",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.emissions.cleaning_operations,
-                config.emissions.metadata,
-            ),
-            dependencies=tuple(
-                set(op.input_file for op in config.emissions.cleaning_operations)
-            ),
-            targets=(config.emissions.input_scenario,),
-        ),
-        SingleNotebookDirStep(
-            name="extend input data to cover target period",
-            doc="extend input data to cover target period",
-            notebook="200_projected_h2_emissions/201_extend_timeseries",
-            raw_notebook_ext=".py",
-            configuration=(config.delta_emissions.extensions,),
-            dependencies=(
-                config.emissions.input_scenario,
-                config.delta_emissions.inputs.share_by_carrier,
-                config.delta_emissions.inputs.emissions_intensities_production,
-                config.delta_emissions.inputs.emissions_intensities_combustion,
-                config.delta_emissions.inputs.leakage_rates,
-            ),
-            targets=(
-                config.delta_emissions.energy_by_carrier,
-                config.delta_emissions.clean.share_by_carrier,
-                config.delta_emissions.clean.emissions_intensities_production,
-                config.delta_emissions.clean.emissions_intensities_combustion,
-                config.delta_emissions.clean.leakage_rates,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="calculate delta emissions from H2 usage",
-            doc="calculate delta emissions from H2 usage",
-            notebook="200_projected_h2_emissions/210_calculate_delta_emissions",
-            raw_notebook_ext=".py",
-            configuration=(),
-            dependencies=(
-                config.delta_emissions.energy_by_carrier,
-                config.delta_emissions.clean.share_by_carrier,
-                config.delta_emissions.clean.emissions_intensities_production,
-                config.delta_emissions.clean.emissions_intensities_combustion,
-                config.delta_emissions.clean.leakage_rates,
-            ),
-            targets=(
-                config.delta_emissions.delta_emissions_complete,
-                config.delta_emissions.delta_emissions_totals,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="calculate baseline projected emissions",
-            doc="calculate baseline projected emissions",
-            notebook="200_projected_h2_emissions/220_calculate_baseline_anthropogenic",
-            raw_notebook_ext=".py",
-            configuration=(config.projected_h2_emissions,),
-            dependencies=(config.projected_h2_emissions.baseline_source,),
-            targets=(
-                config.projected_h2_emissions.baseline_h2_emissions_regions,
-                config.projected_h2_emissions.figure_baseline_by_source,
-                config.projected_h2_emissions.figure_baseline_by_sector,
-                config.projected_h2_emissions.figure_baseline_by_source_and_sector,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="merge projected emissions to form a scenario",
-            doc="merge projected emissions to form a scenario",
-            notebook="200_projected_h2_emissions/230_merge_emissions",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.name,
-                config.ssp_scenario,
-            ),
-            dependencies=(
-                config.emissions.input_scenario,
-                config.delta_emissions.delta_emissions_complete,
-                config.projected_h2_emissions.baseline_h2_emissions_regions,
-            ),
-            targets=(
-                config.emissions.complete_scenario,
-                config.emissions.magicc_scenario,
-                # Figures
-                config.emissions.figure_by_sector,
-                config.emissions.figure_by_sector_only_modified,
-                config.emissions.figure_vs_rcmip,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="downscale projected H2 regional emissions to countries",
-            doc="downscale projected H2 regional emissions to countries",
-            notebook="200_projected_h2_emissions/240_downscale_projected_emissions",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.historical_h2_emissions.baseline_h2_emissions_countries,
-            ),
-            dependencies=(config.emissions.complete_scenario,),
-            targets=(config.emissions.complete_scenario_countries,),
-        ),
-        SingleNotebookDirStep(
-            name="grid projected H2 emissions",
-            doc="grid projected H2 emissions",
-            notebook="200_projected_h2_emissions/250_grid_projected_emissions",
-            raw_notebook_ext=".py",
-            configuration=(config.projected_gridding,),
-            dependencies=(config.emissions.complete_scenario_countries,),
-            targets=(get_checklist_file(config.projected_gridding.output_directory),),
-        ),
-        SingleNotebookDirStep(
-            name="write projected input4MIPS results",
-            doc="write projected input4MIPS results",
-            notebook="200_projected_h2_emissions/260_write_projected_input4MIPs",
-            raw_notebook_ext=".py",
-            configuration=(config.input4mips_archive,),
-            dependencies=(
-                get_checklist_file(config.projected_gridding.output_directory),
-            ),
-            targets=(get_checklist_file(projected_emissions_dir),),
-        ),
-    ]
-
-    concentration_gridding_steps = [
-        SingleNotebookDirStep(
-            name="MAGICC run",
-            doc="run MAGICC to project concentrations",
-            notebook="300_projected_concentrations/310_run-magicc-for-scenarios",
-            raw_notebook_ext=".py",
-            configuration=(config.magicc_runs,),
-            dependencies=(config.emissions.magicc_scenario,),
-            targets=(config.magicc_runs.output_file,),
-        ),
-        SingleNotebookDirStep(
-            name="MAGICC - CMIP6 comparison",
-            doc="compare MAGICC projections against CMIP6 concentrations",
-            notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6",
-            raw_notebook_ext=".py",
-            configuration=(config.rcmip.concentrations_path,),
-            dependencies=(config.magicc_runs.output_file,),
-            targets=(),
-        ),
-        SingleNotebookDirStep(
-            name="Download CMIP6 concentrations",
-            doc="download required CMIP6 concentrations",
-            notebook="300_projected_concentrations/320_download-cmip6-data",
-            raw_notebook_ext=".py",
-            configuration=(config.cmip6_concentrations,),
-            dependencies=(),
-            targets=(
-                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="Extract CMIP6 grids",
-            doc="extract grids from CMIP6 concentrations",
-            notebook="300_projected_concentrations/321_extract-grids-from-cmip6",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.cmip6_concentrations.concentration_scenario_ids,
-                config.cmip6_concentrations.concentration_variables,
-            ),
-            dependencies=(
-                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
-            ),
-            targets=(
-                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="Grided projections",
-            doc="create gridded concentration projections",
-            notebook="300_projected_concentrations/322_projection-gridding",
-            raw_notebook_ext=".py",
-            configuration=(config.cmip6_concentrations.concentration_variables,),
-            dependencies=(
-                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
-                config.rcmip.concentrations_path,
-                config.magicc_runs.output_file,
-            ),
-            targets=(
-                get_checklist_file(
-                    config.concentration_gridding.interim_gridded_output_dir
-                ),
-            ),
-        ),
-        SingleNotebookDirStep(
-            name="Write input4MIPs concentrations",
-            doc="write concentration input4MIPs style files",
-            notebook="300_projected_concentrations/330_write-input4MIPs-files",
-            raw_notebook_ext=".py",
-            configuration=(),
-            dependencies=(
-                get_checklist_file(
-                    config.concentration_gridding.interim_gridded_output_dir
-                ),
-            ),
-            targets=(
-                get_checklist_file(config.concentration_gridding.gridded_output_dir),
-            ),
-        ),
-    ]
-
-    # Iterate over the spatial emissions setups to run
-    spatial_emissions_steps = itertools.chain(
-        *(
-            (
-                SingleNotebookDirStep(
-                    name=f"spaemis - {spatial_emis_region.name} - generate scaler configuration",
-                    doc="Combines different templates for scalers together",
-                    notebook="400_spatial_emissions/400_generate_configuration",
-                    raw_notebook_ext=".py",
-                    configuration=(spatial_emis_region,),
-                    dependencies=tuple(
-                        template.input_file
-                        for template in spatial_emis_region.scaler_templates
-                    ),
-                    targets=(spatial_emis_region.downscaling_config,),
-                    notebook_suffix=spatial_emis_region.name,
-                    notebook_parameters={"name": spatial_emis_region.name},
-                ),
-                SingleNotebookDirStep(
-                    name=f"spaemis - {spatial_emis_region.name} - calculate projections for a region",
-                    doc="Calculate emissions for a given region",
-                    notebook="400_spatial_emissions/410_run_projection",
-                    raw_notebook_ext=".py",
-                    configuration=(),
-                    dependencies=(spatial_emis_region.downscaling_config,),
-                    targets=(
-                        get_checklist_file(spatial_emis_region.csv_output_directory),
-                        spatial_emis_region.netcdf_output,
-                    ),
-                    notebook_suffix=spatial_emis_region.name,
-                    notebook_parameters={"name": spatial_emis_region.name},
-                ),
-            )
-            for spatial_emis_region in config.spatial_emissions
-        )
-    )
-    out = [
-        sds.to_notebook_step(
-            raw_notebooks_dir=raw_notebooks_dir,
-            output_notebook_dir=config.output_notebook_dir,
-            stub=stub,
-        )
-        for sds in [
-            *historical_baseline_emissions_steps,
-            *projected_emissions_steps,
-            *concentration_gridding_steps,
-            *spatial_emissions_steps,
-        ]
-    ]
-
-    return out
-
-
-def gen_crunch_scenario_tasks(
-    config_bundle: ConfigBundle, raw_notebooks_dir: Path, params
-) -> Iterator[dict[str, Any]]:
-    """
-    Generate crunch scenario tasks
-
-    Parameters
-    ----------
-    config_bundle
-        Configuration bundle
-
-    raw_notebooks_dir
-        Where raw notebooks live
-
-    Yields
-    ------
-        Tasks to run with pydoit
-    """
-    notebook_steps = get_notebook_steps(
-        config_bundle.config_hydrated, raw_notebooks_dir, stub=config_bundle.stub
-    )
-
-    yield from gen_run_notebook_tasks(
-        notebook_steps,
-        config_bundle.config_hydrated_path,
-    )
