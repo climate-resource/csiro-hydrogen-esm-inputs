@@ -49,7 +49,6 @@ config_file: str = "../dev.yaml"  # config file
 # %%
 config = load_config_from_file(config_file)
 
-
 # %%
 gridded_data_directory = config.historical_h2_gridding.output_directory
 

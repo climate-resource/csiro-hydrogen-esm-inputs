@@ -119,15 +119,9 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
     yield from gen_crunch_historical_tasks(
         config_bundles,
         raw_notebooks_dir.absolute(),
-        # I think Jared might have had the idea to also make the tasks
-        # uptodate depend on the value of the input params, but I don't think
-        # it was implemented
     )
 
     yield from gen_crunch_scenario_tasks(
         config_bundles,
         raw_notebooks_dir.absolute(),
-        # I think Jared might have had the idea to also make the tasks
-        # uptodate depend on the value of the input params, but I don't think
-        # it was implemented
     )

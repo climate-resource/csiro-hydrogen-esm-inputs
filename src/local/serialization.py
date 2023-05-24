@@ -7,6 +7,7 @@ sure it's worth making general pattern assumptions yet.
 """
 from __future__ import annotations
 
+import copyreg
 from pathlib import Path
 from typing import Any, TypeVar, get_origin
 
@@ -32,9 +33,25 @@ class FrozenDict(dict[KeyT, ValueT]):
 
     def __setitem__(self, key: KeyT, value: ValueT) -> None:
         """
-        Raise an exception for
+        Raise an exception when attempting to set values
         """
         raise NotImplementedError
+
+    def __reduce__(self):
+        """
+        Workaround to enable pickling
+
+        I have no idea why this works because I believe the return value is the
+        same as :class:`dict`
+        """
+        return (
+            copyreg._reconstructor,
+            (
+                self.__class__,
+                dict,
+                dict(**self),
+            ),
+        )
 
     def __hash__(self) -> int:  # type: ignore
         """
