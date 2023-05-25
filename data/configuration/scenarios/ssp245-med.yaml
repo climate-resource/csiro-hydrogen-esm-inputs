@@ -1,16 +1,16 @@
-name: ssp119-med
-ssp_scenario: ssp119
-base_model: IMAGE
+name: ssp245-med
+ssp_scenario: ssp245
+base_model: MESSAGE-GLOBIOM
 
 emissions:
   cleaning_operations:
     - input_file: data/raw/input_emissions/SSP_IAM_V2_201811.csv
       filters:
-        scenario: SSP1-19
-        model: IMAGE
+        scenario: SSP2-45
+        model: MESSAGE-GLOBIOM
     - input_file: data/raw/input_emissions/SSP_CMIP6_201811.csv
       filters:
-        scenario: SSP1-19
+        scenario: SSP2-45
         variable: CMIP6 Emissions|*
         region:
           - World
@@ -24,7 +24,7 @@ emissions:
 
 delta_emissions:
   inputs:
-    share_by_carrier: data/raw/delta_emissions/share_by_carrier_NZE.csv
+    share_by_carrier: data/raw/delta_emissions/share_by_carrier_APS.csv
     leakage_rates: data/raw/delta_emissions/leakage_rates_low.csv
     emissions_intensities_production: data/raw/delta_emissions/emissions_intensities_production_low.csv
     emissions_intensities_combustion: data/raw/delta_emissions/emissions_intensities_combustion_low.csv
@@ -40,7 +40,7 @@ delta_emissions:
       rate: -0.04
 
 projected_h2_emissions:
-  scenario: "ssp119"
+  scenario: "ssp245"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
   anthropogenic_proxy:
     "Emissions|H2|Fossil Fuel": Emissions|CO

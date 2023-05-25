@@ -450,6 +450,10 @@ class Config:
 
     name: str
     ssp_scenario: str
+    base_model: str
+    """
+    Name of the IAM from which the projections of secondary energy are sourced
+    """
 
     historical_notebook_dir: Path
     """Directory to store the templated historical notebooks"""

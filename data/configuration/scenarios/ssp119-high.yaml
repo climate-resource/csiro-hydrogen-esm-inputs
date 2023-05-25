@@ -1,5 +1,6 @@
 name: ssp119-high
 ssp_scenario: ssp119
+base_model: IMAGE
 
 emissions:
   cleaning_operations:
@@ -19,7 +20,7 @@ emissions:
           to: Baseline Emissions
           dimension: variable
   metadata:
-    assumptions: med
+    assumptions: high
 
 delta_emissions:
   inputs:
@@ -39,15 +40,6 @@ delta_emissions:
       end_year: 2050
       rate: -0.04
 
-historical_h2_emissions:
-  scenario: ssp245
-  baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
-  anthropogenic_proxy:
-    "Emissions|H2|Fossil Fuel": Emissions|CO
-    "Emissions|H2|Biomass burning": Emissions|BC
-    "Emissions|H2|Photochemical production|CH4": Emissions|CH4
-    "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-
 projected_h2_emissions:
   scenario: "ssp119"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
@@ -57,68 +49,4 @@ projected_h2_emissions:
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
 
-spatial_emissions:
-  - name: ssp119_australia
-    configuration_template:
-      name: ssp119_australia
-
-      inventory:
-        name: australia
-        year: 2016
-
-      timeslices:
-        - 2020
-        - 2040
-        - 2060
-        - 2080
-        - 2100
-
-      input_timeseries:
-      scalers:
-        default_scaler:
-          name: constant
-    scaler_templates:
-      - input_file: data/raw/spaemis/templates/template_australia_H2_scalers.yaml
-        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/template_australia_H2_scalers.yaml"
-      - input_file: data/raw/spaemis/templates/template_australia_scalers.csv
-        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/template_australia_scalers.csv"
-    scalar_template_replacements:
-      cr_h2_scenario: CR-IMAGE-{name}
-      ssp_scenario: IAMC-IMAGE-ssp119-1-1
-    downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
-    inventory_directory: "{spaemis_inventory_directory}"
-    proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia"
-  - name: ssp119_victoria
-    configuration_template:
-      name: ssp119_victoria
-
-      inventory:
-        name: victoria
-        year: 2016
-
-      timeslices:
-        - 2020
-        - 2040
-        - 2060
-        - 2080
-        - 2100
-
-      input_timeseries:
-      scalers:
-        default_scaler:
-          name: constant
-    scaler_templates:
-      - input_file: data/raw/spaemis/templates/template_victoria_H2_scalers.yaml
-        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_H2_scalers.yaml"
-      - input_file: data/raw/spaemis/templates/template_victoria_scalers.csv
-        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_scalers.csv"
-    scalar_template_replacements:
-      cr_h2_scenario: CR-IMAGE-{name}
-      ssp_scenario: IAMC-IMAGE-ssp119-1-1
-    downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
-    inventory_directory: "{spaemis_inventory_directory}"
-    proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"
+spatial_emissions: [] # No spatial emissions downscaling

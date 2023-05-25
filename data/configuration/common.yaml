@@ -19,6 +19,13 @@ emissions:
   figure_vs_rcmip: "{output_root_dir}/{run_id}/{name}/plots/emissions_vs-rcmip.pdf"
 
 historical_h2_emissions:
+  scenario: ssp245
+  baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
+  anthropogenic_proxy:
+    "Emissions|H2|Fossil Fuel": Emissions|CO
+    "Emissions|H2|Biomass burning": Emissions|BC
+    "Emissions|H2|Photochemical production|CH4": Emissions|CH4
+    "Emissions|H2|Photochemical production|VOC": Emissions|VOC
   baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/historical/data/interim/baseline_h2_emissions_regions.csv"
   baseline_h2_emissions_countries: "{output_root_dir}/{run_id}/historical/data/interim/baseline_h2_emissions_country.csv"
   figure_baseline_by_sector: "{output_root_dir}/{run_id}/historical/plots/baseline_by-sector.pdf"

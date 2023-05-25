@@ -55,7 +55,7 @@ __version__ = config.input4mips_archive.version
 # %%
 
 gridded_data_directory = config.projected_gridding.output_directory
-source_id = f"CR-{config.name.replace('_', '-')}"
+source_id = f"CR-{config.base_model}-{config.name}"
 
 
 def load_existing_data(variable_id: str, scenario_id: str) -> xr.Dataset | None:

@@ -1,16 +1,18 @@
-name: ssp119-low
-ssp_scenario: ssp119
-base_model: IMAGE
+name: ssp226-med
+ssp_scenario: ssp126
+base_model: REMIND-MAGPIE
 
 emissions:
   cleaning_operations:
+    # This ssp226 is used for the secondary energy timeseries
     - input_file: data/raw/input_emissions/SSP_IAM_V2_201811.csv
       filters:
-        scenario: SSP1-19
-        model: IMAGE
+        scenario: SSP2-26
+        model: "{base_model}"
+    # Note that we are using the CMIP6 emissions from IMAGE ssp126
     - input_file: data/raw/input_emissions/SSP_CMIP6_201811.csv
       filters:
-        scenario: SSP1-19
+        scenario: SSP1-26
         variable: CMIP6 Emissions|*
         region:
           - World
@@ -20,11 +22,11 @@ emissions:
           to: Baseline Emissions
           dimension: variable
   metadata:
-    assumptions: low
+    assumptions: med
 
 delta_emissions:
   inputs:
-    share_by_carrier: data/raw/delta_emissions/share_by_carrier_NZE.csv
+    share_by_carrier: data/raw/delta_emissions/share_by_carrier_SDS.csv
     leakage_rates: data/raw/delta_emissions/leakage_rates_low.csv
     emissions_intensities_production: data/raw/delta_emissions/emissions_intensities_production_low.csv
     emissions_intensities_combustion: data/raw/delta_emissions/emissions_intensities_combustion_low.csv
@@ -36,11 +38,11 @@ delta_emissions:
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2100
+      end_year: 2050
       rate: -0.04
 
 projected_h2_emissions:
-  scenario: "ssp119"
+  scenario: "ssp126"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
   anthropogenic_proxy:
     "Emissions|H2|Fossil Fuel": Emissions|CO
@@ -49,9 +51,9 @@ projected_h2_emissions:
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
 
 spatial_emissions:
-  - name: ssp119_australia
+  - name: ssp226_australia
     configuration_template:
-      name: ssp119_australia
+      name: ssp226_australia
 
       inventory:
         name: australia
@@ -75,15 +77,15 @@ spatial_emissions:
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/template_australia_scalers.csv"
     scalar_template_replacements:
       cr_h2_scenario: "CR-{base_model}-{name}"
-      ssp_scenario: "IAMC-{base_model}-{ssp_scenario}-1-1"
+      ssp_scenario: "IAMC-IMAGE-{ssp_scenario}-1-1"
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
     netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia/{run_id}_{name}_australia_projections.nc"
     csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia"
-  - name: ssp119_victoria
+  - name: ssp226_victoria
     configuration_template:
-      name: ssp119_victoria
+      name: ssp226_victoria
 
       inventory:
         name: victoria
@@ -107,7 +109,8 @@ spatial_emissions:
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_scalers.csv"
     scalar_template_replacements:
       cr_h2_scenario: "CR-{base_model}-{name}"
-      ssp_scenario: "IAMC-{base_model}-{ssp_scenario}-1-1"
+      # Note that we are using SSP126 emissions for gridding
+      ssp_scenario: "IAMC-IMAGE-{ssp_scenario}-1-1"
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies

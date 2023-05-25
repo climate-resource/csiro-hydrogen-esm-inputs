@@ -1,16 +1,18 @@
-name: ssp119-med
-ssp_scenario: ssp119
-base_model: IMAGE
+name: ssp226-low
+ssp_scenario: ssp126
+base_model: REMIND-MAGPIE
 
 emissions:
   cleaning_operations:
+    # This ssp226 is used for the secondary energy timeseries
     - input_file: data/raw/input_emissions/SSP_IAM_V2_201811.csv
       filters:
-        scenario: SSP1-19
-        model: IMAGE
+        scenario: SSP2-26
+        model: REMIND-MAGPIE
+    # Note that we are using the CMIP6 emissions from IMAGE ssp126
     - input_file: data/raw/input_emissions/SSP_CMIP6_201811.csv
       filters:
-        scenario: SSP1-19
+        scenario: SSP1-26
         variable: CMIP6 Emissions|*
         region:
           - World
@@ -20,11 +22,11 @@ emissions:
           to: Baseline Emissions
           dimension: variable
   metadata:
-    assumptions: med
+    assumptions: low
 
 delta_emissions:
   inputs:
-    share_by_carrier: data/raw/delta_emissions/share_by_carrier_NZE.csv
+    share_by_carrier: data/raw/delta_emissions/share_by_carrier_SDS.csv
     leakage_rates: data/raw/delta_emissions/leakage_rates_low.csv
     emissions_intensities_production: data/raw/delta_emissions/emissions_intensities_production_low.csv
     emissions_intensities_combustion: data/raw/delta_emissions/emissions_intensities_combustion_low.csv
@@ -36,11 +38,11 @@ delta_emissions:
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2050
+      end_year: 2100
       rate: -0.04
 
 projected_h2_emissions:
-  scenario: "ssp119"
+  scenario: "ssp126"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
   anthropogenic_proxy:
     "Emissions|H2|Fossil Fuel": Emissions|CO
