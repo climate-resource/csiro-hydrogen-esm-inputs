@@ -40,14 +40,6 @@ class ConfigGridding:
     sector_type: Literal["CEDS9"]
     """Type of CEDS sectors used for gridding"""
 
-    grid_data_directory: Path
-    """
-    Pre-processed data for gridding
-
-    TODO: write more docs
-
-    See https://github.com/lewisjared/aneris/blob/feng/notebooks/gridding/010_prepare_input_data.py
-    """
     output_directory: Path
     """
     Where to write the outputs
@@ -80,6 +72,21 @@ class ConfigInput4MIPs:
     version: str
     """
     Version flag for the generated results
+    """
+
+    complete_file_emissions_historical: Path
+    """
+    File that indicates the historical emissions have been written in the input4MIPs archive
+    """
+
+    complete_file_emissions_scenario: Path
+    """
+    File that indicates the scenario emissions have been written in the input4MIPs archive
+    """
+
+    complete_file_concentrations: Path
+    """
+    File that indicates the concentrations have been written in the archive
     """
 
 
@@ -311,9 +318,6 @@ class ConcentrationGriddingConfig:
     From these we write the input4MIPs style files
     """
 
-    gridded_output_dir: Path
-    """Path to gridded output, written in input4MIPs style"""
-
 
 @frozen
 class ConfigSpatialEmissionsScalerTemplate:
@@ -382,6 +386,43 @@ class ConfigSpatialEmissions:
 
 
 @frozen
+class GriddingPreparationConfig:
+    """
+    Configuration for gridding preparation
+    """
+
+    raw_rscript: Path
+    """
+    Path to raw R script used for prepration
+    """
+
+    output_rscript: Path
+    """
+    Path to R script in the output
+    """
+
+    zenoda_data_archive: Path
+    """
+    Path in which results from [Feng et al. 2020](https://zenodo.org/record/2538194) have been extracted
+    """
+
+    input_dir_rscript: Path
+    """
+    Input directory used by the R script
+    """
+
+    output_dir_rscript: Path
+    """
+    Output directory used by the R script
+    """
+
+    output_dir: Path
+    """
+    Path in which to save the outputs
+    """
+
+
+@frozen
 class Config:
     """
     Configuration class
@@ -399,6 +440,14 @@ class Config:
 
     output_notebook_dir: Path
     """Notebook output directory"""
+
+    finalisation_notebook_dir: Path
+    """Directory to store the templated finalisation notebooks"""
+
+    gridding_preparation: GriddingPreparationConfig
+    """
+    Configuration for gridding preparation
+    """
 
     emissions: ConfigEmissions
     """

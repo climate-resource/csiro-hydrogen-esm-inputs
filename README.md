@@ -33,6 +33,7 @@ below
 
 ```sh
 poetry run doit run --verbosity 2 display_info crunch_scenarios --run-id myrun
+poetry run doit run --verbosity 2 generate_notebook_tasks --run-id zn-test-2505 --configglob-scenarios "*low*yaml" "Write input4MIPs concentrations" "write projected input4MIPS results" "write historical input4MIPS results"
 ```
 
 Running in this way allows pydoit's task checking to only re-run tasks where the dependencies have been updated.
@@ -42,50 +43,58 @@ Running in this way allows pydoit's task checking to only re-run tasks where the
 
 Not all data required to complete the pipeline can be included in the Git repository.
 
+For now, you need to change any paths that start with `/Users` in
+`data/configuration/common.yaml` to the relevant path for you.
+You also need to update the paths in `notebooks/000_preparation/000_decompose_air_seasonality.R`.
+In future, we will update these so they are supplied as an environment variable instead.
+
 For the gridding step, a range of proxies and seasonality data are needed. These
 can be obtained by downloading the results from
 [Feng et al. 2020](https://zenodo.org/record/2538194) (this can take
-some time so start with that). While that is downloading, install `R` so that
-`Rscript` is available on your `PATH`. This step is OS specific, but for MacOS
-we recommend using `brew`.
+some time so start with that).
 
-The `aneris` repository with the feng gridding module then needs to be cloned and setup.
-In this case we are creating a local virtual environment instead of having to setup
-`aneris`'s complete conda development environment.
+Once the outputs from `Feng et al. 2020` have been downloaded, extract them to
+`data/raw/emissions_downscaling_archive`. There is a file that appears to be
+missing from the archive, it is
+`data/raw/emissions_downscaling_archive/gridding/gridding-mappings/country_location_index_05.csv`.
+This can be downloaded from
+[here](https://github.com/iiasa/emissions_downscaling/blob/master/input/gridding/gridding-mappings/country_location_index_05.csv).
+Make sure you have downloaded and saved this file in
+`data/raw/emissions_downscaling_archive/gridding/gridding-mappings/country_location_index_05.csv`
+before preceeding.
+
+While the Feng data is downloading, install `R` so that
+`Rscript` is available on your `PATH`. This step is OS specific, but for MacOS
+we recommend using `brew` ([see homebrew](https://brew.sh/)).
+
+If successful, you should be able to run the following and get output like the following
+
+```bash
+$ Rscript --version
+Rscript (R) version 4.3.0 (2023-04-21)
+```
+
+The `aneris` repository with the feng gridding module then needs to be cloned.
+Put the `aneris` folder wherever best suits, we recommend putting it in a
+folder in the root level of this repository as it is automatically ignored by
+our `.gitignore` file.
 
 ```bash
 git clone git@github.com:lewisjared/aneris.git
 cd aneris
 git checkout feng
-python -m venv venv
-source venv/bin/activate
-pip install pyreadr xarray pandas numpy joblib
 ```
 
-Once `aneris` and the outputs from `Feng et al. 2020` have been downloaded and extracted to
-`data/raw/emissions_downscaling_archive` inside the aneris repository, the processing
-notebook can be run.
-
-The `notebooks/gridding/010_prepare_input_data.py` notebook preprocesses the
-required data from `Feng et al` into a set of data that can be easily read
-by Python.
-
-The results of this preprocessing should be available in `data/processed/gridding`.
-This directory is the `historical_h2_gridding.grid_data_directory` configuration
-variable (TODO: figure out how to make this non-user-specific) and contains the
-following subdirectories:
-
-```bash
-data/processed
-└── gridding
-    ├── masks
-    ├── proxies
-    ├── seasonality
-    └── seasonality-temp
-```
+You will also need to download MAGICC7 and the AR6 probabilistic file from
+https://magicc.org/download/magicc7. The paths to the downloaded files can
+then be set in the common configuration under the `magicc_runs` key.
 
 If input4MIPs data are available they will be included in
 the gridded results for sectors that have not been modified.
 If no-data are available these non-modified sectors will be set to
 nan.
-TODO: write the list of variables and sources that should be downloaded.s
+TODO: write the list of variables and sources that should be downloaded.
+[@jared I have left this to-do, this is good enough for now. I am happy to write a
+little download script (same as what I did for concentrations) if helpful.]
+
+- are files in data/raw/gridding meant to be sourced from elsewhere?

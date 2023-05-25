@@ -1,6 +1,13 @@
 name: ssp119-low
 ssp_scenario: ssp119
-output_notebook_dir: dev-output/notebooks
+output_notebook_dir: dev-output/ssp119-low/notebooks
+historical_notebook_dir: dev-output/historical/notebooks
+
+gridding_preparation:
+  zenoda_data_archive: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive
+  input_dir_rscript: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive/gridding
+  output_dir_rscript: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/processed/gridding
+  output_dir: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/processed/gridding
 
 emissions:
   cleaning_operations:
@@ -48,8 +55,9 @@ historical_h2_gridding:
   proxy_mapping: ../../data/raw/gridding/grid_proxy_mapping.csv
   seasonality_mapping: ../../data/raw/gridding/seasonality_mapping_CEDS9.csv
   sector_type: "CEDS9"
-  # TODO: make this non-user specific
-  grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
+  # TODO: make this non-user specific (should we remove the equivalent key
+  # from the scenarios?)
+  grid_data_directory: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/aneris/data/processed/gridding
   output_directory: dev-output/historical/gridding
   fast: true
 
@@ -104,7 +112,7 @@ projected_gridding:
   seasonality_mapping: ../../data/raw/gridding/seasonality_mapping_CEDS9.csv
   sector_type: "CEDS9"
   # TODO: make this non-user specific
-  grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
+  grid_data_directory: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/aneris/data/processed/gridding
   output_directory: dev-output/ssp119-low/gridding
   fast: true
 

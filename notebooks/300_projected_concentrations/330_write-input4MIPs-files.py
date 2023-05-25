@@ -19,6 +19,7 @@
 
 # %%
 import copy
+import datetime
 
 import cf_xarray.units
 import matplotlib.pyplot as plt
@@ -53,13 +54,16 @@ config_file: str = "../dev.yaml"  # config file
 # %%
 config = load_config_from_file(config_file)
 
+# %%
+__version__ = config.input4mips_archive.version
+
 # %% [markdown]
 # ## Write files
 #
 # Write files from our own data.
 
 # %%
-output_dir = config.concentration_gridding.gridded_output_dir
+output_dir = config.input4mips_archive.results_archive
 output_dir
 
 # %%
@@ -116,7 +120,7 @@ lat_mean.sel(region="World")[v].isel(time=range(150)).plot(hue="scenario")
 plt.show()
 
 # %%
-source_version = "0.1.0"
+source_version = __version__
 
 metadata_self = Input4MIPsMetadata(
     contact="zebedee.nicholls@climate-resource.com",
@@ -130,7 +134,7 @@ metadata_self = Input4MIPsMetadata(
     realm="atmos",
     source_id="{scenario}",
     source_version=source_version,
-    target_mip="HydrogenMIP",  # TODO: check desired value here
+    target_mip="ScenarioMIP",
     title="{equal-to-source_id}",
     Conventions="CF-1.6",
     activity_id="input4MIPs",
@@ -389,3 +393,7 @@ generate_directory_checklist(output_dir)
 #         pprint(result)
 #         print("-" * len(v))
 #     print("=" * len(written_file.name))
+
+# %%
+with open(config.input4mips_archive.complete_file_concentrations, "w") as fh:
+    fh.write(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))

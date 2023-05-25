@@ -22,7 +22,11 @@ from local.parameters import (
 from local.pydoit_nb.config_discovery import (
     glob_config_files,
 )
-from local.steps import gen_crunch_historical_tasks, gen_crunch_scenario_tasks
+from local.steps import (
+    gen_crunch_historical_tasks,
+    gen_crunch_scenario_tasks,
+    gen_finalise_tasks,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("dodo")
@@ -122,6 +126,11 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
     )
 
     yield from gen_crunch_scenario_tasks(
+        config_bundles,
+        raw_notebooks_dir.absolute(),
+    )
+
+    yield from gen_finalise_tasks(
         config_bundles,
         raw_notebooks_dir.absolute(),
     )

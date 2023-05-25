@@ -62,7 +62,7 @@ scenario_emissions.get_unique_meta("sector")
 
 # %%
 gridder = Gridder(
-    grid_dir=str(grid_config.grid_data_directory),
+    grid_dir=str(config.gridding_preparation.output_dir),
     proxy_definition_file=str(grid_config.proxy_mapping),
     seasonality_mapping_file=str(grid_config.seasonality_mapping),
     sector_type=grid_config.sector_type,

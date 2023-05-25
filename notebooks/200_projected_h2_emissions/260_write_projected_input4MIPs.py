@@ -24,12 +24,12 @@
 
 
 # %%
+import datetime
 import logging
 
 import xarray as xr
 from joblib import Parallel, delayed  # type: ignore
 
-from local import __version__
 from local.config import load_config_from_file
 from local.h2_adjust.constants import HYDROGEN_PRODUCTS
 from local.h2_adjust.outputs import (
@@ -48,6 +48,9 @@ config_file: str = "../dev.yaml"  # config file
 
 # %%
 config = load_config_from_file(config_file)
+
+# %%
+__version__ = config.input4mips_archive.version
 
 # %%
 
@@ -183,7 +186,7 @@ n_jobs = 4
 Parallel(n_jobs=n_jobs)(delayed(f)(*args) for f, *args in jobs)
 
 # %%
-
+# Probably remove?
 generate_directory_checklist(
     config.input4mips_archive.results_archive
     / "input4MIPs"
@@ -192,3 +195,7 @@ generate_directory_checklist(
     / "CR"
     / source_id
 )
+
+# %%
+with open(config.input4mips_archive.complete_file_emissions_scenario, "w") as fh:
+    fh.write(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))

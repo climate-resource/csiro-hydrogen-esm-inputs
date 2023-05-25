@@ -7,7 +7,7 @@ We have two sets of notebooks that are run:
 * scenario - Set of steps that are run for each unique configuration bundle
 """
 import itertools
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +51,30 @@ def get_notebook_steps_historical(
 
     steps = [
         SingleNotebookDirStep(
+            name="Prepare gridding proxies inputs",
+            doc="check the inputs for the gridding proxies are all in the right place",
+            notebook="000_preparation/009_prepare_for_processing_gridding",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=(config.gridding_preparation.raw_rscript,),
+            targets=(
+                get_checklist_file(config.gridding_preparation.zenoda_data_archive),
+                config.gridding_preparation.output_rscript,
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="Prepare gridding proxies",
+            doc="prepare gridding proxies from Feng et al. (2020)",
+            notebook="000_preparation/010_prepare_input_data",
+            raw_notebook_ext=".py",
+            configuration=(config.gridding_preparation.output_dir,),
+            dependencies=(
+                config.gridding_preparation.output_rscript,
+                get_checklist_file(config.gridding_preparation.zenoda_data_archive),
+            ),
+            targets=(get_checklist_file(config.gridding_preparation.output_dir),),
+        ),
+        SingleNotebookDirStep(
             name="Download CMIP6 concentrations",
             doc="download required CMIP6 concentrations",
             notebook="300_projected_concentrations/320_download-cmip6-data",
@@ -59,6 +83,22 @@ def get_notebook_steps_historical(
             dependencies=(),
             targets=(
                 get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
+            ),
+        ),
+        SingleNotebookDirStep(
+            name="Extract CMIP6 grids",
+            doc="extract grids from CMIP6 concentrations",
+            notebook="300_projected_concentrations/321_extract-grids-from-cmip6",
+            raw_notebook_ext=".py",
+            configuration=(
+                config.cmip6_concentrations.concentration_scenario_ids,
+                config.cmip6_concentrations.concentration_variables,
+            ),
+            dependencies=(
+                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
+            ),
+            targets=(
+                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
             ),
         ),
         SingleNotebookDirStep(
@@ -97,6 +137,7 @@ def get_notebook_steps_historical(
             configuration=(config.historical_h2_gridding,),
             dependencies=(
                 config.historical_h2_emissions.baseline_h2_emissions_countries,
+                get_checklist_file(config.gridding_preparation.output_dir),
             ),
             targets=(
                 get_checklist_file(config.historical_h2_gridding.output_directory),
@@ -107,11 +148,18 @@ def get_notebook_steps_historical(
             doc="write historical input4MIPS results",
             notebook="100_historical_h2_emissions/130_write_historical_input4MIPs",
             raw_notebook_ext=".py",
-            configuration=(config.input4mips_archive,),
+            configuration=(
+                config.input4mips_archive.results_archive,
+                config.input4mips_archive.local_archive,
+                config.input4mips_archive.version,
+            ),
             dependencies=(
                 get_checklist_file(config.historical_h2_gridding.output_directory),
             ),
-            targets=(get_checklist_file(historical_emissions_dir),),
+            targets=(
+                get_checklist_file(historical_emissions_dir),
+                config.input4mips_archive.complete_file_emissions_historical,
+            ),
         ),
     ]
 
@@ -153,7 +201,7 @@ def get_notebook_steps_scenario(
     -------
         Notebook steps to run
     """
-    projected_emissions_dir = (
+    (
         config.input4mips_archive.results_archive
         / "input4MIPs"
         / "CMIP6"
@@ -259,10 +307,11 @@ def get_notebook_steps_scenario(
             doc="downscale projected H2 regional emissions to countries",
             notebook="200_projected_h2_emissions/240_downscale_projected_emissions",
             raw_notebook_ext=".py",
-            configuration=(
+            configuration=(),
+            dependencies=(
+                config.emissions.complete_scenario,
                 config.historical_h2_emissions.baseline_h2_emissions_countries,
             ),
-            dependencies=(config.emissions.complete_scenario,),
             targets=(config.emissions.complete_scenario_countries,),
         ),
         SingleNotebookDirStep(
@@ -271,7 +320,10 @@ def get_notebook_steps_scenario(
             notebook="200_projected_h2_emissions/250_grid_projected_emissions",
             raw_notebook_ext=".py",
             configuration=(config.projected_gridding,),
-            dependencies=(config.emissions.complete_scenario_countries,),
+            dependencies=(
+                config.emissions.complete_scenario_countries,
+                get_checklist_file(config.gridding_preparation.output_dir),
+            ),
             targets=(get_checklist_file(config.projected_gridding.output_directory),),
         ),
         SingleNotebookDirStep(
@@ -283,7 +335,7 @@ def get_notebook_steps_scenario(
             dependencies=(
                 get_checklist_file(config.projected_gridding.output_directory),
             ),
-            targets=(get_checklist_file(projected_emissions_dir),),
+            targets=(config.input4mips_archive.complete_file_emissions_scenario,),
         ),
     ]
 
@@ -305,22 +357,6 @@ def get_notebook_steps_scenario(
             configuration=(config.rcmip.concentrations_path,),
             dependencies=(config.magicc_runs.output_file,),
             targets=(),
-        ),
-        SingleNotebookDirStep(
-            name="Extract CMIP6 grids",
-            doc="extract grids from CMIP6 concentrations",
-            notebook="300_projected_concentrations/321_extract-grids-from-cmip6",
-            raw_notebook_ext=".py",
-            configuration=(
-                config.cmip6_concentrations.concentration_scenario_ids,
-                config.cmip6_concentrations.concentration_variables,
-            ),
-            dependencies=(
-                get_checklist_file(config.cmip6_concentrations.root_raw_data_dir),
-            ),
-            targets=(
-                config.concentration_gridding.cmip6_seasonality_and_latitudinal_gradient_path,
-            ),
         ),
         SingleNotebookDirStep(
             name="Grided projections",
@@ -350,9 +386,7 @@ def get_notebook_steps_scenario(
                     config.concentration_gridding.interim_gridded_output_dir
                 ),
             ),
-            targets=(
-                get_checklist_file(config.concentration_gridding.gridded_output_dir),
-            ),
+            targets=(config.input4mips_archive.complete_file_concentrations,),
         ),
     ]
 
@@ -404,6 +438,78 @@ def get_notebook_steps_scenario(
             *spatial_emissions_steps,
         ]
     ]
+
+    return out
+
+
+def get_notebook_steps_finalise(
+    configs: Iterable[Config], raw_notebooks_dir: Path, stub: str
+) -> tuple[NotebookStep, ...]:
+    """
+    Get finalisation notebook steps
+
+    Parameters
+    ----------
+    configs
+        Hydrated configuration from which targets and dependencies can be
+        taken. Here we are condensing so we take in multiple configurations.
+
+    raw_notebooks_dir
+        Where raw notebooks live
+
+    stub
+        Stub to identify this particular set of hydrated config, separate from
+        all others
+
+    Returns
+    -------
+        Finalisation notebook steps to run
+    """
+    dependencies_dup = itertools.chain(
+        *[
+            [
+                c.input4mips_archive.complete_file_emissions_historical,
+                c.input4mips_archive.complete_file_emissions_scenario,
+                c.input4mips_archive.complete_file_concentrations,
+            ]
+            for c in configs
+        ]
+    )
+    dependencies = set(dependencies_dup)
+
+    # Very lazy, sorry @Jared
+    results_archives = set(c.input4mips_archive.results_archive for c in configs)
+    if len(results_archives) > 1:
+        raise NotImplementedError()
+
+    results_archive = list(results_archives)[0]
+
+    finalisation_notebook_dirs = set(c.finalisation_notebook_dir for c in configs)
+    if len(finalisation_notebook_dirs) > 1:
+        raise NotImplementedError()
+
+    finalisation_notebook_dir = list(finalisation_notebook_dirs)[0]
+
+    steps = [
+        SingleNotebookDirStep(
+            name="Create input4MIPs checklist file",
+            doc="Creates a checklist file based on all input4MIPs outputs",
+            notebook="500_finalisation/500_write-input4MIPs-checklist",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=dependencies,
+            targets=(get_checklist_file(results_archive),),
+        ),
+    ]
+
+    out = tuple(
+        sds.to_notebook_step(
+            raw_notebooks_dir=raw_notebooks_dir,
+            output_notebook_dir=finalisation_notebook_dir,
+            stub=stub,
+        )
+        for sds in steps
+    )
 
     return out
 
@@ -483,5 +589,41 @@ def gen_crunch_historical_tasks(
     # Doesn't matter which config you use, results are all the same
     yield from gen_run_notebook_tasks(
         notebook_steps[0],  # type: ignore
+        config_bundles[0].config_hydrated_path,
+    )
+
+
+def gen_finalise_tasks(
+    config_bundles: Sequence[ConfigBundle],
+    raw_notebooks_dir: Path,
+) -> Iterator[dict[str, Any]]:
+    """
+    Generate finalisation tasks
+
+    This only creates one finalisation task, even though there are multiple
+    scenarios captured by ``config_bundles``.
+
+    Parameters
+    ----------
+    config_bundles
+        Collection of configuration bundle to be run
+
+    raw_notebooks_dir
+        Where raw notebooks live
+
+    Yields
+    ------
+        Tasks to run with pydoit
+    """
+    notebook_steps = get_notebook_steps_finalise(
+        [cb.config_hydrated for cb in config_bundles],
+        raw_notebooks_dir,
+        # Hard-coding might actually be the right choice here
+        stub="finalise",
+    )
+
+    # Doesn't matter which config you use, results are all the same
+    yield from gen_run_notebook_tasks(
+        notebook_steps,  # type: ignore
         config_bundles[0].config_hydrated_path,
     )

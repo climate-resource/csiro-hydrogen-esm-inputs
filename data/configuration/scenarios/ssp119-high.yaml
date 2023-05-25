@@ -48,11 +48,6 @@ historical_h2_emissions:
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
 
-historical_h2_gridding:
-  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
-  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
-  sector_type: "CEDS9"
-
 projected_h2_emissions:
   scenario: "ssp119"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
@@ -61,11 +56,6 @@ projected_h2_emissions:
     "Emissions|H2|Biomass burning": Emissions|BC
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-
-projected_gridding:
-  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
-  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
-  sector_type: "CEDS9"
 
 spatial_emissions:
   - name: ssp119_australia

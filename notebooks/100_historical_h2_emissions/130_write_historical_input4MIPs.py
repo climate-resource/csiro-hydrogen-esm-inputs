@@ -25,12 +25,12 @@
 
 
 # %%
+import datetime
 import logging
 
 import xarray as xr
 from joblib import Parallel, delayed  # type: ignore
 
-from local import __version__
 from local.config import load_config_from_file
 from local.h2_adjust.outputs import (
     SupportsWriteSlice,
@@ -48,6 +48,9 @@ config_file: str = "../dev.yaml"  # config file
 
 # %%
 config = load_config_from_file(config_file)
+
+# %%
+__version__ = config.input4mips_archive.version
 
 # %%
 gridded_data_directory = config.historical_h2_gridding.output_directory
@@ -138,7 +141,7 @@ n_jobs = 2
 Parallel(n_jobs=n_jobs)(delayed(f)(*args) for f, *args in jobs)
 
 # %%
-
+# Probably remove?
 generate_directory_checklist(
     config.input4mips_archive.results_archive
     / "input4MIPs"
@@ -147,3 +150,7 @@ generate_directory_checklist(
     / "CR"
     / "CR-historical"
 )
+
+# %%
+with open(config.input4mips_archive.complete_file_emissions_historical, "w") as fh:
+    fh.write(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))

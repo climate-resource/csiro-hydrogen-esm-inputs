@@ -1,10 +1,15 @@
+# Local clone of aneris
+aneris
+
 # Data
 data/runs
 data/raw/cmip6-concentrations
 data/raw/rcmip
-data/raw/magicc-bits-and-pieces
+*magicc-bits-and-pieces
 output-bundles
 notebooks/dev-output
+data/processed
+data/raw/emissions_downscaling_archive
 
 # Notebooks and related stuff
 *.ipynb

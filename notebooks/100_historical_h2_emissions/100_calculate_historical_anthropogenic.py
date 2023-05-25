@@ -367,6 +367,7 @@ plt.savefig(baseline_config.figure_baseline_by_source_and_sector)
 
 # %%
 sectoral_regional_emissions["scenario"] = scenario
+baseline_config.baseline_h2_emissions_regions.parent.mkdir(parents=True, exist_ok=True)
 sectoral_regional_emissions.filter(year=range(1850, 2015 + 1)).to_csv(
     baseline_config.baseline_h2_emissions_regions
 )

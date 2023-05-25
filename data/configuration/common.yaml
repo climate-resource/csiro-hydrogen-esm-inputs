@@ -1,67 +1,83 @@
 # A common set of configuration that are applied to all scenarios
 output_notebook_dir: "{output_root_dir}/{run_id}/{name}/notebooks"
 historical_notebook_dir: "{output_root_dir}/{run_id}/historical/notebooks"
+finalisation_notebook_dir: "{output_root_dir}/{run_id}/finalisation/notebooks"
+
+gridding_preparation:
+  # TODO: env variables
+  raw_rscript: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/notebooks/000_preparation/000_decompose_air_seasonality.R
+  output_rscript: "{output_root_dir}/{run_id}/historical/notebooks/000_preparation/000_decompose_air_seasonality.R"
+  zenoda_data_archive: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive
+  input_dir_rscript: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive/gridding
+  output_dir_rscript: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/data/processed/gridding
+  output_dir: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/aneris/data/processed/gridding
 
 emissions:
-  input_scenario: "{output_root_dir}/{run_id}/{name}/emissions_input.csv"
-  magicc_scenario: "{output_root_dir}/{run_id}/{name}/emissions_CR-{name}_magicc.csv"
-  complete_scenario: "{output_root_dir}/{run_id}/{name}/emissions_CR-{name}_complete.csv"
-  complete_scenario_countries: "{output_root_dir}/{run_id}/{name}/emissions_CR-{name}_countries.csv"
+  input_scenario: "{output_root_dir}/{run_id}/{name}/data/interim/emissions-scenario/emissions_input.csv"
+  magicc_scenario: "{output_root_dir}/{run_id}/{name}/data/interim/emissions-scenario/emissions_CR-{name}_magicc.csv"
+  complete_scenario: "{output_root_dir}/{run_id}/{name}/data/interim/emissions-scenario/emissions_CR-{name}_complete.csv"
+  complete_scenario_countries: "{output_root_dir}/{run_id}/{name}/data/interim/emissions-scenario/emissions_CR-{name}_countries.csv"
   figure_by_sector: "{output_root_dir}/{run_id}/{name}/plots/emissions_by-sector.pdf"
   figure_by_sector_only_modified: "{output_root_dir}/{run_id}/{name}/plots/emissions_by-sector-modified.pdf"
   figure_vs_rcmip: "{output_root_dir}/{run_id}/{name}/plots/emissions_vs-rcmip.pdf"
 
 historical_h2_emissions:
-  baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/historical/baseline_h2_emissions_regions.csv"
-  baseline_h2_emissions_countries: "{output_root_dir}/{run_id}/historical/baseline_h2_emissions_country.csv"
+  baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/historical/data/interim/baseline_h2_emissions_regions.csv"
+  baseline_h2_emissions_countries: "{output_root_dir}/{run_id}/historical/data/interim/baseline_h2_emissions_country.csv"
   figure_baseline_by_sector: "{output_root_dir}/{run_id}/historical/plots/baseline_by-sector.pdf"
   figure_baseline_by_source: "{output_root_dir}/{run_id}/historical/plots/baseline_by-source.pdf"
   figure_baseline_by_source_and_sector: "{output_root_dir}/{run_id}/historical/plots/baseline_by-source-sector.pdf"
 
 historical_h2_gridding:
-  # TODO: make this non-user specific
-  grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
-  output_directory: "{output_root_dir}/{run_id}/historical/gridding"
+  output_directory: "{output_root_dir}/{run_id}/historical/data/interim/gridding"
   fast: true
+  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
+  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
+  sector_type: "CEDS9"
 
 input4mips_archive:
   # TODO: THis should also be an environment variable
   local_archive: ../spaemis/data/processed/input4MIPs
   results_archive: "{output_root_dir}/{run_id}/results"
   version: 20230515
+  complete_file_emissions_historical: "{output_root_dir}/{run_id}/historical/data/interim/gridding/emissions_historical.complete"
+  complete_file_emissions_scenario: "{output_root_dir}/{run_id}/{name}/data/interim/gridding/emissions_scenario.complete"
+  complete_file_concentrations: "{output_root_dir}/{run_id}/{name}/data/interim/gridding/concentrations.complete"
 
 delta_emissions:
   clean:
-    share_by_carrier: "{output_root_dir}/{run_id}/{name}/delta_emissions/share_by_carrier_clean.csv"
-    leakage_rates: "{output_root_dir}/{run_id}/{name}/delta_emissions/leakage_rates_clean.csv"
-    emissions_intensities_production: "{output_root_dir}/{run_id}/{name}/delta_emissions/emissions_intensities_production_clean.csv"
-    emissions_intensities_combustion: "{output_root_dir}/{run_id}/{name}/delta_emissions/emissions_intensities_combustion_clean.csv"
+    share_by_carrier: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/share_by_carrier_clean.csv"
+    leakage_rates: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/leakage_rates_clean.csv"
+    emissions_intensities_production: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/emissions_intensities_production_clean.csv"
+    emissions_intensities_combustion: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/emissions_intensities_combustion_clean.csv"
 
-  energy_by_carrier: "{output_root_dir}/{run_id}/{name}/delta_emissions/energy_by_carrier.csv"
-  delta_emissions_complete: "{output_root_dir}/{run_id}/{name}/delta_emissions/delta_emissions_complete.csv"
-  delta_emissions_totals: "{output_root_dir}/{run_id}/{name}/delta_emissions/delta_emissions_totals.csv"
+  energy_by_carrier: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/energy_by_carrier.csv"
+  delta_emissions_complete: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/delta_emissions_complete.csv"
+  delta_emissions_totals: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/delta_emissions_totals.csv"
 
 projected_h2_emissions:
-  baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/{name}/baseline_h2_emissions_regions.csv"
-  baseline_h2_emissions_countries: "{output_root_dir}/{run_id}/{name}/baseline_h2_emissions_country.csv"
+  baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/{name}/data/interim/baseline_h2_emissions_regions.csv"
+  baseline_h2_emissions_countries: "{output_root_dir}/{run_id}/{name}/data/interim/baseline_h2_emissions_country.csv"
   figure_baseline_by_sector: "{output_root_dir}/{run_id}/{name}/plots/baseline_by-sector.pdf"
   figure_baseline_by_source: "{output_root_dir}/{run_id}/{name}/plots/baseline_by-source.pdf"
   figure_baseline_by_source_and_sector: "{output_root_dir}/{run_id}/{name}/plots/baseline_by-source-sector.pdf"
 
 projected_gridding:
-  # TODO: make this non-user specific
-  grid_data_directory: /Users/jared/code/cr/aneris/data/processed/gridding
-  output_directory: "{output_root_dir}/{run_id}/{name}/gridding"
+  output_directory: "{output_root_dir}/{run_id}/{name}/data/interim/gridding"
   fast: true
+  proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
+  seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
+  sector_type: "CEDS9"
 
 magicc_runs:
   n_cfgs_to_run: 5
   output_file: "{output_root_dir}/{run_id}/{name}/data/interim/magicc-output/magicc-concentration-projections.nc"
-  ar6_probabilistic_distribution_file: data/raw/magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
+  # TODO: move all this to env file
+  ar6_probabilistic_distribution_file: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
   # this probably belongs in an environment variable if we're perfectly honest
   # because it's platform dependent, @jared what do you think?
-  magicc_executable_path: data/raw/magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc-darwin-arm64
-  magicc_worker_root_dir: ~/Desktop
+  magicc_executable_path: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc-darwin-arm64
+  magicc_worker_root_dir: /Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/magicc-bits-and-pieces/workers
   magicc_worker_number: 4
 
 rcmip:
@@ -80,6 +96,5 @@ cmip6_concentrations:
     - mole-fraction-of-methane-in-air
 
 concentration_gridding:
-  cmip6_seasonality_and_latitudinal_gradient_path: "{output_root_dir}/{run_id}/{name}/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc"
+  cmip6_seasonality_and_latitudinal_gradient_path: "{output_root_dir}/{run_id}/common/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc"
   interim_gridded_output_dir: "{output_root_dir}/{run_id}/{name}/data/interim/gridded-concentration-projections"
-  gridded_output_dir: "{output_root_dir}/{run_id}/{name}/data/processed/input4MIPs-gridded-concentration-projections"
