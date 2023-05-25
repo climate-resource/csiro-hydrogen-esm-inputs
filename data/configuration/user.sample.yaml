@@ -1,0 +1,7 @@
+input4mips_local_archive: ../spaemis/data/processed/input4MIPs
+gridding_data_archive: ../h2-adjust/data/raw/emissions_downscaling_archive
+spaemis_inventory_directory: ../spaemis/data/raw/inventories
+ar6_probabilistic_distribution_file: magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
+magicc_executable_path: magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc-darwin-arm64
+magicc_worker_root_dir: "magicc-bits-and-pieces/workers"
+magicc_worker_number: 4

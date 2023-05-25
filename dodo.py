@@ -90,6 +90,7 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
     run_id,
     raw_notebooks_dir,
     common_configuration,
+    user_placeholders,
 ) -> Iterable[dict[str, Any]]:
     """
     Generate tasks based on notebooks
@@ -105,6 +106,7 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
             output_root_dir=output_root_dir,
             run_id=run_id,
             common_config_file=common_configuration,
+            user_placeholder_file=user_placeholders,
         )
         for cf in config_files
     ]

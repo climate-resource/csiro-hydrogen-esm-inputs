@@ -85,7 +85,7 @@ spatial_emissions:
       cr_h2_scenario: CR-IMAGE-{name}
       ssp_scenario: IAMC-IMAGE-ssp119-1-1
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
-    inventory_directory: ../spaemis/data/raw/inventories
+    inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
     netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia/{run_id}_{name}_australia_projections.nc"
     csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia"
@@ -117,7 +117,7 @@ spatial_emissions:
       cr_h2_scenario: CR-IMAGE-{name}
       ssp_scenario: IAMC-IMAGE-ssp119-1-1
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
-    inventory_directory: ../spaemis/data/raw/inventories
+    inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
     netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_australia_projections.nc"
     csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"

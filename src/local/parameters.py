@@ -63,6 +63,13 @@ config_files_task_params: list[dict[str, Any]] = [
         "long": "common_config",
         "help": "Common configuration used across all scenario runs",
     },
+    {
+        "name": "user_placeholders",
+        "default": Path("data") / "configuration" / "user.yaml",
+        "type": str,
+        "long": "user-placeholders",
+        "help": "User-specific placeholders used to hydrate the configuration",
+    },
 ]
 """
 Task parameters to use when discovering files with glob

@@ -3,6 +3,7 @@ aneris
 
 # Data
 data/runs
+data/configuration/user.yaml
 data/raw/cmip6-concentrations
 data/raw/rcmip
 *magicc-bits-and-pieces

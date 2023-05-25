@@ -43,10 +43,11 @@ Running in this way allows pydoit's task checking to only re-run tasks where the
 
 Not all data required to complete the pipeline can be included in the Git repository.
 
-For now, you need to change any paths that start with `/Users` in
-`data/configuration/common.yaml` to the relevant path for you.
-You also need to update the paths in `notebooks/000_preparation/000_decompose_air_seasonality.R`.
-In future, we will update these so they are supplied as an environment variable instead.
+Before starting you need to create a user-specific placeholder file. This file will contain
+so user-specific paths. A sample file is provided at `data/configuration/user.sample.yaml`. The
+default location for this file is `data/configuration/user.yaml`, but this can be
+modified by passing adding a `--user_placeholders my/custom/user/file.yaml` argument when
+running `doit`.
 
 For the gridding step, a range of proxies and seasonality data are needed. These
 can be obtained by downloading the results from
@@ -96,5 +97,3 @@ nan.
 TODO: write the list of variables and sources that should be downloaded.
 [@jared I have left this to-do, this is good enough for now. I am happy to write a
 little download script (same as what I did for concentrations) if helpful.]
-
-- are files in data/raw/gridding meant to be sourced from elsewhere?

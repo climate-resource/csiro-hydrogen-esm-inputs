@@ -6,11 +6,12 @@ application
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from attrs import frozen
+from attrs import asdict, frozen
 
 from local.h2_adjust.timeseries import TimeseriesExtension
 from local.pydoit_nb.config_discovery import (
@@ -406,20 +407,35 @@ class GriddingPreparationConfig:
     Path in which results from [Feng et al. 2020](https://zenodo.org/record/2538194) have been extracted
     """
 
-    input_dir_rscript: Path
-    """
-    Input directory used by the R script
-    """
-
-    output_dir_rscript: Path
-    """
-    Output directory used by the R script
-    """
-
     output_dir: Path
     """
     Path in which to save the outputs
     """
+
+
+@frozen
+class UserPlaceholders:
+    """
+    Additional user-specific placeholders
+
+    These user-specific placeholders are used for configuration that varys by
+    user. For example, there maybe references to external repositories that
+    are required.
+
+    These placeholders shouldn't contain sensitive information as the contents
+    will be added to the hydrated configuration. For sensitive information,
+    use environment variables and ensure that the secrets aren't written to log
+    output otherwise it will be available in the executed notebooks in the
+    output bundle.
+    """
+
+    input4mips_local_archive: Path
+    gridding_data_archive: Path
+    spaemis_inventory_directory: Path
+    ar6_probabilistic_distribution_file: Path
+    magicc_executable_path: Path
+    magicc_worker_root_dir: Path
+    magicc_worker_number: int
 
 
 @frozen
@@ -543,6 +559,29 @@ def load_config_from_file(config_file: str) -> Config:
     return config
 
 
+def load_user_placeholders_from_file(
+    placeholder_file: os.PathLike[str],
+) -> UserPlaceholders:
+    """
+    Load a set of user placeholders from disk
+
+    Also verifies that all required values are present
+
+    Parameters
+    ----------
+    placeholder_file
+        User-specific placeholder file
+
+    Returns
+    -------
+        Loaded placeholders
+    """
+    with open(placeholder_file) as fh:
+        config = converter_yaml.loads(fh.read(), UserPlaceholders)
+
+    return config
+
+
 def load_config(config: str) -> Config:
     """
     Load config from a string
@@ -564,6 +603,7 @@ def get_config_bundle(
     output_root_dir: Path,
     run_id: str,
     common_config_file: Path,
+    user_placeholder_file: Path,
 ) -> ConfigBundle:
     """
     Get config bundle from config file
@@ -602,6 +642,13 @@ def get_config_bundle(
         YAML file containing a fragment of configuration which is common for all
         sets of configuration.
 
+    user_placeholder_file
+        YAML file containing user-specific placeholders
+
+        These user-specific parameters will be combined with placeholders from
+        the CLI and the scenario. The user-specific parameters take preference
+        over the scenario placeholders
+
     Returns
     -------
         Configuration bundle
@@ -617,6 +664,9 @@ def get_config_bundle(
         run_id=run_id,
         stub=stub,
     )
+
+    # TODO: We probably should have a class for all placeholders
+    user_placeholders = load_user_placeholders_from_file(user_placeholder_file)
 
     scenario_specific_config = load_config_fragment(raw_config_file)
     base_config = load_config_fragment(common_config_file)
@@ -637,10 +687,11 @@ def get_config_bundle(
 
     # Replace any placeholders
     # Convert back to a string temporarily for the placeholder replacement
-    # Preferences the placeholders from the CLI over values from config
+    # Preferences the placeholders is: cli > user-specific > scenario
     scenario_config_str = parse_placeholders(
         yaml.safe_dump(scenario_config_with_placeholders),
         **scenario_placeholders,
+        **asdict(user_placeholders),
         **placeholders,
     )
 

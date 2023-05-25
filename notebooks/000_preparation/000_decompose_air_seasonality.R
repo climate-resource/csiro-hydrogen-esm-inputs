@@ -1,11 +1,18 @@
+#!/usr/bin/env Rscript
+args = commandArgs(trailingOnly=TRUE)
+
+if (length(args)!=2) {
+  stop("Two arguments must be specified (input file, output file).n", call.=FALSE)
+}
+
 # No idea how to pass these from Python...
-input_dir <- "/Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive/gridding/"
-output_dir <- "/Users/znicholls/Desktop/csiro-hydrogen-esm-inputs/data/processed/gridding/seasonality-temp/"
+input_dir <- args[1]
+output_dir <- args[2]
 
 dir.create(output_dir, showWarnings = FALSE)
 
 decompose_air_seas <- function(name) {
-  input_fname <- paste0(input_dir, 'seasonality-CEDS9/', name, ".Rd" )
+  input_fname <- paste0(input_dir, 'gridding/seasonality-CEDS9/', name, ".Rd" )
   load(input_fname)
 
   seas <- get( name )
