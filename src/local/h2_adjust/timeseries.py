@@ -62,7 +62,8 @@ def _apply_extension(
         extrapolation_type="constant",
     ).timeseries()
 
-    extrapolated.iloc[0, 1:] = extrapolated.iloc[0, 0:-1] * (1 + extension.rate)
+    for i in range(1, extrapolated.shape[1]):
+        extrapolated.iloc[0, i] = extrapolated.iloc[0, i - 1] * (1 + extension.rate)
     return scmdata.ScmRun(extrapolated)
 
 

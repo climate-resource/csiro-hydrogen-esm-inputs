@@ -4,7 +4,7 @@ base_model: REMIND-MAGPIE
 
 emissions:
   cleaning_operations:
-    # This ssp226 is used for the secondary energy timeseries
+    # ssp226 is used for the secondary energy timeseries
     - input_file: data/raw/input_emissions/SSP_IAM_V2_201811.csv
       filters:
         scenario: SSP2-26
@@ -114,5 +114,5 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_australia_projections.nc"
+    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
     csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"

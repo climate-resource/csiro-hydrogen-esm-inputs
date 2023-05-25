@@ -417,6 +417,8 @@ for v in rcmip_emissions.get_unique_meta("variable"):
         scenario_for_magicc_complete = scenario_for_magicc_complete.append(to_add)
 
 scenario_for_magicc_complete["scenario"] = "CR-" + config.name
+# This isn't strictly true in the case of ssp226 (which uses IMAGE's ssp126 scenario for infilling)
+scenario_for_magicc_complete["model"] = config.base_model
 scenario_for_magicc_complete["base_scenario"] = config.ssp_scenario
 scenario_for_magicc_complete["assumptions"] = scenario_for_magicc.get_unique_meta(
     "assumptions"

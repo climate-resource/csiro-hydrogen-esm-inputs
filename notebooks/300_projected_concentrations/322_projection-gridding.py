@@ -20,12 +20,12 @@
 # This notebook currently includes a redundant harmonisation step, but we should leave that in there as it may be helpful in future work, does not come with significant cognitive overhead given how familiar we all are with harmonisation and is a good guardrail.
 
 # %%
-import aneris.convenience
+import aneris.convenience  # type: ignore
 import cf_xarray.units
-import cftime
-import matplotlib.pyplot as plt
-import pint_xarray
-import pooch
+import cftime  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
+import pint_xarray  # type: ignore
+import pooch  # type: ignore
 import scmdata
 import xarray as xr
 from carpet_concentrations.gridders import LatitudeSeasonalityGridder
@@ -69,10 +69,12 @@ SCEN_MAP = {
     "CR-ssp119-low": "IMAGE-ssp119",
     "CR-ssp119-med": "IMAGE-ssp119",
     "CR-ssp119-high": "IMAGE-ssp119",
-    #     "CR-ssp119-low": "MESSAGE-GLOBIOM-ssp245",
-    #     "CR-ssp119-low": "REMIND-MAGPIE-ssp534-over",
-    #     "IMAGE-ssp119-low": "IMAGE-ssp119",
-    #     "MESSAGE-GLOBIOM-ssp245-high": "MESSAGE-GLOBIOM-ssp245",
+    "CR-ssp226-low": "IMAGE-ssp126",
+    "CR-ssp226-med": "IMAGE-ssp126",
+    "CR-ssp226-high": "IMAGE-ssp126",
+    "CR-ssp245-low": "MESSAGE-GLOBIOM-ssp245",
+    "CR-ssp245-med": "MESSAGE-GLOBIOM-ssp245",
+    "CR-ssp245-high": "MESSAGE-GLOBIOM-ssp245",
 }
 
 # %% [markdown]

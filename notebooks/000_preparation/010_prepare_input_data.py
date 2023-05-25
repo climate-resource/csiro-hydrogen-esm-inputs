@@ -30,9 +30,10 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-import pyreadr
+import pyreadr  # type: ignore
 import xarray as xr
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed  # type: ignore
+from numpy.typing import ArrayLike
 
 from local.config import load_config_from_file
 from local.pydoit_nb.checklist import generate_directory_checklist
@@ -177,6 +178,8 @@ def read_proxy_file(proxy_fname: str) -> Union[xr.DataArray, None]:
     assert len(data) == 1
     data = data[list(data.keys())[0]]
 
+    coords: tuple[ArrayLike, ...]
+    dims: tuple[str, ...]
     if data.ndim == 2:  # noqa: PLR2004
         coords, dims = (LAT_CENTERS, LON_CENTERS), ("lat", "lon")
     elif data.ndim == 3 and data.shape[2] != 12:  # noqa: PLR2004
@@ -196,7 +199,7 @@ def read_proxy_file(proxy_fname: str) -> Union[xr.DataArray, None]:
     else:
         raise ValueError(f"Unexpected dimensionality for proxy : {data.shape}")  # noqa
 
-    return xr.DataArray(data, coords=coords, dims=dims)
+    return xr.DataArray(data, coords=coords, dims=dims)  # type: ignore
 
 
 # %%

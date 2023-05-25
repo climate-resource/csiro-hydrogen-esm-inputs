@@ -111,5 +111,5 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_australia_projections.nc"
+    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
     csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"

@@ -20,9 +20,9 @@
 # %%
 
 import cf_xarray.units
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
-import pint_xarray
+import pint_xarray  # type: ignore
 import tqdm.autonotebook as tqdman
 import xarray as xr
 from carpet_concentrations.gridders import LatitudeSeasonalityGridder

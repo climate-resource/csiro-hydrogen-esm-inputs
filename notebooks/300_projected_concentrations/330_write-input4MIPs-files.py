@@ -22,10 +22,10 @@ import copy
 import datetime
 
 import cf_xarray.units
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
-import pint_xarray
-import tqdm.autonotebook as tqdman
+import pint_xarray  # type: ignore
+import tqdm.autonotebook as tqdman  # type: ignore
 import xarray as xr
 from carpet_concentrations.input4MIPs.dataset import (
     Input4MIPsDataset,

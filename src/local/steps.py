@@ -339,6 +339,24 @@ def get_notebook_steps_scenario(
         ),
     ]
 
+    # Only include the high production calculation step if the configuration exists
+    if config.emissions.high_production:
+        projected_emissions_steps.append(
+            SingleNotebookDirStep(
+                name="calculate high production in Australia",
+                doc="determine the additional production emissions where "
+                "Australia has a higher share of H2 production",
+                notebook="200_projected_h2_emissions/270_check_production",
+                raw_notebook_ext=".py",
+                configuration=(config.emissions.high_production,),
+                dependencies=(
+                    config.emissions.complete_scenario_countries,
+                    config.emissions.complete_scenario,
+                ),
+                targets=(config.emissions.high_production.output_file,),
+            ),
+        )
+
     concentration_gridding_steps = [
         SingleNotebookDirStep(
             name="MAGICC run",
@@ -497,7 +515,7 @@ def get_notebook_steps_finalise(
             notebook="500_finalisation/500_write-input4MIPs-checklist",
             raw_notebook_ext=".py",
             configuration=(),
-            dependencies=dependencies,
+            dependencies=tuple(dependencies),
             targets=(get_checklist_file(results_archive),),
         ),
     ]

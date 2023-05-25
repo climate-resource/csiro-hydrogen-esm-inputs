@@ -1,0 +1,20 @@
+# Scalers used to apply the additional emissions from assuming Australia plays a large role in global H2 production
+# An additional input_timeseries named "high_production" must be declared in the base configuration
+- variable: H2
+  sector: h2_production
+  allow_missing: true
+  method:
+    name: point_source
+    point_sources: point_sources/hysupply_locations.csv
+    source_timeseries: high_production
+    source_filters:
+      - product: H2
+- variable: NOx
+  sector: h2_production
+  allow_missing: true
+  method:
+    name: point_source
+    point_sources: point_sources/hysupply_locations.csv
+    source_timeseries: high_production
+    source_filters:
+      - product: NOx

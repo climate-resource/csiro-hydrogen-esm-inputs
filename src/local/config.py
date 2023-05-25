@@ -129,6 +129,31 @@ class TimeseriesOperation:
 
 
 @frozen
+class ConfigHighProduction:
+    """
+    Additional production emissions to be assumed in Australia
+
+    This is used to model expected Australia's higher production emissions than
+    their "fair" share would suggest.
+    """
+
+    output_file: Path
+    """Output file containing the additional production related emissions that should
+     be added to Australia
+
+    This is in addition to the global scenario so should only be used for
+    Australian-focussed modelling where the where the results are not sensitive to the
+     global total emissions.
+    """
+
+    target_share: float
+    """Share of the world's H2 production that is modelled to occur in Australia
+
+    This is constant over time
+    """
+
+
+@frozen
 class ConfigEmissions:
     """
     Configuration representing the merged set of emissions
@@ -160,10 +185,18 @@ class ConfigEmissions:
     """
 
     complete_scenario_countries: Path
+    """
+    The complete emissions scenario disaggregated into countries
+
+    Ready for gridding
+    """
 
     figure_by_sector: Path
     figure_by_sector_only_modified: Path
     figure_vs_rcmip: Path
+
+    high_production: ConfigHighProduction | None = None
+    """Configuration for calculating Australia's higher than expected share of H2 production"""
 
 
 @frozen

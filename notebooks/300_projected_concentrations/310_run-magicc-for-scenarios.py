@@ -22,8 +22,8 @@ import datetime as dt
 import json
 import os.path
 
-import openscm_runner
-import pymagicc.definitions
+import openscm_runner  # type: ignore
+import pymagicc.definitions  # type: ignore
 import scmdata
 
 from local.config import load_config_from_file
@@ -167,7 +167,7 @@ def get_openscm_runner_output_names(magicc_names: list[str]) -> list[str]:
 
 # %%
 openscm_runner_output_names = get_openscm_runner_output_names(
-    magicc_names=common_cfgs["out_dynamic_vars"]
+    magicc_names=common_cfgs["out_dynamic_vars"]  # type: ignore
 )
 openscm_runner_output_names
 

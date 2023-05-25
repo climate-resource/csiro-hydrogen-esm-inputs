@@ -16,8 +16,8 @@
 # # Compare MAGICC7 output with CMIP6 concentrations
 
 # %%
-import matplotlib.pyplot as plt
-import pooch
+import matplotlib.pyplot as plt  # type: ignore
+import pooch  # type: ignore
 import scmdata
 
 from local.config import load_config_from_file
@@ -50,7 +50,7 @@ projections_magicc7
 for vdf in projections_magicc7.groupby("variable"):
     variable = vdf.get_unique_meta("variable", True)
     scenarios = vdf.get_unique_meta("scenario")
-    scenarios_cmip6 = list(set([s.split("_")[1] for s in scenarios]))
+    scenarios_cmip6 = list(set([s.split("-")[0] for s in scenarios]))
 
     cmip6_vdf = ssps.filter(scenario=scenarios_cmip6, region="World", variable=variable)
 
