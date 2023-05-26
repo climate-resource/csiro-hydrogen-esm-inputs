@@ -99,7 +99,6 @@ def process_slice(func: SupportsWriteSlice, year_slice: str, title: str) -> None
     func(
         example_file,
         "H2",
-        version=config.input4mips_archive.version,
         years_slice=year_slice,
         common_meta={**common_meta, "title": title},
         root_data_directory=config.input4mips_archive.results_archive,

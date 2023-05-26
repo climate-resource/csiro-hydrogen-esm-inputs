@@ -1,6 +1,7 @@
 """
 input4MIPs dataset generation
 """
+import datetime as dt
 import logging
 import os
 import uuid
@@ -217,10 +218,15 @@ class Input4MIPsDataset:
 
     root_data_dir = "."
 
-    def __init__(self, data: xr.Dataset, metadata: Input4MIPsMetadata, version: str):
+    def __init__(self, data: xr.Dataset, metadata: Input4MIPsMetadata):
         self.data = data
         self.metadata = metadata
-        self.version = version
+        # Version is related to creation date (has YYYYMMDD format). It isn't
+        # the same as source_version which follows semVer (X.Y.Z). I don't
+        # know why it's like this, it just seems to be what input4MIPs has
+        # gone for.
+        version = dt.datetime.utcnow().strftime("%Y%m%d")
+        self.version = f"v{version}"
 
         self.prepare()
 
@@ -344,7 +350,6 @@ class GriddedEmissionsDataset(Input4MIPsDataset):
         time: Sequence[Any],
         lat: Sequence[float],
         lon: Sequence[float],
-        version: str,
         metadata: Input4MIPsMetadata,
     ) -> Self:
         """
@@ -360,7 +365,6 @@ class GriddedEmissionsDataset(Input4MIPsDataset):
             Latitude values
         lon
             Longitude values
-        version
 
         metadata
             Metadata configuration to use
@@ -384,7 +388,7 @@ class GriddedEmissionsDataset(Input4MIPsDataset):
         da[:] = np.nan
         da.name = metadata.variable_id
 
-        return cls(da.to_dataset(), metadata, version)
+        return cls(da.to_dataset(), metadata)
 
 
 class GriddedAircraftEmissionsDataset(Input4MIPsDataset):
@@ -401,7 +405,6 @@ class GriddedAircraftEmissionsDataset(Input4MIPsDataset):
         time: Sequence[Any],
         lat: Sequence[float],
         lon: Sequence[float],
-        version: str,
         metadata: Input4MIPsMetadata,
     ) -> Self:
         """
@@ -417,7 +420,6 @@ class GriddedAircraftEmissionsDataset(Input4MIPsDataset):
             Latitude values
         lon
             Longitude values
-        version
 
         metadata
             Metadata configuration to use
@@ -438,7 +440,7 @@ class GriddedAircraftEmissionsDataset(Input4MIPsDataset):
         da[:] = np.nan
         da.name = metadata.variable_id
 
-        return cls(da.to_dataset(), metadata, version)
+        return cls(da.to_dataset(), metadata)
 
 
 class SupportsWriteSlice(Protocol):
@@ -450,7 +452,6 @@ class SupportsWriteSlice(Protocol):
         self,
         example_da: xr.DataArray,
         output_variable: str,
-        version: str,
         years_slice: str,
         common_meta: dict[str, str],
         root_data_directory: Path,
@@ -463,7 +464,6 @@ class SupportsWriteSlice(Protocol):
 def write_anthropogenic_slice(  # noqa: PLR0913
     example_da: xr.DataArray,
     output_variable: str,
-    version: str,
     years_slice: str,
     common_meta: dict[str, str],
     root_data_directory: Path,
@@ -478,8 +478,7 @@ def write_anthropogenic_slice(  # noqa: PLR0913
     example_da
     output_variable
         Variable Identifier
-    version
-        Version identifier for the data release
+
     years_slice
         Used to differentate between a varable with multiple timeslices
 
@@ -501,7 +500,6 @@ def write_anthropogenic_slice(  # noqa: PLR0913
         lat=example_da.lat,
         lon=example_da.lon,
         sectors=SECTOR_MAP,
-        version=version,
         metadata=Input4MIPsMetadata(
             variable_id=variable_id,
             **common_meta,
@@ -552,7 +550,6 @@ def write_anthropogenic_slice(  # noqa: PLR0913
 def write_anthropogenic_AIR_slice(  # noqa: PLR0913
     example_da: xr.DataArray,
     output_variable: str,
-    version: str,
     years_slice: str,
     common_meta: dict[str, str],
     root_data_directory: Path,
@@ -567,8 +564,7 @@ def write_anthropogenic_AIR_slice(  # noqa: PLR0913
     example_da
     output_variable
         Variable Identifier
-    version
-        Version identifier for the data release
+
     years_slice
         Used to differentiate between a variable with multiple timeslices
 
@@ -590,7 +586,6 @@ def write_anthropogenic_AIR_slice(  # noqa: PLR0913
         lat=example_da.lat,
         lon=example_da.lon,
         levels=LEVELS,
-        version=version,
         metadata=Input4MIPsMetadata(
             variable_id=variable_id,
             **common_meta,

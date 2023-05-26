@@ -5,7 +5,6 @@ if (length(args)!=2) {
   stop("Two arguments must be specified (input file, output file).n", call.=FALSE)
 }
 
-# No idea how to pass these from Python...
 input_dir <- args[1]
 output_dir <- args[2]
 

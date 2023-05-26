@@ -32,8 +32,7 @@ If you want to have more control, you can specify the output run ID with the
 below
 
 ```sh
-poetry run doit run --verbosity 2 display_info crunch_scenarios --run-id myrun
-poetry run doit run --verbosity 2 generate_notebook_tasks --run-id zn-test-2505 --configglob-scenarios "*low*yaml" "Write input4MIPs concentrations" "write projected input4MIPS results" "write historical input4MIPS results"
+poetry run doit run --verbosity 2 -n 4 display_info generate_notebook_tasks --run-id myrun "Create input4MIPs checklist file"
 ```
 
 Running in this way allows pydoit's task checking to only re-run tasks where the dependencies have been updated.
@@ -89,11 +88,3 @@ git checkout feng
 You will also need to download MAGICC7 and the AR6 probabilistic file from
 https://magicc.org/download/magicc7. The paths to the downloaded files can
 then be set in the common configuration under the `magicc_runs` key.
-
-If input4MIPs data are available they will be included in
-the gridded results for sectors that have not been modified.
-If no-data are available these non-modified sectors will be set to
-nan.
-TODO: write the list of variables and sources that should be downloaded.
-[@jared I have left this to-do, this is good enough for now. I am happy to write a
-little download script (same as what I did for concentrations) if helpful.]

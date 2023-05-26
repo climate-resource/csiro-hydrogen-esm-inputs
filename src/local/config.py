@@ -451,7 +451,7 @@ class UserPlaceholders:
     """
     Additional user-specific placeholders
 
-    These user-specific placeholders are used for configuration that varys by
+    These user-specific placeholders are used for configuration that varies by
     user. For example, there maybe references to external repositories that
     are required.
 
@@ -724,7 +724,7 @@ def get_config_bundle(
 
     # Replace any placeholders
     # Convert back to a string temporarily for the placeholder replacement
-    # Preferences the placeholders is: cli > user-specific > scenario
+    # Preferences of the placeholders is: cli > user-specific > scenario
     scenario_config_str = parse_placeholders(
         yaml.safe_dump(scenario_config_with_placeholders),
         **scenario_placeholders,

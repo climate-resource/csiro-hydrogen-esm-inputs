@@ -372,7 +372,7 @@ scenario_for_magicc = (
     .convert_unit("kt N2O/yr", variable="Emissions|N2O", context="N2O_conversions")
     .drop_meta("unit_context")
 )
-scenario_for_magicc["scenario"] = "CR-" + config.name
+scenario_for_magicc["scenario"] = f"CR-{config.base_model}-{config.name}"
 scenario_for_magicc["variable"] = scenario_for_magicc["variable"].str.replace(
     "Baseline ", ""
 )
@@ -416,7 +416,9 @@ for v in rcmip_emissions.get_unique_meta("variable"):
         print("adding " + v)
         scenario_for_magicc_complete = scenario_for_magicc_complete.append(to_add)
 
-scenario_for_magicc_complete["scenario"] = "CR-" + config.name
+scenario_for_magicc_complete["scenario"] = scenario_for_magicc.get_unique_meta(
+    "scenario", True
+)
 # This isn't strictly true in the case of ssp226 (which uses IMAGE's ssp126 scenario for infilling)
 scenario_for_magicc_complete["model"] = config.base_model
 scenario_for_magicc_complete["base_scenario"] = config.ssp_scenario

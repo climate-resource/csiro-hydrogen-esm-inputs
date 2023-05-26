@@ -85,6 +85,7 @@ def load_existing_data(variable_id: str, scenario_id: str) -> xr.Dataset | None:
 
 
 # %%
+
 common_meta = dict(
     contact="Jared Lewis (jared.lewis@climate-resource.com)",
     dataset_category="emissions",
@@ -137,7 +138,6 @@ def process_slice(
     func(
         example_file,
         output_variable,
-        version=config.input4mips_archive.version,
         years_slice=year_slice,
         common_meta={**common_meta, "title": title},
         root_data_directory=config.input4mips_archive.results_archive,

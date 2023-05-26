@@ -65,16 +65,16 @@ RCMIP_VAR_MAP = {
 
 # %%
 SCEN_MAP = {
-    # Output name: CMIP6 grid to use
-    "CR-ssp119-low": "IMAGE-ssp119",
-    "CR-ssp119-med": "IMAGE-ssp119",
-    "CR-ssp119-high": "IMAGE-ssp119",
-    "CR-ssp226-low": "IMAGE-ssp126",
-    "CR-ssp226-med": "IMAGE-ssp126",
-    "CR-ssp226-high": "IMAGE-ssp126",
-    "CR-ssp245-low": "MESSAGE-GLOBIOM-ssp245",
-    "CR-ssp245-med": "MESSAGE-GLOBIOM-ssp245",
-    "CR-ssp245-high": "MESSAGE-GLOBIOM-ssp245",
+    # Output name:  CMIP6 grid to use
+    "CR-IMAGE-ssp119-low": "IMAGE-ssp119",
+    "CR-IMAGE-ssp119-med": "IMAGE-ssp119",
+    "CR-IMAGE-ssp119-high": "IMAGE-ssp119",
+    "CR-REMIND-MAGPIE-ssp226-low": "IMAGE-ssp126",
+    "CR-REMIND-MAGPIE-ssp226-med": "IMAGE-ssp126",
+    "CR-REMIND-MAGPIE-ssp226-high": "IMAGE-ssp126",
+    "CR-MESSAGE-GLOBIOM-ssp245-low": "MESSAGE-GLOBIOM-ssp245",
+    "CR-MESSAGE-GLOBIOM-ssp245-med": "MESSAGE-GLOBIOM-ssp245",
+    "CR-MESSAGE-GLOBIOM-ssp245-high": "MESSAGE-GLOBIOM-ssp245",
 }
 
 # %% [markdown]

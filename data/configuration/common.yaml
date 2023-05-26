@@ -42,7 +42,7 @@ historical_h2_gridding:
 input4mips_archive:
   local_archive: "{input4mips_local_archive}"
   results_archive: "{output_root_dir}/{run_id}/results"
-  version: 20230515
+  version: 0.1.0
   complete_file_emissions_historical: "{output_root_dir}/{run_id}/historical/data/interim/gridding/emissions_historical.complete"
   complete_file_emissions_scenario: "{output_root_dir}/{run_id}/{name}/data/interim/gridding/emissions_scenario.complete"
   complete_file_concentrations: "{output_root_dir}/{run_id}/{name}/data/interim/gridding/concentrations.complete"

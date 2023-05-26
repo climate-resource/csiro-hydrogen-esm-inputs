@@ -56,6 +56,7 @@ config = load_config_from_file(config_file)
 
 # %%
 __version__ = config.input4mips_archive.version
+__version__
 
 # %% [markdown]
 # ## Write files
