@@ -33,11 +33,12 @@ delta_emissions:
         variable:
           - Emissions Intensity|H2|Energy Sector
           - Emissions Intensity|NH3|Energy Sector
+          - Emissions Intensity|CH4|Energy Sector
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2100
-      rate: -0.04
+      end_year: 2050
+      rate: -0.02
 
 projected_h2_emissions:
   scenario: "ssp119"
@@ -79,8 +80,8 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia"
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
   - name: ssp119_victoria
     configuration_template:
       name: ssp119_victoria
@@ -111,5 +112,5 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"

@@ -84,8 +84,8 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_australia"
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}-australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
   - name: ssp245_victoria
     configuration_template:
       name: ssp245_victoria
@@ -116,8 +116,8 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria"
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"
   - name: ssp245-high-production_victoria
     configuration_template:
       name: ssp245-high-production_victoria
@@ -154,5 +154,5 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}-high-production_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}_victoria/{run_id}_{name}-high-production_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/results/{name}-high-production_victoria"
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}-high-production_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}-high-production_victoria"

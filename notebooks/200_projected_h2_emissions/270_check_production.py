@@ -70,7 +70,7 @@ production_emissions
 assert config.emissions.high_production
 
 target = config.emissions.high_production.target_share
-assert 0.0 > target > 1.0  # noqa: PLR2004
+assert 0.0 < target < 1.0  # noqa: PLR2004
 target
 
 # %%

@@ -35,11 +35,12 @@ delta_emissions:
         variable:
           - Emissions Intensity|H2|Energy Sector
           - Emissions Intensity|NH3|Energy Sector
+          - Emissions Intensity|CH4|Energy Sector
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2100
-      rate: -0.04
+      end_year: 2050
+      rate: -0.02
 
 projected_h2_emissions:
   scenario: "ssp126"
@@ -50,4 +51,68 @@ projected_h2_emissions:
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
 
-spatial_emissions: [] # No spatial emissions downscaling
+spatial_emissions:
+  - name: ssp226_australia
+    configuration_template:
+      name: ssp226_australia
+
+      inventory:
+        name: australia
+        year: 2016
+
+      timeslices:
+        - 2020
+        - 2040
+        - 2060
+        - 2080
+        - 2100
+
+      input_timeseries:
+      scalers:
+        default_scaler:
+          name: constant
+    scaler_templates:
+      - input_file: data/raw/spaemis/templates/template_australia_H2_scalers.yaml
+        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/template_australia_H2_scalers.yaml"
+      - input_file: data/raw/spaemis/templates/template_australia_scalers.csv
+        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/template_australia_scalers.csv"
+    scalar_template_replacements:
+      cr_h2_scenario: "CR-{base_model}-{name}"
+      ssp_scenario: "IAMC-IMAGE-{ssp_scenario}-1-1"
+    downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
+    inventory_directory: "{spaemis_inventory_directory}"
+    proxy_directory: data/raw/spaemis/proxies
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
+  - name: ssp226_victoria
+    configuration_template:
+      name: ssp226_victoria
+
+      inventory:
+        name: victoria
+        year: 2016
+
+      timeslices:
+        - 2020
+        - 2040
+        - 2060
+        - 2080
+        - 2100
+
+      input_timeseries:
+      scalers:
+        default_scaler:
+          name: constant
+    scaler_templates:
+      - input_file: data/raw/spaemis/templates/template_victoria_H2_scalers.yaml
+        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_H2_scalers.yaml"
+      - input_file: data/raw/spaemis/templates/template_victoria_scalers.csv
+        output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_scalers.csv"
+    scalar_template_replacements:
+      cr_h2_scenario: "CR-{base_model}-{name}"
+      ssp_scenario: "IAMC-{base_model}-{ssp_scenario}-1-1"
+    downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
+    inventory_directory: "{spaemis_inventory_directory}"
+    proxy_directory: data/raw/spaemis/proxies
+    netcdf_output: "{output_root_dir}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"

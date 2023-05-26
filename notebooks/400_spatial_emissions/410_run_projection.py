@@ -67,15 +67,13 @@ database.paths
 
 # Set up the proxy data directory
 os.environ.setdefault("SPAEMIS_PROXY_DIRECTORY", str(spaemis_config.proxy_directory))
+os.environ.setdefault(
+    "SPAEMIS_INVENTORY_DIRECTORY", str(spaemis_config.inventory_directory)
+)
 # %%
 inventory = load_inventory(
     downscaling_config.inventory.name,
     downscaling_config.inventory.year,
-    data_directory=str(
-        spaemis_config.inventory_directory
-        / downscaling_config.inventory.name
-        / str(downscaling_config.inventory.year)
-    ),
 )
 inventory
 
@@ -138,6 +136,7 @@ for variable in merged.data_vars:
 
 # %%
 logger.info("Writing output dataset as netcdf")
+spaemis_config.netcdf_output.parent.mkdir(parents=True, exist_ok=True)
 merged.to_netcdf(spaemis_config.netcdf_output)
 
 # %%

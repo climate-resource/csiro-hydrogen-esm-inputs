@@ -33,11 +33,12 @@ delta_emissions:
         variable:
           - Emissions Intensity|H2|Energy Sector
           - Emissions Intensity|NH3|Energy Sector
+          - Emissions Intensity|CH4|Energy Sector
         sector: Energy Sector
         product: NOx
       start_year: 2020
-      end_year: 2100
-      rate: -0.04
+      end_year: 2050
+      rate: -0.02
 
 projected_h2_emissions:
   scenario: "ssp245"
