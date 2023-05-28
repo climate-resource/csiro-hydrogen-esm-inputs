@@ -18,6 +18,7 @@
 # Extract the gridding patterns from the CMIP6 data. Using these ensures that we have a smooth transition between the CMIP6 historical data and our updated projections.
 
 # %%
+from pathlib import Path
 
 import cf_xarray.units
 import matplotlib.pyplot as plt  # type: ignore
@@ -140,7 +141,7 @@ def get_gridding_values(seasonality_and_latitudinal_gradient, variable):
 
 
 # %%
-available_files = {"gridded": {}, "gmnhsh": {}}
+available_files: dict[str, dict[tuple[str, str], Path]] = {"gridded": {}, "gmnhsh": {}}
 for f in config.cmip6_concentrations.root_raw_data_dir.glob("*.nc"):
     toks = f.name.split("_")
     variable = toks[0]
@@ -204,18 +205,20 @@ for scenario in tqdman.tqdm(
         all_gridding_values.append(to_keep.pint.to("ppm"))
 
 # %%
-all_gridding_values = xr.merge(all_gridding_values)
+all_gridding_values = xr.merge(all_gridding_values)  # type: ignore
 all_gridding_values
 
 # %%
-tmp = all_gridding_values.pint.dequantify()
+tmp = all_gridding_values.pint.dequantify()  # type: ignore
 tmp.to_netcdf(OUTPUT_FILE)
 OUTPUT_FILE
 
 # %%
-convert_year_month_to_time(all_gridding_values["latitudinal_gradient"]).sel(
+convert_year_month_to_time(
+    all_gridding_values["latitudinal_gradient"],  # type: ignore
+).sel(
     variable=[variable_under]
-).plot.pcolormesh(
+).plot.pcolormesh(  # type: ignore
     x="time", y="lat", cmap="rocket_r", levels=100, row="scenario", col="variable"
 )
 plt.show()

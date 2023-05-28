@@ -32,7 +32,9 @@ If you want to have more control, you can specify the output run ID with the
 below
 
 ```sh
-poetry run doit run --verbosity 2 -n 4 display_info generate_notebook_tasks --run-id myrun "Create input4MIPs checklist file"
+poetry run doit run <doit-run-args> generate_notebook_tasks --run-id myrun <tasks-to-run>
+# For example
+poetry run doit run --verbosity 2 -n 4 generate_notebook_tasks --run-id myrun  display_info "Create input4MIPs checklist file"
 ```
 
 Running in this way allows pydoit's task checking to only re-run tasks where the dependencies have been updated.

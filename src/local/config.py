@@ -736,7 +736,9 @@ def get_config_bundle(
     # Any missing values will cause an exception
     config_hydrated = load_config(scenario_config_str)
 
-    config_hydrated_path = output_root_dir / run_id / stub / raw_config_file.name
+    config_hydrated_path = (
+        get_run_root_dir(output_root_dir, run_id) / stub / raw_config_file.name
+    )
     config_hydrated_path.parent.mkdir(parents=True, exist_ok=True)
 
     return ConfigBundle(
@@ -747,6 +749,25 @@ def get_config_bundle(
         stub=stub,
         raw_config_file=raw_config_file,
     )
+
+
+def get_run_root_dir(output_root_dir: Path, run_id: str) -> Path:
+    """
+    Get root directory for run
+
+    Parameters
+    ----------
+    output_root_dir
+        Output root directory
+
+    run_id
+        Run ID
+
+    Returns
+    -------
+        Root directory for output from this run
+    """
+    return output_root_dir.absolute() / run_id
 
 
 def write_config_file_in_output_dir(cb: ConfigBundle) -> None:

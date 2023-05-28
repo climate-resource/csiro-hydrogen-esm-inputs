@@ -30,7 +30,7 @@ checks:  ## run all the linting checks of the codebase
 
 .PHONY: black
 black:  ## format the code using black
-	poetry run black dodo.py src notebooks
+	poetry run black dodo.py src notebooks scripts
 
 .PHONY: ruff-fixes
 ruff-fixes:  ## fix the code using ruff

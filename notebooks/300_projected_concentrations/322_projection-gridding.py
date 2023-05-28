@@ -20,6 +20,8 @@
 # This notebook currently includes a redundant harmonisation step, but we should leave that in there as it may be helpful in future work, does not come with significant cognitive overhead given how familiar we all are with harmonisation and is a good guardrail.
 
 # %%
+from pathlib import Path
+
 import aneris.convenience  # type: ignore
 import cf_xarray.units
 import cftime  # type: ignore
@@ -124,7 +126,7 @@ for v in [
     "*CO2",
     #     "*H2"
 ]:
-    display(  # noqa: F821
+    display(  # type: ignore[name-defined]  # noqa: F821
         pdf.filter(variable=v, year=range(2010, 2020 + 1)).timeseries()
     )
     ax = pdf.filter(variable=v, year=range(2010, 2030 + 1)).lineplot(style="variable")
@@ -231,7 +233,7 @@ cmip6_seasonality_lat_grad_file
 
 
 # %%
-def load_dataset_and_add_bounds_units(f: str) -> xr.Dataset:
+def load_dataset_and_add_bounds_units(f: Path) -> xr.Dataset:
     """
     Load dataset and add units to bounds
 
@@ -331,10 +333,10 @@ for variable in config.cmip6_concentrations.concentration_variables:
     res_time_axis = convert_year_month_to_time(res)
 
     # TODO: make sure this flows through more sensibly
-    for v in res_time_axis.data_vars:
+    for v in res_time_axis.data_vars:  # type: ignore
         res_time_axis[v].attrs["cell_methods"] = "time: mean area: mean"
 
-    display(res_time_axis)  # noqa: F821
+    display(res_time_axis)  # type: ignore[name-defined]  # noqa: F821
 
     res_time_axis.sel(region="World").groupby("time.year").mean().mean("lat")[
         rcmip_variable

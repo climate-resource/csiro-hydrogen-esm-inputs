@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "title": "CSIRO hydrogen Earth System Model inputs",
+        "version": "to-be-replaced",
+        "upload_type": "dataset",
+        "description": "Repository of inputs and outputs for generating hydrogen inputs for CSIRO's earth system model",
+        "creators": [
+            {
+                "name": "Jared Lewis",
+                "affiliation": "Climate Resource",
+                "orcid": "0000-0002-4767-2723"
+            },
+            {
+                "name": "Zebedee Nicholls",
+                "affiliation": "Climate Resource",
+                "orcid": "0000-0002-4767-2723"
+            },
+            {
+                "name": "Rebecca Burdon",
+                "affiliation": "Climate Resource"
+            },
+            {
+                "name": "Malte Meinshausen",
+                "affiliation": "Climate Resource",
+                "orcid": "0000-0003-4048-3521"
+            }
+        ],
+        "language": "eng",
+        "license": "cc-by-nc-4.0",
+        "keywords": ["climate change", "hydrogen", "earth system models", "magicc", "emulator", "scenarios", "pathways"],
+        "references": [
+            "TBD"
+        ]
+    }
+}

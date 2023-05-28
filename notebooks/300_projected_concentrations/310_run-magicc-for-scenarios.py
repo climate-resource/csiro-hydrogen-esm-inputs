@@ -143,7 +143,10 @@ def to_openscm(inrun: scmdata.ScmRun) -> scmdata.ScmRun:
 scenarios = scenarios.interpolate(
     [
         dt.datetime(y, 1, 1)
-        for y in range(scenarios["year"].min(), common_cfgs["endyear"] + 1)
+        for y in range(
+            scenarios["year"].min(),
+            common_cfgs["endyear"] + 1,  # type: ignore
+        )
     ],
     extrapolation_type="constant",
 )

@@ -309,7 +309,7 @@ for data_var in tqdman.tqdm(ds.data_vars, desc="variable", leave=True):
             metadata_optional=optional_metadata,
         )
         gridded_path = input4mips_ds.write(root_data_dir=output_dir)
-        display(gridded_path)  # noqa: F821
+        display(gridded_path)  # type: ignore[name-defined]  # noqa: F821
 
         bounded_data_quantified = input4mips_ds.ds.pint.quantify(
             lat_bounds="degrees_north", lat="degrees_north"
@@ -330,7 +330,7 @@ for data_var in tqdman.tqdm(ds.data_vars, desc="variable", leave=True):
             gmnhsh_data,
         )
         gmnhsh_path = input4mips_gmnhsh_ds.write(root_data_dir=output_dir)
-        display(gmnhsh_path)  # noqa: F821
+        display(gmnhsh_path)  # type: ignore[name-defined]  # noqa: F821
 #         break
 #     break
 
