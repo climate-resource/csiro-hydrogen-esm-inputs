@@ -417,32 +417,35 @@ files = [
 
 [[package]]
 name = "carpet-concentrations"
-version = "0.3.0"
+version = "0.1.0"
 description = "Core tools for the development of greenhouse gas concentration input files (i.e. flying carpets)."
 category = "main"
 optional = false
-python-versions = ">=3.9,<4.0"
-files = [
-    {file = "carpet_concentrations-0.3.0-py3-none-any.whl", hash = "sha256:3183a41c1cf12c8039528d1eb6b5a5c41f657fab0fe2a46f4b165778366ab1d7"},
-    {file = "carpet_concentrations-0.3.0.tar.gz", hash = "sha256:48dbdf39f8ccf5e207471b488f3b42167934866a7b2678df6f62c449d8de9183"},
-]
+python-versions = "^3.9"
+files = []
+develop = false
 
 [package.dependencies]
-attrs = ">=23.1.0,<24.0.0"
-cf-xarray = {version = ">=0.8.1,<0.9.0", optional = true, markers = "extra == \"cfxarray\""}
-cftime = ">=1.6.2,<2.0.0"
-matplotlib = ">=3.7.1,<4.0.0"
-openscm-units = ">=0.5.2,<0.6.0"
+attrs = "^23.1.0"
+cf-xarray = {version = "^0.8.1", optional = true}
+cftime = "^1.6.2"
+openscm-units = "^0.5.2"
 pint = ">=0.19"
-pint-xarray = ">=0.3,<0.4"
-pooch = {version = ">=1.7.0,<2.0.0", optional = true, markers = "extra == \"cfxarray\""}
-xarray = ">=2023.4.2,<2024.0.0"
+pint-xarray = "^0.3"
+pooch = {version = "^1.7.0", optional = true}
+xarray = "^2023.4.2"
 
 [package.extras]
 cfxarray = ["cf-xarray (>=0.8.1,<0.9.0)", "pooch (>=1.7.0,<2.0.0)"]
 netcdf = ["netcdf4 (>=1.6.3,<2.0.0)"]
 notebooks = ["ipywidgets (>=8.0.6,<9.0.0)", "notebook (>=6.5.3,<7.0.0)"]
 plots = ["seaborn (>=0.12.2,<0.13.0)"]
+
+[package.source]
+type = "git"
+url = "https://gitlab.com/climate-resource/carpet-concentrations.git"
+reference = "hotfix"
+resolved_reference = "ca77e589a5688038898558eee0ab0bc16e756b8e"
 
 [[package]]
 name = "cattrs"
@@ -961,14 +964,14 @@ develop = ["httpretty", "mock", "pylama", "pytest", "pytest-cov", "tableschema-s
 
 [[package]]
 name = "datatoolbox"
-version = "0.5.8"
+version = "0.5.6"
 description = "The Python Data Toolbox"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "datatoolbox-0.5.8-py3-none-any.whl", hash = "sha256:a75c46261d6fbc265678057f156146f94313079c5967298d94e0dd09445c2ca2"},
-    {file = "datatoolbox-0.5.8.tar.gz", hash = "sha256:bc9c127130e3c2c790b1429206fa62047a868f2b71e937bad3cd1a478d6a045a"},
+    {file = "datatoolbox-0.5.6-py3-none-any.whl", hash = "sha256:ba5e085b0a57a7af9656241db79a81d5f7471f3e751bfa80dc3957e336e3fdbe"},
+    {file = "datatoolbox-0.5.6.tar.gz", hash = "sha256:f79df48d31c0e7cf0e095e9568d3795ef96970fb3f402ce511e6bbc652195a04"},
 ]
 
 [package.dependencies]
@@ -5102,4 +5105,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "27e4652f652b3541366d82dcc8d6e953b1fdd0f088e9ae8a8d9765299162d3a8"
+content-hash = "bb3bd14af725690dff79925eef8344752a1ae00bff003455e72ad4d6fc67ab79"

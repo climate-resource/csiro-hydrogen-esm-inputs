@@ -432,7 +432,10 @@ def get_notebook_steps_scenario(
                     notebook="400_spatial_emissions/410_run_projection",
                     raw_notebook_ext=".py",
                     configuration=(),
-                    dependencies=(spatial_emis_region.downscaling_config,),
+                    dependencies=(
+                        config.input4mips_archive.complete_file_emissions_scenario,
+                        spatial_emis_region.downscaling_config,
+                    ),
                     targets=(
                         get_checklist_file(spatial_emis_region.csv_output_directory),
                         spatial_emis_region.netcdf_output,
