@@ -34,7 +34,7 @@ historical_h2_emissions:
 
 historical_h2_gridding:
   output_directory: "{output_root_dir}/{run_id}/historical/data/interim/gridding"
-  fast: true
+  fast: false
   proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
   seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
   sector_type: "CEDS9"
@@ -67,13 +67,13 @@ projected_h2_emissions:
 
 projected_gridding:
   output_directory: "{output_root_dir}/{run_id}/{name}/data/interim/gridding"
-  fast: true
+  fast: false
   proxy_mapping: data/raw/gridding/grid_proxy_mapping.csv
   seasonality_mapping: data/raw/gridding/seasonality_mapping_CEDS9.csv
   sector_type: "CEDS9"
 
 magicc_runs:
-  n_cfgs_to_run: 5
+  n_cfgs_to_run: 600
   output_file: "{output_root_dir}/{run_id}/{name}/data/interim/magicc-output/magicc-concentration-projections.nc"
   ar6_probabilistic_distribution_file: "{ar6_probabilistic_distribution_file}"
   magicc_executable_path: "{magicc_executable_path}"
