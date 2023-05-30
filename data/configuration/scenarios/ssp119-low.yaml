@@ -80,8 +80,9 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia"
   - name: ssp119_victoria
     configuration_template:
       name: ssp119_victoria
@@ -112,5 +113,6 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_victoria"

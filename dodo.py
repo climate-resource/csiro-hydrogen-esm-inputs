@@ -188,7 +188,7 @@ def task_generate_notebook_tasks(  # noqa: PLR0913
     for ft in finalise_tasks:
         yield ft
         if "targets" in ft:
-            ft_targets.append(*ft["targets"])
+            ft_targets.extend(ft["targets"])
 
     run_root_dir = get_run_root_dir(output_root_dir, run_id)
     repo_root_dir = Path(__file__).parent

@@ -2,6 +2,8 @@
 output_notebook_dir: "{output_root_dir}/{run_id}/{name}/notebooks"
 historical_notebook_dir: "{output_root_dir}/{run_id}/historical/notebooks"
 finalisation_notebook_dir: "{output_root_dir}/{run_id}/finalisation/notebooks"
+finalisation_data_dir: "{output_root_dir}/{run_id}/finalisation/data/processed"
+finalisation_plot_dir: "{output_root_dir}/{run_id}/finalisation/plots"
 
 gridding_preparation:
   raw_rscript: notebooks/000_preparation/000_decompose_air_seasonality.R

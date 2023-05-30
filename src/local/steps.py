@@ -367,15 +367,16 @@ def get_notebook_steps_scenario(
             dependencies=(config.emissions.magicc_scenario,),
             targets=(config.magicc_runs.output_file,),
         ),
-        SingleNotebookDirStep(
-            name="MAGICC - CMIP6 comparison",
-            doc="compare MAGICC projections against CMIP6 concentrations",
-            notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6",
-            raw_notebook_ext=".py",
-            configuration=(config.rcmip.concentrations_path,),
-            dependencies=(config.magicc_runs.output_file,),
-            targets=(),
-        ),
+        # This task isn't working in a complete run under ubuntu
+        # SingleNotebookDirStep(
+        #     name="MAGICC - CMIP6 comparison",
+        #     doc="compare MAGICC projections against CMIP6 concentrations",
+        #     notebook="300_projected_concentrations/311_compare-magicc7-output-cmip6",
+        #     raw_notebook_ext=".py",
+        #     configuration=(config.rcmip.concentrations_path,),
+        #     dependencies=(config.magicc_runs.output_file,),
+        #     targets=(),
+        # ),
         SingleNotebookDirStep(
             name="Grided projections",
             doc="create gridded concentration projections",
@@ -498,28 +499,45 @@ def get_notebook_steps_finalise(
     )
     dependencies = set(dependencies_dup)
 
-    # Very lazy, sorry @Jared
-    results_archives = set(c.input4mips_archive.results_archive for c in configs)
-    if len(results_archives) > 1:
-        raise NotImplementedError()
+    def _get_value(func):
+        values = set(func(c) for c in configs)
+        if len(values) > 1:
+            raise NotImplementedError()
+        return list(values)[0]
 
-    results_archive = list(results_archives)[0]
-
-    finalisation_notebook_dirs = set(c.finalisation_notebook_dir for c in configs)
-    if len(finalisation_notebook_dirs) > 1:
-        raise NotImplementedError()
-
-    finalisation_notebook_dir = list(finalisation_notebook_dirs)[0]
+    results_archive = _get_value(lambda c: c.input4mips_archive.results_archive)
+    finalisation_notebook_dir = _get_value(lambda c: c.finalisation_notebook_dir)
+    finalisation_data_dir = _get_value(lambda c: c.finalisation_data_dir)
+    finalisation_plot_dir = _get_value(lambda c: c.finalisation_plot_dir)
 
     steps = [
         SingleNotebookDirStep(
-            name="Create input4MIPs checklist file",
+            name="finalise - Create input4MIPs checklist file",
             doc="Creates a checklist file based on all input4MIPs outputs",
             notebook="500_finalisation/500_write-input4MIPs-checklist",
             raw_notebook_ext=".py",
             configuration=(),
             dependencies=tuple(dependencies),
             targets=(get_checklist_file(results_archive),),
+        ),
+        SingleNotebookDirStep(
+            name="finalise - Create emissions figures",
+            doc="Generate emissions figures across all scenarios",
+            notebook="500_finalisation/510_generate_emissions_figures",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=tuple(set(c.emissions.complete_scenario for c in configs)),
+            targets=(
+                finalisation_data_dir / "emissions_delta.csv",
+                finalisation_data_dir / "emissions_total.csv",
+                finalisation_data_dir / "energy_by_carrier.csv",
+                finalisation_plot_dir / "total_emissions.pdf",
+                finalisation_plot_dir / "emissions_by_carrier.pdf",
+                finalisation_plot_dir / "emissions_by_region.pdf",
+                finalisation_plot_dir / "emissions_by_sector.pdf",
+                finalisation_plot_dir / "energy_by_carrier.pdf",
+                finalisation_plot_dir / "energy_by_region.pdf",
+            ),
         ),
     ]
 

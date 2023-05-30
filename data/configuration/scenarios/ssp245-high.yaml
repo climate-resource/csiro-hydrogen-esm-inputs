@@ -20,7 +20,7 @@ emissions:
           to: Baseline Emissions
           dimension: variable
   metadata:
-    assumptions: med
+    assumptions: high
 
   high_production:
     target_share: 0.1
@@ -84,8 +84,9 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}-australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia/{run_id}_{name}-australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia"
   - name: ssp245_victoria
     configuration_template:
       name: ssp245_victoria
@@ -116,8 +117,9 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_victoria"
   - name: ssp245-high-production_victoria
     configuration_template:
       name: ssp245-high-production_victoria
@@ -146,7 +148,7 @@ spatial_emissions:
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_H2_scalers.yaml"
       - input_file: data/raw/spaemis/templates/template_victoria_scalers.csv
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_scalers.csv"
-      - input_file: data/raw/spaemis/templates/template_victoria_production_scalers.csv
+      - input_file: data/raw/spaemis/templates/template_victoria_production_scalers.yaml
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_production_scalers.yaml"
     scalar_template_replacements:
       cr_h2_scenario: "CR-{base_model}-{name}"
@@ -154,5 +156,6 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}-high-production_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}-high-production_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}-high-production_victoria"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}-high-production_victoria/{run_id}_{name}-high-production_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}-high-production_victoria"

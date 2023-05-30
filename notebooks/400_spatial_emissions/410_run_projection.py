@@ -30,7 +30,7 @@ import os
 
 import xarray as xr
 from spaemis.config import load_config
-from spaemis.input_data import database
+from spaemis.input_data import database, load_timeseries
 from spaemis.inventory import clip_region, load_inventory, write_inventory_csvs
 from spaemis.project import calculate_point_sources, calculate_projections
 
@@ -70,6 +70,9 @@ os.environ.setdefault("SPAEMIS_PROXY_DIRECTORY", str(spaemis_config.proxy_direct
 os.environ.setdefault(
     "SPAEMIS_INVENTORY_DIRECTORY", str(spaemis_config.inventory_directory)
 )
+os.environ.setdefault(
+    "SPAEMIS_POINT_SOURCE_DIRECTORY", str(spaemis_config.point_source_directory)
+)
 # %%
 inventory = load_inventory(
     downscaling_config.inventory.name,
@@ -77,8 +80,13 @@ inventory = load_inventory(
 )
 inventory
 
+if downscaling_config.input_timeseries:
+    timeseries = load_timeseries(downscaling_config.input_timeseries)
+else:
+    timeseries = {}
+
 # %%
-dataset = calculate_projections(downscaling_config, inventory, timeseries={})
+dataset = calculate_projections(downscaling_config, inventory, timeseries=timeseries)
 dataset
 
 

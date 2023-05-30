@@ -412,6 +412,9 @@ class ConfigSpatialEmissions:
     inventory_directory: Path
     """Path to the inventory data"""
 
+    point_source_directory: Path
+    """Path to the point source data"""
+
     netcdf_output: Path
     """NetCDF output for all years, sectors and gases"""
 
@@ -496,6 +499,12 @@ class Config:
 
     finalisation_notebook_dir: Path
     """Directory to store the templated finalisation notebooks"""
+
+    finalisation_data_dir: Path
+    """Directory to store the templated finalisation data"""
+
+    finalisation_plot_dir: Path
+    """Directory to store the templated finalisation plots"""
 
     gridding_preparation: GriddingPreparationConfig
     """

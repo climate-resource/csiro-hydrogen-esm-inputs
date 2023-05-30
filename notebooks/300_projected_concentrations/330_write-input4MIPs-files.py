@@ -304,7 +304,7 @@ for data_var in tqdman.tqdm(ds.data_vars, desc="variable", leave=True):
         drop_coords = set(dsvs.coords) - set(dimensions)
         input4mips_ds = Input4MIPsDataset.from_metadata_autoadd_bounds_to_dimensions(
             dsvs.drop(drop_coords).copy().transpose(*dimensions),
-            dimensions,
+            dimensions,  # type: ignore
             metadata=metadata,
             metadata_optional=optional_metadata,
         )

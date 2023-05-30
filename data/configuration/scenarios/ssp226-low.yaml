@@ -82,8 +82,9 @@ spatial_emissions:
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_australia/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_australia"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia/{run_id}_{name}_australia_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_australia"
   - name: ssp226_victoria
     configuration_template:
       name: ssp226_victoria
@@ -110,9 +111,10 @@ spatial_emissions:
         output_file: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/template_victoria_scalers.csv"
     scalar_template_replacements:
       cr_h2_scenario: "CR-{base_model}-{name}"
-      ssp_scenario: "IAMC-{base_model}-{ssp_scenario}-1-1"
+      ssp_scenario: "IAMC-IMAGE-{ssp_scenario}-1-1"
     downscaling_config: "{output_root_dir}/{run_id}/{name}/data/processed/spaemis/{name}_victoria/config.yaml"
     inventory_directory: "{spaemis_inventory_directory}"
     proxy_directory: data/raw/spaemis/proxies
-    netcdf_output: "{output_root_dir}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
-    csv_output_directory: "{output_root_dir}/results/spaemis/{name}_victoria"
+    point_source_directory: data/raw/spaemis/point_sources
+    netcdf_output: "{output_root_dir}/{run_id}/results/spaemis/{name}_victoria/{run_id}_{name}_victoria_projections.nc"
+    csv_output_directory: "{output_root_dir}/{run_id}/results/spaemis/{name}_victoria"
