@@ -1,3 +1,15 @@
+## v0.3.0 (2023-05-30)
+
+### Fix
+
+- Updates from preliminary run-through
+
+## v0.2.1 (2023-05-28)
+
+### Fix
+
+- Include dependency for h2 data in spaemis tasks
+
 ## v0.2.0 (2023-05-28)
 
 ### BREAKING CHANGE
