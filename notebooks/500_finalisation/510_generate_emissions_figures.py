@@ -154,9 +154,6 @@ total_emissions = scmdata.run_append(
 total_emissions.get_unique_meta("region")
 
 # %%
-total_emissions.filter(variable="Emissions|NOx").get_
-
-# %%
 delta_emissions.to_csv(os.path.join(output_dir, "emissions_delta.csv"))
 total_emissions.to_csv(os.path.join(output_dir, "emissions_total.csv"))
 energy_by_carrier.to_csv(os.path.join(output_dir, "energy_by_carrier.csv"))
@@ -201,12 +198,7 @@ for product in products:
     sns.despine()
 
     to_plot = total_emissions.filter(
-        variable=f"Emissions|{product}*", region="World"
-    ).process_over(
-        ("variable", "sector", "modified"),
-        "sum",
-        op_cols={"variable": f"Emissions|{product}"},
-        as_run=True,
+        variable=f"Emissions|{product}", region="World", sector="Total"
     )
 
     plt.ylabel(f"Mt {product} / yr")
@@ -305,7 +297,9 @@ delta_emissions.get_unique_meta("scenario")
 # %%
 disagg_by = "carrier"
 data_to_plot = get_melted_emissions(
-    delta_emissions.filter(year=years, region="World", assumptions="low"),
+    delta_emissions.filter(year=years, region="World", assumptions="low").filter(
+        sector="Total", keep=False
+    ),
     ["sector", "method"],
 )
 
@@ -330,9 +324,9 @@ pdf.close()
 # %%
 disagg_by = "region"
 data_to_plot = get_melted_emissions(
-    delta_emissions.filter(year=years, assumptions="low").filter(
-        region="World", keep=False
-    ),
+    delta_emissions.filter(year=years, assumptions="low")
+    .filter(region="World", keep=False)
+    .filter(sector="Total", keep=False),
     ["carrier", "sector", "method"],
 )
 
@@ -357,7 +351,9 @@ pdf.close()
 # %%
 disagg_by = "sector"
 data_to_plot = get_melted_emissions(
-    delta_emissions.filter(year=years, region="World", assumptions="low"),
+    delta_emissions.filter(year=years, region="World", assumptions="low").filter(
+        sector="Total", keep=False
+    ),
     ["carrier", "method"],
 )
 y = delta_emissions.get_unique_meta(disagg_by)
