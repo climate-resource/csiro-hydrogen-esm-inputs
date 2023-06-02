@@ -260,6 +260,11 @@ class ConfigBaselineH2Emissions:
     sourced.
     """
 
+    ceds_breakdown_sectors: FrozenDict[str, list[str]]
+    # """
+    # CEDS sectors to use for the sectoral breakdown for each hydrogen sector
+    # """
+
     # Data
     baseline_h2_emissions_regions: Path
     """

@@ -44,9 +44,41 @@ projected_h2_emissions:
   scenario: "ssp119"
   baseline_source: data/raw/baseline_h2_sources/petterson_2020.csv
   anthropogenic_proxy:
-    "Emissions|H2|Fossil Fuel": Emissions|CO
-    "Emissions|H2|Biomass burning": Emissions|BC
+    "Emissions|H2|Fossil Fuel": "Emissions|CO|MAGICC Fossil and Industrial"
+    "Emissions|H2|Biomass burning": "Emissions|BC|MAGICC AFOLU"
     "Emissions|H2|Photochemical production|CH4": Emissions|CH4
     "Emissions|H2|Photochemical production|VOC": Emissions|VOC
+  ceds_breakdown_sectors:
+    "Emissions|H2|Biomass burning":
+    - "Agriculture"
+    "Emissions|H2|Fossil Fuel":
+    - "Aircraft"
+    - "Energy Sector"
+    - "Industrial Sector"
+    - "Residential, Commercial, Other"
+    - "Solvents production and application"
+    - "Transportation Sector"
+    - "Waste"
+    - "International Shipping"
+    "Emissions|H2|Photochemical production|CH4":
+    - "Agriculture"
+    - "Aircraft"
+    - "Energy Sector"
+    - "Industrial Sector"
+    - "Residential, Commercial, Other"
+    - "Solvents production and application"
+    - "Transportation Sector"
+    - "Waste"
+    - "International Shipping"
+    "Emissions|H2|Photochemical production|VOC":
+    - "Agriculture"
+    - "Aircraft"
+    - "Energy Sector"
+    - "Industrial Sector"
+    - "Residential, Commercial, Other"
+    - "Solvents production and application"
+    - "Transportation Sector"
+    - "Waste"
+    - "International Shipping"
 
 spatial_emissions: [] # No spatial emissions downscaling

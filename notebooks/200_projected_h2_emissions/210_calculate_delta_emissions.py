@@ -352,6 +352,11 @@ total_emissions = emissions.process_over(("carrier", "product", "method"), "sum"
 total_emissions
 
 # %%
+scmdata.ScmRun(total_emissions).process_over(("sector",), "sum", as_run=True).filter(
+    variable="Emissions|H2"
+).lineplot(hue="region")
+
+# %%
 emissions.to_csv(config.delta_emissions.delta_emissions_complete)
 total_emissions.to_csv(config.delta_emissions.delta_emissions_totals)
 

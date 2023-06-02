@@ -19,6 +19,7 @@
 # quantified by other studies (see
 # `docs/Literature review on anthropogenic and natural global H2 sources and sinks_9Aug2022.docx`)
 # We are only modelling sources
+# For the historical baseline covers up until 2015. Then the scenario projections start
 
 
 # %%
@@ -65,7 +66,7 @@ ceds_book = shelf.load("ceds", version="v2016_07_26")
 
 # These are only used until 2015
 proxy_emissions = (
-    rcmip_book.timeseries("magicc")
+    rcmip_book.timeseries("complete")
     .filter(scenario=baseline_config.scenario, region="World", year=range(1850, 2101))
     .resample("AS")
 ).drop_meta(["activity_id", "mip_era"])
@@ -211,7 +212,7 @@ calc_sector_weights(ceds_data_global.filter(variable="Emissions|CO")).lineplot(
 
 # %%
 methane_weights = calc_sector_weights(
-    ceds_data_global.filter(variable="Emissions|CH4", year=range(1970, 2020))
+    ceds_data_global.filter(variable="Emissions|CH4", year=range(1970, 2101))
 )
 methane_weights.lineplot(hue="sector")
 
@@ -221,14 +222,32 @@ methane_weights.interpolate(
 ).lineplot(hue="sector")
 
 # %%
+ceds_sectors = config.projected_h2_emissions.ceds_breakdown_sectors
+ceds_sectors
+
+# %%
 sector_scales = {}
 
 for v in anthropogenic_proxy:
     proxy_variable = anthropogenic_proxy[v]
-    historical_emissions = ceds_data_global.filter(variable=proxy_variable)
+    ceds_variable = "|".join(proxy_variable.split("|")[:2])
+    ceds_sectors_v = ceds_sectors[v]
+    historical_emissions = ceds_data_global.filter(
+        sector=ceds_sectors_v, variable=ceds_variable
+    )
+
+    if historical_emissions.shape[0] == 1:
+        tmp = historical_emissions.copy()
+        tmp["unit"] = 1
+        tmp["variable"] = "Sector weights"
+        tmp.values[:, :] = 1
+        sector_scales[v] = tmp.interpolate(
+            scaled_emissions["time"], extrapolation_type="constant"
+        )
+        continue
 
     if "CH4" in proxy_variable:
-        historical_emissions = historical_emissions.filter(year=range(1970, 2020))
+        historical_emissions = historical_emissions.filter(year=range(1970, 2101))
 
     sector_scales[v] = calc_sector_weights(historical_emissions).interpolate(
         scaled_emissions["time"], extrapolation_type="constant"
