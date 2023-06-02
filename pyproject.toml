@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "local"
-version = "0.4.0"
+version = "0.4.1"
 description = "Local code for generation of hydrogen and associated input files for CSIRO's earth system modelling. The rest of the functionality is derived from the dependencies."
 authors = [
     "Jared Lewis <jared.lewis@climate-resource.com>",
@@ -123,7 +123,7 @@ module = "scmdata.*"
 ignore_missing_imports = true
 
 [tool.commitizen]
-version = "0.4.0"
+version = "0.4.1"
 version_files = ["pyproject.toml:^version"]
 tag_format = "v$version"
 major_version_zero = true

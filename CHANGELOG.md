@@ -1,3 +1,9 @@
+## v0.4.1 (2023-06-02)
+
+### Fix
+
+- resolve double counting in final figures
+
 ## v0.4.0 (2023-06-02)
 
 ### Feat
