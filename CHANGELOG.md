@@ -1,3 +1,9 @@
+## v0.4.0 (2023-06-02)
+
+### Feat
+
+- Use specific sectors from CEDS when calculating baseline H2 emissions
+
 ## v0.3.0 (2023-05-30)
 
 ### Fix
