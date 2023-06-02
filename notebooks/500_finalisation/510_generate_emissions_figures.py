@@ -34,9 +34,6 @@ from local.h2_adjust.constants import PALETTES
 config_file: str = "../dev.yaml"  # config file
 
 # %%
-config_file = "../../output-bundles/20230530a/ssp119-high/ssp119-high.yaml"
-
-# %%
 config = load_config_from_file(config_file)
 
 # %%
