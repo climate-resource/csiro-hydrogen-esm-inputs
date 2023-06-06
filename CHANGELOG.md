@@ -1,3 +1,10 @@
+## v0.5.0 (2023-06-06)
+
+### Feat
+
+- Remove photochemical production baseline emissions
+- Increase production leakages rates to cover all fuels
+
 ## v0.4.2 (2023-06-02)
 
 ### Fix
