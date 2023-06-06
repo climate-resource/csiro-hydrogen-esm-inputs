@@ -141,9 +141,9 @@ def scale_by_proxy(baseline: pd.DataFrame | scmdata.ScmRun) -> scmdata.ScmRun:
 
 
 scaled_emissions = scmdata.ScmRun(
-    baseline_values.filter(type="anthropogenic")
+    baseline_values.filter(type="anthropogenic", variable=anthropogenic_proxy.keys())
     .groupby("variable")
-    .map(scale_by_proxy)
+    .apply(scale_by_proxy)
     .filter(year=range(1850, year_to_scale + 1))
 )
 scaled_emissions.timeseries()
