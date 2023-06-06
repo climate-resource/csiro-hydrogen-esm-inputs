@@ -1,6 +1,7 @@
 # Makefile to help automate key steps
 
 .DEFAULT_GOAL := help
+TEMP_FILE := $(shell mktemp)
 
 
 # A helper script to get short descriptions of each target in the Makefile
@@ -46,6 +47,13 @@ virtual-environment:  ## update virtual environment, create a new one if it does
 	poetry install --all-extras
 	poetry run jupyter nbextension enable --py widgetsnbextension
 	poetry run pre-commit install
+
+.PHONY: licence-check
+licence-check:  ## Check that licences of the dependencies are suitable
+	poetry export > $(TEMP_FILE)
+
+	poetry run liccheck -r $(TEMP_FILE) -R licence-check.txt
+	rm -f $(TEMP_FILE)
 
 # the following lines need to go in the above somehow
 # @jared is this the right way? Seems odd to be putting passwords in plain text into the terminal...

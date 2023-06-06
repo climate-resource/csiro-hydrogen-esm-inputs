@@ -159,3 +159,5 @@ dmypy.json
 # Mac stuff
 *.DS_Store
 .doit.*
+
+licence-check.txt

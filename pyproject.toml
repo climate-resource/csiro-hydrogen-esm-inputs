@@ -8,6 +8,7 @@ authors = [
 ]
 readme = "README.md"
 packages = [{include = "local", from = "src"}]
+license = "BSD-3-Clause"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -54,6 +55,7 @@ mypy = "^1.3.0"
 pandas-stubs = "^2.0.1.230501"
 types-pyyaml = "^6.0.12.10"
 types-tqdm = "^4.65.0.1"
+liccheck = "^0.9.1"
 
 [tool.jupytext]
 formats = "ipynb,py:percent"
@@ -127,3 +129,34 @@ version = "0.5.0"
 version_files = ["pyproject.toml:^version"]
 tag_format = "v$version"
 major_version_zero = true
+
+[tool.liccheck]
+authorized_licenses = [
+    "bsd",
+    "bsd license",
+    "BSD 3-Clause",
+    "CC0",
+    "apache",
+    "apache 2.0",
+    "apache software",
+    "apache software license",
+    "Apache License, Version 2.0",
+    "gnu lgpl",
+    "lgpl with exceptions or zpl",
+    "LGPLv2+",
+    "GNU Lesser General Public License v2 (LGPLv2)",
+    "GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "Historical Permission Notice and Disclaimer (HPND)",
+    "isc license",
+    "isc license (iscl)",
+    "mit",
+    "mit license",
+    "Mozilla Public License 2.0 (MPL 2.0)",
+    "python software foundation",
+    "python software foundation license",
+    "zpl 2.1",
+]
+unauthorized_licenses = [
+    "gpl v3",
+    "gplv3",
+]
