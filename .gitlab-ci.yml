@@ -45,3 +45,14 @@ test:commit-messages:
   script:
     - pip install commitizen
     - cz check --rev-range dfbc95a1..HEAD
+
+
+test:licence-check:
+  stage: test
+  script:
+    - poetry install --no-interaction --all-extras
+    - make licence-check
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - licence-check.txt
