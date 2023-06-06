@@ -125,7 +125,7 @@ def process_production_emissions(ts):
         production_nh3["unit"] = "Mt NH3/yr"
         # Units are all kg/t
         emissions = production_nh3 * ts.values.squeeze() / 1000
-    elif carrier == "H2":
+    elif product == "H2":
         # Units are all %
         assert target_unit == production.get_unique_meta("unit", True)
         emissions = (

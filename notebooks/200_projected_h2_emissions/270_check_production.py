@@ -33,6 +33,11 @@ production_emissions = delta_emissions.filter(method="Production", region="World
 production_emissions
 
 # %%
+
+production_emissions = production_emissions.process_over("carrier", "sum", as_run=True)
+production_emissions
+
+# %%
 production_emissions.lineplot(hue="variable")
 
 # %%
@@ -105,11 +110,11 @@ extra_emissions.line_plot(hue="variable")
 aus_emissions
 
 # %%
-extra_emissions.drop_meta(["carrier", "product", "method"]).set_meta("region", "AUS")
+extra_emissions.drop_meta(["product", "method"]).set_meta("region", "AUS")
 
 # %%
 new_aus_emissions = aus_emissions.add(
-    extra_emissions.drop_meta(["carrier", "product", "method", "sector"]), op_cols={}
+    extra_emissions.drop_meta(["product", "method", "sector"]), op_cols={}
 )
 new_aus_emissions["stage"] = "new"
 new_aus_emissions
