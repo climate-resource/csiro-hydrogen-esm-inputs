@@ -56,8 +56,5 @@ licence-check:  ## Check that licences of the dependencies are suitable
 	rm -f $(TEMP_FILE)
 
 # the following lines need to go in the above somehow
-# @jared is this the right way? Seems odd to be putting passwords in plain text into the terminal...
 # poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
 # poetry config http-basic.git-lewisjarednz-domestic_pathways <gitlab-username> <gitlab-password>
-# poetry config repositories.git-climate-resource_carpet-concentrations https://gitlab.com/climate-resource/carpet-concentrations.git
-# poetry config http-basic.git-climate-resource_carpet-concentrations <gitlab-username> <gitlab-password>
