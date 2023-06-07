@@ -31,7 +31,7 @@ seaborn = "^0.12.2"
 joblib = "^1.2.0"
 aneris-iamc = {git = "https://github.com/lewisjared/aneris.git", rev = "feng"}
 netcdf4 = "^1.6.3"
-carpet-concentrations = {git = "https://gitlab.com/climate-resource/carpet-concentrations.git", rev = "hotfix", extras = ["cfxarray"]}
+carpet-concentrations = {extras = ["cfxarray"], version = "^0.4.0"}
 
 ## Temporary pin until requests and botocore support urllib3>=2
 # https://github.com/psf/requests/issues/6432
@@ -146,6 +146,9 @@ authorized_licenses = [
     "LGPLv2+",
     "GNU Lesser General Public License v2 (LGPLv2)",
     "GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "gplv3",
+    "GNU General Public License v2 (GPLv2)",
+    "GNU Affero General Public License v3 or later (AGPLv3+)",
     "Historical Permission Notice and Disclaimer (HPND)",
     "isc license",
     "isc license (iscl)",
@@ -157,6 +160,6 @@ authorized_licenses = [
     "zpl 2.1",
 ]
 unauthorized_licenses = [
-    "gpl v3",
-    "gplv3",
 ]
+[tool.liccheck.authorized_packages]
+datatoolbox = "0.5.6"  # Repository contains MIT license file - https://gitlab.com/climateanalytics/datatoolbox

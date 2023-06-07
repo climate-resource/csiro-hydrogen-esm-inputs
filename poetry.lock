@@ -417,35 +417,32 @@ files = [
 
 [[package]]
 name = "carpet-concentrations"
-version = "0.1.0"
+version = "0.4.0"
 description = "Core tools for the development of greenhouse gas concentration input files (i.e. flying carpets)."
 category = "main"
 optional = false
-python-versions = "^3.9"
-files = []
-develop = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "carpet_concentrations-0.4.0-py3-none-any.whl", hash = "sha256:3a1467402bde5e3e9dbca58aeb282c3525458151b833f2b9107ae2b5cb02b47f"},
+    {file = "carpet_concentrations-0.4.0.tar.gz", hash = "sha256:33840ba1a320916fe45e3e0c7c6e04c0addda4c83c2d37ec2e98ade9dac59794"},
+]
 
 [package.dependencies]
-attrs = "^23.1.0"
-cf-xarray = {version = "^0.8.1", optional = true}
-cftime = "^1.6.2"
-openscm-units = "^0.5.2"
+attrs = ">=23.1.0,<24.0.0"
+cf-xarray = {version = ">=0.8.1,<0.9.0", optional = true, markers = "extra == \"cfxarray\""}
+cftime = ">=1.6.2,<2.0.0"
+matplotlib = ">=3.7.1,<4.0.0"
+openscm-units = ">=0.5.2,<0.6.0"
 pint = ">=0.19"
-pint-xarray = "^0.3"
-pooch = {version = "^1.7.0", optional = true}
-xarray = "^2023.4.2"
+pint-xarray = ">=0.3,<0.4"
+pooch = {version = ">=1.7.0,<2.0.0", optional = true, markers = "extra == \"cfxarray\""}
+xarray = ">=2023.4.2,<2024.0.0"
 
 [package.extras]
 cfxarray = ["cf-xarray (>=0.8.1,<0.9.0)", "pooch (>=1.7.0,<2.0.0)"]
 netcdf = ["netcdf4 (>=1.6.3,<2.0.0)"]
 notebooks = ["ipywidgets (>=8.0.6,<9.0.0)", "notebook (>=6.5.3,<7.0.0)"]
 plots = ["seaborn (>=0.12.2,<0.13.0)"]
-
-[package.source]
-type = "git"
-url = "https://gitlab.com/climate-resource/carpet-concentrations.git"
-reference = "hotfix"
-resolved_reference = "ca77e589a5688038898558eee0ab0bc16e756b8e"
 
 [[package]]
 name = "cattrs"
@@ -5154,4 +5151,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "deafa2ee3a4137e0a51cfaee2f8a5d2d5220ac6472c8161912e5d534e9bc1ed0"
+content-hash = "2bd6868c50dca1ca46b0b0bf5e8264deb93227028169148b0775a8326842abc6"
