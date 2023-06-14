@@ -24,8 +24,6 @@ before_script:
   - pip install poetry
   - poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
   - poetry config http-basic.git-lewisjarednz-domestic_pathways gitlab-ci-token $CI_JOB_TOKEN
-  - poetry config repositories.git-climate-resource_carpet-concentrations https://gitlab.com/climate-resource/carpet-concentrations.git
-  - poetry config http-basic.git-climate-resource_carpet-concentrations gitlab-ci-token $CI_JOB_TOKEN
   - poetry config installer.max-workers 5
   - poetry config virtualenvs.create true
   - poetry config virtualenvs.in-project true

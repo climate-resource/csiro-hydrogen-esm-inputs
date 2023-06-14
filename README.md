@@ -16,8 +16,8 @@ choices with the building blocks from these external libraries.
 As part of this project, two new libraries were developed:
 
 * [spaemis](https://spaemis.readthedocs.com/) - Spatial emissions scaling
-* [carpet-concentration](https://gitlab.com/climate-resource/carpet-concentrations)
-    - GHG concentration input file generation  #TODO: make public
+* [carpet-concentration](https://github.com/climate-resource/carpet-concentrations)
+    - GHG concentration input file generation
 
 There were a range of project-specific choices that were made such as emissions
 intensities, scaling proxies. As more information comes available, these assumptions
@@ -25,12 +25,12 @@ can be modified to generate an updated dataset.
 
 ## Installation
 
-This repository should be cloned from the [GitLab repository](https://gitlab.com/climate-resource/csiro/csiro-hydrogen-esm-inputs).
+This repository should be cloned from the [GitHub repository](https://github.com/climate-resource/csiro-hydrogen-esm-inputs).
 Since this is an application repository, the package isn't installable via pypi or
 conda.
 
 ```bash
-git clone https://gitlab.com/climate-resource/csiro/csiro-hydrogen-esm-inputs.git
+git clone https://github.com/climate-resource/csiro-hydrogen-esm-inputs.git
 ```
 
 We rely on `poetry <https://python-poetry.org>`_ for all our dependency
@@ -41,7 +41,7 @@ found that pipx and pip worked better to install on a Mac). Poetry creates a loc
 to ensure someone else can generate the exact same python environment.
 
 There is one private repository that is required to reproduce the results for this project.
-This [dependency will eventually be removed](https://gitlab.com/climate-resource/csiro/csiro-hydrogen-esm-inputs/-/issues/16)
+This [dependency will eventually be removed](https://github.com/climate-resource/csiro/csiro-hydrogen-esm-inputs/-/issues/16)
 to make the project easier to install.[Jared Lewis](mailto:jared.lewis@climate-resource.com)
 can provide access to this repository if requested. Poetry requires some additional
 configuration before the project dependencies can be installed.
@@ -65,7 +65,7 @@ update if dependencies change (e.g. the environment is updated).
 
 If there are any issues, the messages from the `Makefile` should guide you
 through. If not, please raise an issue in the
-[issue tracker](https://gitlab.com/climate-resource/csiro/csiro-hydrogen-esm-inputs/-/issues).
+[issue tracker](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/-/issues).
 
 ## Architecture
 
