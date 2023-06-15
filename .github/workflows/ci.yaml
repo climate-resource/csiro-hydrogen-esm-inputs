@@ -20,7 +20,8 @@ jobs:
           poetry-dependency-install-flags: "--all-extras --only 'main,dev'"
           gitlab-access-token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
       - name: mypy
-        run: MYPYPATH=stubs poetry run mypy src notebooks
+        run: |
+          MYPYPATH=stubs poetry run mypy --install-types src notebooks
 
   check-commit-messages:
     if: ${{ !github.event.pull_request.draft }}
