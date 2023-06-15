@@ -43,7 +43,7 @@ check-commit-messages:  ## check commit messages
         # have old commits we don't want to re-write), this
         # can be changed to
         # poetry run cz check --rev-range <commit-to-start-from-sha>..HEAD
-	poetry run cz check --rev-range HEAD
+	poetry run cz check --rev-range 62b58b90..HEAD
 
 .PHONY: licence-check
 licence-check:  ## Check that licences of the dependencies are suitable
