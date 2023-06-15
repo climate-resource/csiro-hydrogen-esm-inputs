@@ -20,7 +20,7 @@ jobs:
           poetry-dependency-install-flags: "--all-extras --only 'main,dev'"
           gitlab-access-token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
       - name: mypy
-        run: MYPYPATH=stubs poetry run mypy src
+        run: MYPYPATH=stubs poetry run mypy src notebooks
 
   check-commit-messages:
     if: ${{ !github.event.pull_request.draft }}
@@ -65,6 +65,6 @@ jobs:
         shell: bash
         run: |
           TEMP_FILE=$(mktemp)
-          poetry export --without=tests --without=docs --without=dev > $TEMP_FILE
+          poetry export --without=dev > $TEMP_FILE
           poetry run liccheck -r $TEMP_FILE -R licence-check.txt
           cat licence-check.txt

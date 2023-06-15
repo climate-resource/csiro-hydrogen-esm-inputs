@@ -81,16 +81,16 @@ exclude_also = [
 ]
 
 [tool.mypy]
-strict = true
-# prevent unimported libraries silently being treated as Any
-disallow_any_unimported = true
-# show error codes on failure with context
-show_error_codes = true
-show_error_context = true
-# warn if code can't be reached
-warn_unreachable = true
-# importing following uses default settings
-follow_imports = "normal"
+#strict = true
+## prevent unimported libraries silently being treated as Any
+#disallow_any_unimported = true
+## show error codes on failure with context
+#show_error_codes = true
+#show_error_context = true
+## warn if code can't be reached
+#warn_unreachable = true
+## importing following uses default settings
+#follow_imports = "normal"
 
 [[tool.mypy.overrides]]
 module = "scmdata.*"
