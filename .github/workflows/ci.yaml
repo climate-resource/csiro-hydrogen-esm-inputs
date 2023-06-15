@@ -21,7 +21,7 @@ jobs:
           gitlab-access-token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
       - name: mypy
         run: |
-          MYPYPATH=stubs poetry run mypy --install-types src notebooks
+          MYPYPATH=stubs poetry run mypy --install-types --non-interactive src notebooks
 
   check-commit-messages:
     if: ${{ !github.event.pull_request.draft }}
