@@ -65,6 +65,7 @@ commitizen = "^3.1.1"
 mypy = "^1.2.0"
 ruff = "0.0.267"
 pre-commit = "^3.3.1"
+liccheck = "^0.9.1"
 
 [build-system]
 requires = ["poetry-core"]
