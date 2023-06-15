@@ -1,173 +1,73 @@
-# CSIRO Hydrogen ESM Inputs
+#
 
-[TODO badges etc.]
+<!---
+Can use start-after and end-before directives in docs, see
+https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html#inserting-other-documents-directly-into-the-current-document
+-->
 
-Generation of hydrogen and associated input files for CSIRO's earth system
-modelling. This work was performed as part of the [TODO funding etc. stuff
-here].
+<!--- sec-begin-description -->
 
-This is an "application" repository which contains the set of notebooks and
-configuration to be able to reproduce the outputs from this study. The more
-generic parts of the methodology are contained in other python libraries so
-they can be reused by a range of other projects. This project contains a
-tree of notebooks in that are the glue that combines the project-specific
-choices with the building blocks from these external libraries.
 
-As part of this project, two new libraries were developed:
 
-* [spaemis](https://spaemis.readthedocs.com/) - Spatial emissions scaling
-* [carpet-concentration](https://github.com/climate-resource/carpet-concentrations)
-    - GHG concentration input file generation
 
-There were a range of project-specific choices that were made such as emissions
-intensities, scaling proxies. As more information comes available, these assumptions
-can be modified to generate an updated dataset.
+# TODO: get something that gets the project org and repo from the url so it can be used here
+**Repository health :**
+[![CI](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/ci.yaml)
+[![Coverage](https://codecov.io/gh/climate-resource/csiro-export/branch/main/graph/badge.svg)](https://codecov.io/gh/climate-resource/csiro-export)
+[![Docs](https://readthedocs.org/projects/csiro-export/badge/?version=latest)](https://csiro-export.readthedocs.io)
+
+**PyPI :**
+[![PyPI](https://img.shields.io/pypi/v/csiro-export.svg)](https://pypi.org/project/csiro-export/)
+[![PyPI: Supported Python versions](https://img.shields.io/pypi/pyversions/csiro-export.svg)](https://pypi.org/project/csiro-export/)
+[![PyPI install](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/install.yaml/badge.svg?branch=main)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/install.yaml)
+
+**Other info :**
+[![License](https://img.shields.io/github/license/climate-resource/csiro-export.svg)](/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/climate-resource/csiro-export.svg)](/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/climate-resource/csiro-export.svg)](/graphs/contributors)
+
+
+<!--- sec-end-description -->
+
+Full documentation can be found at:
+[csiro-export.readthedocs.io](https://csiro-export.readthedocs.io/en/latest/).
+We recommend reading the docs there because the internal documentation links
+don't render correctly on GitHub's viewer.
 
 ## Installation
 
-This repository should be cloned from the [GitHub repository](https://github.com/climate-resource/csiro-hydrogen-esm-inputs).
-Since this is an application repository, the package isn't installable via pypi or
-conda.
+<!--- sec-begin-installation -->
+
+ can be installed with conda or pip:
 
 ```bash
-git clone https://github.com/climate-resource/csiro-hydrogen-esm-inputs.git
+pip install csiro-export
+conda install -c conda-forge csiro-export
 ```
 
-We rely on `poetry <https://python-poetry.org>`_ for all our dependency
-management. To get started, you will need to make sure that poetry is installed
-(https://python-poetry.org/docs/#installing-with-the-official-installer, we
-found that pipx and pip worked better to install on a Mac). Poetry creates a lock file
-(`poetry.lock`) which contains the versions of any dependencies used by this project
-to ensure someone else can generate the exact same python environment.
 
-There is one private repository that is required to reproduce the results for this project.
-This [dependency will eventually be removed](https://github.com/climate-resource/csiro/csiro-hydrogen-esm-inputs/-/issues/16)
-to make the project easier to install.[Jared Lewis](mailto:jared.lewis@climate-resource.com)
-can provide access to this repository if requested. Poetry requires some additional
-configuration before the project dependencies can be installed.
+<!--- sec-end-installation -->
 
-```
-poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
-poetry config http-basic.git-lewisjarednz-domestic_pathways <gitlab-username> <gitlab-password>
-```
+### For developers
 
-The project dependencies can then be installed. Poetry will create a local virtual
-environment (`.venv`) to isolate this environment from other projects.
+<!--- sec-begin-installation-dev -->
 
-```bash
-make virtual-environment
-```
+For development, we rely on [poetry](https://python-poetry.org) for all our
+dependency management. To get started, you will need to make sure that poetry
+is installed
+([instructions here](https://python-poetry.org/docs/#installing-with-the-official-installer),
+we found that pipx and pip worked better to install on a Mac).
 
-We use a `Makefile` to run common processing steps.
+For all of work, we use our `Makefile`.
 You can read the instructions out and run the commands by hand if you wish,
-but we generally discourage this because it can be error-prone and doesn't
-update if dependencies change (e.g. the environment is updated).
+but we generally discourage this because it can be error prone.
+In order to create your environment, run `make virtual-environment`.
 
 If there are any issues, the messages from the `Makefile` should guide you
-through. If not, please raise an issue in the
-[issue tracker](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/-/issues).
+through. If not, please raise an issue in the [issue tracker][issue_tracker].
 
-## Architecture
+For the rest of our developer docs, please see [](development-reference).
 
-A large configuration class is used to manage the required configuration for
-a given scenario.
+[issue_tracker]: https://github.com/climate-resource/csiro-hydrogen-esm-inputs/issues
 
-There are some common configuration and user-specific configuration that is
-merged with the configuration for each scenario. The common configuration and
-user-specific configuration is located at `data/configuration/common.yaml` and
-`data/configuration/user.yaml` respectively.
-
-With a given configuration, the steps that are required to generate the results
-can be created (`src/local/steps.py`). Each step consists of:
-
-* A notebook to be run
-* A set of input files that are required by the notebook
-* A set of files that will be produced by the notebook (figures, data, diagnostics)
-* The configuration values that are required by the notebook
-
-`pydoit` uses these steps to build a graph of what work needs to be performed to
-complete all the steps. If any part of the step has been modified that step (and
-all steps that depend on that step) will be rerun. Some of the steps are duplicated
-for each scenario and will only be run once, for example the generation of
-historical gridded H2 fields.
-
-
-### Required data
-
-Not all data required to complete the pipeline can be included in the Git repository.
-
-Before starting you need to create a user-specific placeholder file. This file will contain
-so user-specific paths. A sample file is provided at `data/configuration/user.sample.yaml`. The
-default location for this file is `data/configuration/user.yaml`, but this can be
-modified by passing adding a `--user_placeholders my/custom/user/file.yaml` argument when
-running `doit`.
-
-For the gridding step, a range of proxies and seasonality data are needed. These
-can be obtained by downloading the results from
-[Feng et al. 2020](https://zenodo.org/record/2538194) (this can take
-some time so start with that).
-
-Once the outputs from `Feng et al. 2020` have been downloaded, extract them to
-`data/raw/emissions_downscaling_archive`. There is a file that appears to be
-missing from the archive, it is
-`data/raw/emissions_downscaling_archive/gridding/gridding-mappings/country_location_index_05.csv`.
-This can be downloaded from
-[here](https://github.com/iiasa/emissions_downscaling/blob/master/input/gridding/gridding-mappings/country_location_index_05.csv).
-Make sure you have downloaded and saved this file in
-`data/raw/emissions_downscaling_archive/gridding/gridding-mappings/country_location_index_05.csv`
-before preceeding.
-
-While the Feng data is downloading, install `R` so that
-`Rscript` is available on your `PATH`. This step is OS specific, but for MacOS
-we recommend using `brew` ([see homebrew](https://brew.sh/)).
-
-If successful, you should be able to run the following and get output like the following
-
-```bash
-$ Rscript --version
-Rscript (R) version 4.3.0 (2023-04-21)
-```
-
-The `aneris` repository with the feng gridding module then needs to be cloned.
-Put the `aneris` folder wherever best suits, we recommend putting it in a
-folder in the root level of this repository as it is automatically ignored by
-our `.gitignore` file.
-
-```bash
-git clone git@github.com:lewisjared/aneris.git
-cd aneris
-git checkout feng
-```
-
-You will also need to download MAGICC7 and the AR6 probabilistic file from
-https://magicc.org/download/magicc7. The paths to the downloaded files can
-then be set in the common configuration under the `magicc_runs` key.
-
-To generate the regional emissions two additional datasets are required:
-
-* The Australia and Victoria emissions inventories
-* input4MIPs emissions data for `IAMC-IMAGE-ssp119-1-1`, `IAMC-IMAGE-ssp126-1-1`
-  and `IAMC-REMIND-MAGPIE-ssp245-1-1`
-
-Additional information about the required input4MIPs dataset is provided at
-the [spaemis input data documentation](https://spaemis.readthedocs.io/en/latest/input_data.html).
-The spaemis repository also contains the required inventory data.
-The user-specific placeholders contain placeholders for the required paths.
-
-## Run
-
-Once the virtual environment has been created, the required input data have been obtained
-and the user-specific placeholders created, the system is ready to run.
-
-To run everything, simply run `make all`.
-
-If you want to have more control, you can specify the output run ID with the
-below
-
-```sh
-poetry run doit run <doit-run-args> generate_notebook_tasks --run-id myrun <tasks-to-run>
-# For example
-poetry run doit run --verbosity 2 -n 4 generate_notebook_tasks --run-id myrun  display_info "Create input4MIPs checklist file"
-```
-
-Running in this way allows pydoit's task checking to only re-run tasks where the dependencies have been updated.
+<!--- sec-end-installation-dev -->

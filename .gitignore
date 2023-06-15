@@ -26,6 +26,9 @@ data/raw/inventories
 # Jupyter cache
 .jupyter_cache
 
+# Licence check
+licence-check.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -159,5 +162,3 @@ dmypy.json
 # Mac stuff
 *.DS_Store
 .doit.*
-
-licence-check.txt

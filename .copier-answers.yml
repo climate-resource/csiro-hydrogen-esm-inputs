@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier
+_commit: fbe160a
+_src_path: ../copier-core-python-repository
+email: ''
+initial_setup: false
+name: Jared Lewis
+notebook_dependencies: false
+plot_dependencies: false
+project_description_short: ''
+project_name_human: ''
+project_name_pip: csiro-export
+project_name_python: csiro_export
+project_url: https://github.com/climate-resource/csiro-hydrogen-esm-inputs

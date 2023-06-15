@@ -3,7 +3,6 @@
 .DEFAULT_GOAL := help
 TEMP_FILE := $(shell mktemp)
 
-
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -32,6 +31,7 @@ checks:  ## run all the linting checks of the codebase
 .PHONY: black
 black:  ## format the code using black
 	poetry run black dodo.py src notebooks scripts
+	poetry run blackdoc src
 
 .PHONY: ruff-fixes
 ruff-fixes:  ## fix the code using ruff
@@ -39,22 +39,23 @@ ruff-fixes:  ## fix the code using ruff
 
 .PHONY: check-commit-messages
 check-commit-messages:  ## check commit messages
-	poetry run cz check --rev-range dfbc95a1..HEAD
-
-virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
-	# Put virtual environments in the project
-	poetry config virtualenvs.in-project true
-	poetry install --all-extras
-	poetry run jupyter nbextension enable --py widgetsnbextension
-	poetry run pre-commit install
+        # If you only want to check a certain range (e.g. we
+        # have old commits we don't want to re-write), this
+        # can be changed to
+        # poetry run cz check --rev-range <commit-to-start-from-sha>..HEAD
+	poetry run cz check --rev-range HEAD
 
 .PHONY: licence-check
 licence-check:  ## Check that licences of the dependencies are suitable
-	poetry export > $(TEMP_FILE)
-
+	# Not sure if this is cross-platform compatible
+	poetry export --without=tests --without=docs --without=dev > $(TEMP_FILE)
 	poetry run liccheck -r $(TEMP_FILE) -R licence-check.txt
 	rm -f $(TEMP_FILE)
 
-# the following lines need to go in the above somehow
-# poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
-# poetry config http-basic.git-lewisjarednz-domestic_pathways <gitlab-username> <gitlab-password>
+.PHONY: virtual-environment
+virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
+	poetry lock
+	# Put virtual environments in the project
+	poetry config virtualenvs.in-project true
+	poetry install --all-extras
+	poetry run pre-commit install
