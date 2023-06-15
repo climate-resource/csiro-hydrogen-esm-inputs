@@ -15,6 +15,9 @@ inputs:
     description: "Should we run the poetry install steps"
     required: false
     default: true
+  gitlab-access-token:
+    description: "gitlab token"
+    required: true
 
 
 runs:
@@ -48,6 +51,8 @@ runs:
       run: |
         poetry config virtualenvs.create true
         poetry config virtualenvs.in-project true
+        poetry config repositories.git-lewisjarednz-domestic_pathways https://gitlab.com/lewisjarednz/domestic_pathways.git
+        poetry config http-basic.git-lewisjarednz-domestic_pathways gitlab-ci-token ${{ inputs.gitlab-access-token }}
         poetry env use ${{ inputs.python-version }}
         poetry install --no-interaction --no-root ${{ inputs.poetry-dependency-install-flags }}
     # Now run same command but let the package install too

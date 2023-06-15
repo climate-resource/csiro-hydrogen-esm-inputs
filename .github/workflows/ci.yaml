@@ -18,6 +18,7 @@ jobs:
           python-version: "3.10"
           venv-id: "docs"
           poetry-dependency-install-flags: "--all-extras --only 'main,dev'"
+          gitlab-access-token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
       - name: mypy
         run: MYPYPATH=stubs poetry run mypy src
 
@@ -59,6 +60,7 @@ jobs:
           python-version: "3.10"
           venv-id: "licence-check"
           poetry-dependency-install-flags: "--all-extras"
+          gitlab-access-token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
       - name: Check licences of dependencies
         shell: bash
         run: |
