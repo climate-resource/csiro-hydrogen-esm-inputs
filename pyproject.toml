@@ -93,6 +93,10 @@ exclude_also = [
 module = "scmdata.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "referencing.*"
+follow_imports = "skip"
+
 
 [tool.jupytext]
 formats = "ipynb,py:percent"
@@ -236,3 +240,6 @@ unauthorized_licenses = [
 
 [tool.liccheck.authorized_packages]
 datatoolbox = "0.5.6"  # Repository contains MIT license file - https://gitlab.com/climateanalytics/datatoolbox
+iam-units = "2022.10.2"  # https://github.com/IAMconsortium/pyam/issues/716
+fuzzywuzzy = "0.18.0"  # Not used
+pyreadr = "0.4.7"  # AGPLv3

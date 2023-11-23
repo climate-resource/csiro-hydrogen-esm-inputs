@@ -41,7 +41,7 @@ ruff-fixes:  ## fix the code using ruff
 licence-check:  ## Check that licences of the dependencies are suitable
 	# Will likely fail on Windows, but Makefiles are in general not Windows
 	# compatible so we're not too worried
-	poetry export --without=tests --without=docs --without=dev > $(TEMP_FILE)
+	poetry export --without=dev > $(TEMP_FILE)
 	poetry run liccheck -r $(TEMP_FILE) -R licence-check.txt
 	rm -f $(TEMP_FILE)
 
