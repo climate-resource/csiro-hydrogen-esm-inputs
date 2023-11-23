@@ -74,9 +74,6 @@ class SingleNotebookDirStep:
     which is configured from elsewhere
     """
 
-    name: str
-    """Name of the step"""
-
     doc: str
     """Longer description of the step"""
 
@@ -108,6 +105,12 @@ class SingleNotebookDirStep:
     targets: tuple[Path, ...]
     """
     Paths this notebook creates
+    """
+
+    name: str | None = None
+    """Name of the step
+
+    If not provided the name will be derived from the notebook name
     """
 
     configuration: Hashable | None = None
@@ -166,8 +169,13 @@ class SingleNotebookDirStep:
         )
         notebook_parameters = FrozenDict(self.notebook_parameters or {})
 
+        if self.name:
+            name = self.name
+        else:
+            name = self.notebook.replace(" ", "_").replace("/", "-")
+
         return NotebookStep(
-            name=self.name,
+            name=name,
             stub=stub,
             doc=self.doc,
             raw_notebook=raw_notebook,
