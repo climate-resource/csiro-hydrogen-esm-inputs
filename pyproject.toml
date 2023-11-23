@@ -239,7 +239,8 @@ unauthorized_licenses = [
 ]
 
 [tool.liccheck.authorized_packages]
+# TODO: Remove datatooolbox dependency as it isn't used
 datatoolbox = "0.5.6"  # Repository contains MIT license file - https://gitlab.com/climateanalytics/datatoolbox
-iam-units = "2022.10.2"  # https://github.com/IAMconsortium/pyam/issues/716
-fuzzywuzzy = "0.18.0"  # Not used
-pyreadr = "0.4.7"  # AGPLv3
+fuzzywuzzy = "0.18.0"  # Not used, but pulled in by datatoolbox
+iam-units = "2022.10.27"  # https://github.com/IAMconsortium/pyam/issues/716
+pyreadr = "0.4.7"  # AGPLv3, but optional dependency
