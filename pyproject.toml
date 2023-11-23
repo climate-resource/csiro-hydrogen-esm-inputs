@@ -8,6 +8,7 @@ version = "0.5.0"
 description = "Local code for generation of hydrogen and associated input files for CSIRO's earth system modelling. The rest of the functionality is derived from the dependencies."
 authors = [
     "Jared Lewis <jared.lewis@climate-resource.com>",
+    "Rebecca Burdon <rebecca.burdon@climate-resource.com>",
     "Zebedee Nicholls <zebedee.nicholls@climate-resource.com>",
 ]
 readme = "README.md"

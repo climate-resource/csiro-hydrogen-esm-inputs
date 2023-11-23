@@ -142,7 +142,7 @@ This can be downloaded from
 [here](https://github.com/iiasa/emissions_downscaling/blob/master/input/gridding/gridding-mappings/country_location_index_05.csv).
 Make sure you have downloaded and saved this file in
 `data/raw/emissions_downscaling_archive/gridding/gridding-mappings/country_location_index_05.csv`
-before preceeding.
+before proceeding.
 
 While the Feng data is downloading, install `R` so that
 `Rscript` is available on your `PATH`. This step is OS specific, but for MacOS
