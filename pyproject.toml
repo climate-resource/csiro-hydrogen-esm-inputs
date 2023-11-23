@@ -1,24 +1,16 @@
-[tool.coverage.run]
-source = ["src"]
-branch = true
-
 [tool.poetry]
 name = "local"
 version = "0.5.0"
 description = "Local code for generation of hydrogen and associated input files for CSIRO's earth system modelling. The rest of the functionality is derived from the dependencies."
 authors = [
     "Jared Lewis <jared.lewis@climate-resource.com>",
+    "Rebecca Burdon <rebecca.burdon@climate-resource.com>",
     "Zebedee Nicholls <zebedee.nicholls@climate-resource.com>",
 ]
 readme = "README.md"
 packages = [{include = "local", from = "src"}]
 license = "BSD-3-Clause"
 
-[tool.commitizen]
-version = "0.5.0"
-version_files = ["pyproject.toml:^version"]
-tag_format = "v$version"
-major_version_zero = true
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -61,15 +53,19 @@ pytest-cov = "^4.0.0"
 coverage = "^7.2.0"
 black = "23.3.0"
 blackdoc = "0.3.8"
-commitizen = "^3.1.1"
 mypy = "^1.2.0"
 ruff = "0.0.267"
 pre-commit = "^3.3.1"
+towncrier = "^23.6.0"
 liccheck = "^0.9.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
 
 [tool.coverage.report]
 fail_under = 95
@@ -96,6 +92,10 @@ exclude_also = [
 [[tool.mypy.overrides]]
 module = "scmdata.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "referencing.*"
+follow_imports = "skip"
 
 
 [tool.jupytext]
@@ -154,6 +154,51 @@ known-first-party = ["src"]
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
+
+[tool.towncrier]
+package = "csiro-hydrogen-esm-inputs"
+package_dir = "src"
+filename = "docs/source/changelog.md"
+directory = "changelog/"
+title_format = "## csiro-hydrogen-esm-inputs {version} ({project_date})"
+underlines = ["", "", ""]
+issue_format = "[#{issue}](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/pulls/{issue})"
+
+  [[tool.towncrier.type]]
+  directory = "breaking"
+  name = "Breaking Changes"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "deprecation"
+  name = "Deprecations"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "feature"
+  name = "Features"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "improvement"
+  name = "Improvements"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "fix"
+  name = "Bug Fixes"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "docs"
+  name = "Improved Documentation"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "trivial"
+  name = "Trivial/Internal Changes"
+  showcontent = false
+
 [tool.liccheck]
 authorized_licenses = [
     "bsd",
@@ -165,17 +210,14 @@ authorized_licenses = [
     "apache software",
     "apache software license",
     "Apache License, Version 2.0",
+    "Historical Permission Notice and Disclaimer (HPND)",
+    "isc license",
+    "isc license (iscl)",
     "gnu lgpl",
     "lgpl with exceptions or zpl",
     "LGPLv2+",
     "GNU Lesser General Public License v2 (LGPLv2)",
     "GNU Lesser General Public License v2 or later (LGPLv2+)",
-    "gplv3",
-    "GNU General Public License v2 (GPLv2)",
-    "GNU Affero General Public License v3 or later (AGPLv3+)",
-    "Historical Permission Notice and Disclaimer (HPND)",
-    "isc license",
-    "isc license (iscl)",
     "mit",
     "mit license",
     "Mozilla Public License 2.0 (MPL 2.0)",
@@ -183,8 +225,22 @@ authorized_licenses = [
     "python software foundation license",
     "zpl 2.1",
 ]
+# This starting list is relatively conservative. Depending on the project, it
+# may make sense to move some of these into the authorized list
 unauthorized_licenses = [
+    "agpl",
+    "gnu agpl",
+    "gpl v3",
+    "gplv3",
+    "gpl v2",
+    "gplv2",
+    "gpl v1",
+    "gplv1",
 ]
 
 [tool.liccheck.authorized_packages]
+# TODO: Remove datatooolbox dependency as it isn't used
 datatoolbox = "0.5.6"  # Repository contains MIT license file - https://gitlab.com/climateanalytics/datatoolbox
+fuzzywuzzy = "0.18.0"  # Not used, but pulled in by datatoolbox
+iam-units = "2022.10.27"  # https://github.com/IAMconsortium/pyam/issues/716
+pyreadr = "0.4.7"  # AGPLv3, but optional dependency

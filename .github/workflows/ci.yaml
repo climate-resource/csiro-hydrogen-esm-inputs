@@ -23,34 +23,6 @@ jobs:
         run: |
           MYPYPATH=stubs poetry run mypy --install-types --non-interactive src notebooks
 
-  check-commit-messages:
-    if: ${{ !github.event.pull_request.draft }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up python
-        id: setup-python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Load pip cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: "${{ runner.os }}-check-commits-pip"
-          restore-keys: "${{ runner.os }}-check-commits-pip"
-      - name: Install commitizen
-        run: pip install commitizen
-      - name: Check commits
-        # If you only want to check a certain range (e.g. we
-        # have old commits we don't want to re-write), this
-        # can be changed to
-        # run: cz check --rev-range <commit-to-start-from-sha>..HEAD
-        run: cz check --rev-range 62b58b90..HEAD
-
   check-dependency-licences:
     runs-on: ubuntu-latest
     steps:

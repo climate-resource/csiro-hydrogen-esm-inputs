@@ -37,24 +37,16 @@ black:  ## format the code using black
 ruff-fixes:  ## fix the code using ruff
 	poetry run ruff dodo.py src notebooks --fix
 
-.PHONY: check-commit-messages
-check-commit-messages:  ## check commit messages
-        # If you only want to check a certain range (e.g. we
-        # have old commits we don't want to re-write), this
-        # can be changed to
-        # poetry run cz check --rev-range <commit-to-start-from-sha>..HEAD
-	poetry run cz check --rev-range 62b58b90..HEAD
-
 .PHONY: licence-check
 licence-check:  ## Check that licences of the dependencies are suitable
-	# Not sure if this is cross-platform compatible
-	poetry export --without=tests --without=docs --without=dev > $(TEMP_FILE)
+	# Will likely fail on Windows, but Makefiles are in general not Windows
+	# compatible so we're not too worried
+	poetry export --without=dev > $(TEMP_FILE)
 	poetry run liccheck -r $(TEMP_FILE) -R licence-check.txt
 	rm -f $(TEMP_FILE)
 
 .PHONY: virtual-environment
 virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
-	poetry lock
 	# Put virtual environments in the project
 	poetry config virtualenvs.in-project true
 	poetry install --all-extras

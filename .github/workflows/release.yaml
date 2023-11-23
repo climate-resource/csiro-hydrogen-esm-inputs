@@ -42,7 +42,7 @@ jobs:
           body_path: ".github/release_template.md"
           draft: true
           files: |
-            dist/csiro_export-${{ env.PROJECT_VERSION }}-py3-none-any.whl
-            dist/csiro_export-${{ env.PROJECT_VERSION }}.tar.gz
+            dist/local-${{ env.PROJECT_VERSION }}-py3-none-any.whl
+            dist/local-${{ env.PROJECT_VERSION }}.tar.gz
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
