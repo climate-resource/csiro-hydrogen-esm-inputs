@@ -7,10 +7,9 @@ https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html#inse
 
 <!--- sec-begin-description -->
 
-# TODO: get something that gets the project org and repo from the url so it can be used here
 **Repository health :**
 [![CI](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/ci.yaml)
-[![Coverage](https://codecov.io/gh/climate-resource/csiro-export/branch/main/graph/badge.svg)](https://codecov.io/gh/climate-resource/csiro-export)
+[![Coverage](https://codecov.io/gh/climate-resource/csiro-hydrogen-esm-inputs/branch/main/graph/badge.svg)](https://codecov.io/gh/climate-resource/csiro-hydrogen-esm-inputs)
 [![Docs](https://readthedocs.org/projects/csiro-export/badge/?version=latest)](https://csiro-export.readthedocs.io)
 
 **PyPI :**
@@ -19,9 +18,9 @@ https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html#inse
 [![PyPI install](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/install.yaml/badge.svg?branch=main)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/actions/workflows/install.yaml)
 
 **Other info :**
-[![License](https://img.shields.io/github/license/climate-resource/csiro-export.svg)](/blob/main/LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/climate-resource/csiro-export.svg)](/commits/main)
-[![Contributors](https://img.shields.io/github/contributors/climate-resource/csiro-export.svg)](/graphs/contributors)
+[![License](https://img.shields.io/github/license/climate-resource/csiro-hydrogen-esm-inputs.svg)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/climate-resource/csiro-hydrogen-esm-inputs.svg)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/climate-resource/csiro-hydrogen-esm-inputs.svg)](https://github.com/climate-resource/csiro-hydrogen-esm-inputs/graphs/contributors)
 
 
 <!--- sec-end-description -->
