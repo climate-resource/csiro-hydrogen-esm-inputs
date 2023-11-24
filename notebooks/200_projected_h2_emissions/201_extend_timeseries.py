@@ -19,7 +19,10 @@
 # annual timeseries.
 #
 # The input data can hint at what method is used for extrapolation
-
+#
+# The units for the emissions intensities and leakage rates are sanitized to make later
+# calculations simpler. For the combustion intensities the target it to convert to kg X / MWh
+# and for production intensities and the leakage rates the goal is kg product / kg H2
 # %%
 
 from pathlib import Path
@@ -32,6 +35,10 @@ import scmdata
 from local.config import load_config_from_file
 from local.h2_adjust.constants import HYDROGEN_CARRIERS, HYDROGEN_SECTORS
 from local.h2_adjust.timeseries import add_world_region, extend
+from local.h2_adjust.units import (
+    sanitize_combustion_intensity_units,
+    sanitize_production_intensity_units,
+)
 
 # %%
 plt.rcParams["figure.figsize"] = (12, 8)
@@ -232,6 +239,8 @@ def process_emissions_intensities(filename: Path) -> scmdata.ScmRun:
         .set_meta("scenario", config.name)
         .set_meta("model", "h2-adjust")
     )
+    emissions_intensities["comment"] = emissions_intensities["comment"].astype(str)
+    emissions_intensities["source"] = emissions_intensities["source"].astype(str)
 
     emissions_intensities.drop_meta(("comment", "source")).head()
 
@@ -244,33 +253,6 @@ def process_emissions_intensities(filename: Path) -> scmdata.ScmRun:
     return emissions_intensities_extended
 
 
-def sanitize_intensities(intensities: scmdata.ScmRun) -> scmdata.ScmRun:
-    """
-    Convert the emissions intensities to a common set of units
-
-    The target unit is "kg X / MWh"
-    """
-    sanitized_emissions = []
-
-    for product in intensities.get_unique_meta("product"):
-        to_clean = intensities.filter(product=product)
-        energy_rate = "MWh"
-        target_unit = f"kg {product} / {energy_rate}"
-
-        for unit in to_clean.get_unique_meta("unit"):
-            selected = to_clean.filter(unit=unit)
-
-            print(unit)
-            if not isinstance(unit, str):
-                selected["unit"] = target_unit
-            else:
-                selected = selected.convert_unit(target_unit)
-
-            sanitized_emissions.append(selected)
-
-    return scmdata.run_append(sanitized_emissions)
-
-
 intensities_combustion = process_emissions_intensities(
     config.delta_emissions.inputs.emissions_intensities_combustion
 )
@@ -279,11 +261,14 @@ intensities_combustion = process_emissions_intensities(
 intensities_combustion.get_unique_meta("unit")
 
 # %%
-intensities_combustion_sanitized = sanitize_intensities(intensities_combustion)
+intensities_combustion_sanitized = sanitize_combustion_intensity_units(
+    # The comment/source metadata play havoc with ScmRun.apply
+    intensities_combustion.drop_meta(["comment", "source"])
+)
 config.delta_emissions.clean.emissions_intensities_combustion.parent.mkdir(
     parents=True, exist_ok=True
 )
-intensities_combustion_sanitized.drop_meta(["comment", "source"]).to_csv(
+intensities_combustion_sanitized.to_csv(
     config.delta_emissions.clean.emissions_intensities_combustion
 )
 intensities_combustion_sanitized
@@ -302,12 +287,13 @@ intensities_combustion_sanitized.filter(product="NOx").lineplot(
 intensities_production = process_emissions_intensities(
     config.delta_emissions.inputs.emissions_intensities_production
 )
-# todo: fix
-# intensities_production_sanitized = sanitize_intensities(intensities_production)
+intensities_production_sanitized = sanitize_production_intensity_units(
+    intensities_production.drop_meta(["comment", "source"])
+)
 config.delta_emissions.clean.emissions_intensities_production.parent.mkdir(
     parents=True, exist_ok=True
 )
-intensities_production.drop_meta(["comment", "source"]).to_csv(
+intensities_production_sanitized.to_csv(
     config.delta_emissions.clean.emissions_intensities_production
 )
 
@@ -387,8 +373,10 @@ energy_by_carrier.to_csv(config.delta_emissions.energy_by_carrier)
 # # Leakage rates
 
 # %%
-leakage_rates = scmdata.ScmRun(config.delta_emissions.inputs.leakage_rates)
-leakage_rates.drop_meta(("comment", "source")).head()
+leakage_rates = scmdata.ScmRun(config.delta_emissions.inputs.leakage_rates).drop_meta(
+    ("comment", "source")
+)
+leakage_rates.head()
 
 # %%
 print_missing(leakage_rates)
@@ -397,13 +385,17 @@ print_missing(leakage_rates)
 leakage_rates_extended = extend(
     leakage_rates, config.delta_emissions.extensions, method="constant"
 ).filter(unit=np.nan, keep=False)
-leakage_rates_extended.drop_meta(("comment", "source")).head()
+leakage_rates_extended.head()
 
 # %%
 leakage_rates_extended.get_unique_meta("unit")
 
 # %%
+leakage_rates_sanitized = sanitize_production_intensity_units(leakage_rates_extended)
+leakage_rates_sanitized.get_unique_meta("unit")
+
+# %%
 config.delta_emissions.clean.leakage_rates.parent.mkdir(parents=True, exist_ok=True)
-leakage_rates_extended.to_csv(config.delta_emissions.clean.leakage_rates)
+leakage_rates_sanitized.to_csv(config.delta_emissions.clean.leakage_rates)
 
 # %%
