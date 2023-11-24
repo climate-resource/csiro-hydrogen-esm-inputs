@@ -148,6 +148,11 @@ line-length = 110
     "D100",  # Missing docstring in public module
     "D103",  # Missing docstring in public function
 ]
+"tests/*" = [
+    "D100",  # Missing docstring in public module
+    "D103",  # Missing docstring in public function
+    "S101",  # Use of `assert` detected
+]
 
 [tool.ruff.isort]
 known-first-party = ["src"]

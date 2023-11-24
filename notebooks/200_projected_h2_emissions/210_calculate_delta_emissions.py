@@ -40,6 +40,7 @@ config_file: str = "../dev.yaml"  # config file
 
 # %%
 config = load_config_from_file(config_file)
+warn_or_raise = "raise"
 
 # %%
 energy_by_carrier = scmdata.ScmRun(config.delta_emissions.energy_by_carrier)
@@ -93,54 +94,54 @@ h2_conversion_factor = f_h2_council
 
 
 # %%
-def process_production_emissions(ts):
+# Calculate the production of H2 from secondary energy
+# Assumes no-losses
+production_h2 = energy_by_carrier * h2_conversion_factor.m
+production_h2["unit"] = "Mt H/yr"
+production_h2["variable"] = "Production|H2"
+
+
+def _maybe_raise(msg):
+    if warn_or_raise == "warn":
+        logger.warning(msg)
+        return scmdata.ScmRun()
+    raise ValueError(msg)
+
+
+def process_production_emissions(production_intensity: scmdata.ScmRun):
     """
     Process the result from a single Emissions intensity timeseries
 
     All production emissions are associated with the Industrial Sector
     """
-    ts = scmdata.ScmRun(ts)
-    assert len(ts) == 1
-    carrier = ts.get_unique_meta("carrier", True)
-    product = ts.get_unique_meta("product", True)
+    assert len(production_intensity) == 1
+    carrier = production_intensity.get_unique_meta("carrier", True)
+    product = production_intensity.get_unique_meta("product", True)
 
-    energy = energy_by_carrier.filter(
+    production_carrier = production_h2.filter(
         carrier=carrier, sector="Total", log_if_empty=False
     )
 
-    if len(energy) == 0:
-        msg = f"No Energy|{carrier} found. Assuming 0"
-        raise ValueError(msg)
-
-    production = energy * h2_conversion_factor.m
-    production["unit"] = "Mt H/yr"
+    if len(production_carrier) == 0:
+        _maybe_raise(f"No Production|H2 found for carrier {carrier}")
 
     product_unit = product if product != "H2" else "H"
     target_unit = f"Mt {product_unit}/yr"
 
-    assert all(energy["year"] == ts["year"])
+    # Checks
+    assert f"kg {product} / kg H2" == production_intensity.get_unique_meta("unit", True)
 
-    if carrier == "NH3":
-        production_nh3 = production * 17 / 3
-        production_nh3["unit"] = "Mt NH3/yr"
-        # Units are all kg/t
-        emissions = production_nh3 * ts.values.squeeze() / 1000
-    elif product == "H2":
-        # Units are all %
-        assert target_unit == production.get_unique_meta("unit", True)
-        emissions = (
-            production * ts.values.squeeze() / 100.0
-        )  # % are used not dimensionless
-    else:
-        raise ValueError(f"No production for {product}")  # noqa
+    # Mt H / yr * (kg product / kg H) * (1e9 Mt product/ kg product) * (1/E9 kg H / Mt H) => Mt product / yr
+    emissions_carrier = production_carrier * production_intensity.values.squeeze()
 
-    emissions["variable"] = f"Emissions|{product}"
-    emissions["unit"] = target_unit
-    emissions["product"] = product
-    emissions["sector"] = "Industrial Sector"
-    emissions["method"] = "Production"
+    emissions_carrier["variable"] = f"Emissions|{product}"
+    emissions_carrier["unit"] = target_unit
+    emissions_carrier["product"] = product
+    # All production emissions are associated with the industrial sector
+    emissions_carrier["sector"] = "Industrial Sector"
+    emissions_carrier["method"] = "Production"
 
-    return emissions
+    return emissions_carrier
 
 
 emissions_intensities_production = scmdata.ScmRun(
@@ -148,9 +149,9 @@ emissions_intensities_production = scmdata.ScmRun(
 )
 emissions_intensities_production.head()
 
-emissions_production = emissions_intensities_production.groupby(
-    "variable", "unit", "carrier", "product", "sector"
-).apply(process_production_emissions)
+emissions_production = emissions_intensities_production.apply(
+    process_production_emissions
+)
 
 emissions_production
 
@@ -182,11 +183,10 @@ def process_combustion_emissions(intensities: scmdata.ScmRun) -> scmdata.ScmRun:
     )
 
     if len(energy) == 0:
-        msg = f"No Energy|{carrier}|{sector} found. Assuming 0"
-        logger.warning(msg)
-        return scmdata.ScmRun()
+        _maybe_raise(f"No Energy|{carrier}|{sector} found")
 
-    target_unit = f"Mt {product}/yr"
+    product_unit = product if product != "H2" else "H"
+    target_unit = f"Mt {product_unit}/yr"
     unit = ur(intensities.get_unique_meta("unit", True))
     energy_unit = ur(energy.get_unique_meta("unit", True))
 
@@ -201,8 +201,6 @@ def process_combustion_emissions(intensities: scmdata.ScmRun) -> scmdata.ScmRun:
     emissions = emissions.convert_unit(target_unit, context="AR6GWP100").drop_meta(
         "unit_context"
     )
-    if product == "H":
-        product = "H2"
     emissions["variable"] = f"Emissions|{product}"
     emissions["unit"] = target_unit
     emissions["product"] = product
@@ -212,10 +210,9 @@ def process_combustion_emissions(intensities: scmdata.ScmRun) -> scmdata.ScmRun:
 
 
 # %%
-emissions_combustion = emissions_intensities_combustion.groupby(
-    "variable", "unit", "carrier", "product", "sector"
-).apply(process_combustion_emissions)
-
+emissions_combustion = emissions_intensities_combustion.apply(
+    process_combustion_emissions
+)
 emissions_combustion
 
 # %%
@@ -235,7 +232,7 @@ for carrier in emissions_combustion.get_unique_meta("carrier"):
     )
 
 # %% [markdown]
-# # Fugative Emissions
+# # Fugitive Emissions
 # Assumed to be global
 
 # %%
@@ -248,89 +245,41 @@ def process_leakage(leakage):
     """
     Process the result from a single leakage timeseries
     """
-    leakage = scmdata.ScmRun(leakage)
     assert len(leakage) == 1
 
     carrier = leakage.get_unique_meta("carrier", True)
     sector = leakage.get_unique_meta("sector", True)
     product = leakage.get_unique_meta("product", True)
 
+    product_unit = product if product != "H2" else "H"
+    target_unit = f"Mt {product_unit}/yr"
+
+    # Sanity checks
     unit = leakage.get_unique_meta("unit", True)
+    assert unit == f"kg {product_unit} / kg H"
     assert leakage.get_unique_meta("variable", True).startswith("Leakage Rate|")
 
-    if product == "H2":
-        product = "H"
-
-    target_unit = f"Mt {product}/yr"
-
-    print(f"{unit} => {target_unit}")
-
-    energy = energy_by_carrier.filter(
+    production_carrier_sector = production_h2.filter(
         carrier=carrier, sector=sector, log_if_empty=False
     )
 
-    if len(energy) == 0:
-        logger.warning(f"No Secondary Energy found for {carrier}|{sector}. Assuming 0")
-        return scmdata.ScmRun()
+    if len(production_carrier_sector) == 0:
+        _maybe_raise(f"No Production|H2 found for {carrier}|{sector}")
 
-    # Work out unit conversion
-    if "%" in unit:
-        consumption = energy * h2_conversion_factor.m
-        consumption["unit"] = "Mt H/yr"
+    # Mt H / yr * (kg product / kg H) * (1e9 Mt product/ kg product) * (1/E9 kg H / Mt H) => Mt product / yr
+    emissions_carrier_sector = production_carrier_sector * leakage.values.squeeze()
 
-        if product == "H":
-            pass
-        elif product == "CH4":
-            # Use conservation of mass (1/12 + 4)
-            consumption = consumption * 16 / 4
-            consumption["unit"] = "Mt CH4/yr"
+    emissions_carrier_sector["variable"] = f"Emissions|{product}"
+    emissions_carrier_sector["unit"] = target_unit
+    emissions_carrier_sector["carrier"] = carrier
+    emissions_carrier_sector["product"] = product
+    emissions_carrier_sector["method"] = "Leakage"
 
-        elif product == "NH3":
-            consumption = consumption * 17 / 3
-            consumption["unit"] = "Mt NH3/yr"
-
-        else:
-            raise ValueError(f"Don't know how to handle {product}")  # noqa
-
-        assert all(consumption["year"] == leakage["year"])
-
-        emissions = consumption * leakage.values.squeeze() / 100.0
-    else:
-        unit = ur(unit)
-        energy_unit = ur(energy.get_unique_meta("unit", True))
-
-        emissions = energy * leakage.values.squeeze()
-        emissions["unit"] = str((unit * energy_unit).u)
-        emissions = emissions.convert_unit(target_unit, context="AR6GWP100").drop_meta(
-            "unit_context"
-        )
-    if product == "H":
-        product = "H2"
-    emissions["variable"] = f"Emissions|{product}"
-    emissions["unit"] = target_unit
-    emissions["carrier"] = carrier
-    emissions["product"] = product
-    emissions["method"] = "Leakage"
-
-    return emissions
-
-
-def run_leakage(ts):
-    """
-    Process the leakage rates and catch any exceptions
-    """
-    try:
-        return process_leakage(ts)
-    except Exception as e:
-        print(e)
-        return scmdata.ScmRun()
+    return emissions_carrier_sector
 
 
 # %%
-emissions_leakage = leakage_rates.groupby(
-    "variable", "unit", "carrier", "product", "sector"
-).apply(run_leakage)
-
+emissions_leakage = leakage_rates.apply(process_leakage)
 emissions_leakage
 
 # %%
@@ -342,13 +291,13 @@ for carrier in emissions_leakage.get_unique_meta("carrier"):
     )
 
 # %%
-emissions = scmdata.run_append(
+merged_emissions = scmdata.run_append(
     [emissions_combustion, emissions_leakage, emissions_production]
 )
-emissions
+merged_emissions
 
 # %%
-total_emissions = emissions.process_over(("carrier", "product", "method"), "sum")
+total_emissions = merged_emissions.process_over(("carrier", "product", "method"), "sum")
 total_emissions
 
 # %%
@@ -357,7 +306,7 @@ scmdata.ScmRun(total_emissions).process_over(("sector",), "sum", as_run=True).fi
 ).lineplot(hue="region")
 
 # %%
-emissions.to_csv(config.delta_emissions.delta_emissions_complete)
+merged_emissions.to_csv(config.delta_emissions.delta_emissions_complete)
 total_emissions.to_csv(config.delta_emissions.delta_emissions_totals)
 
 # %%
