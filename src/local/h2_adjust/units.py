@@ -102,7 +102,7 @@ def sanitize_production_intensity_units(
             scale = scale * mass_factor
         elif unit == "kgNH3/tNH3" or unit == "kgNOx/tNH3":
             # kg X / t NH3 = (kg X / t NH3) * (0.001 tNH3 / kg NH3) * (19 kg NH3 / 3 kg H2) = kg X / kg H2
-            scale = _get_unit_scaling("kg / t", "kg/kg") * 19 / 3
+            scale = _get_unit_scaling("kg / t", "kg/kg") * h2_mass_factor(unit, "NH3")
 
             assert carrier == "NH3"  # noqa: S101
         else:
