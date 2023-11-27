@@ -117,6 +117,7 @@ def process_production_emissions(production_intensity: scmdata.ScmRun):
     assert len(production_intensity) == 1
     carrier = production_intensity.get_unique_meta("carrier", True)
     product = production_intensity.get_unique_meta("product", True)
+    unit = production_intensity.get_unique_meta("unit", True)
 
     production_carrier = production_h2.filter(
         carrier=carrier, sector="Total", log_if_empty=False
@@ -129,7 +130,10 @@ def process_production_emissions(production_intensity: scmdata.ScmRun):
     target_unit = f"Mt {product_unit}/yr"
 
     # Checks
-    assert f"kg {product} / kg H2" == production_intensity.get_unique_meta("unit", True)
+    assert f"kg {product_unit} / kg H" == unit, unit
+    assert "Mt H/yr" == production_carrier.get_unique_meta(
+        "unit", True
+    ), production_carrier.get_unique_meta("unit", True)
 
     # Mt H / yr * (kg product / kg H) * (1e9 Mt product/ kg product) * (1/E9 kg H / Mt H) => Mt product / yr
     emissions_carrier = production_carrier * production_intensity.values.squeeze()
@@ -256,7 +260,7 @@ def process_leakage(leakage):
 
     # Sanity checks
     unit = leakage.get_unique_meta("unit", True)
-    assert unit == f"kg {product_unit} / kg H"
+    assert unit == f"kg {product_unit} / kg H", unit
     assert leakage.get_unique_meta("variable", True).startswith("Leakage Rate|")
 
     production_carrier_sector = production_h2.filter(

@@ -84,7 +84,9 @@ def sanitize_production_intensity_units(
         carrier: str = ts.get_unique_meta("carrier", True)
         unit: str = ts.get_unique_meta("unit", True)
 
-        target_unit = f"{mass_unit} {product} / {mass_unit} H"
+        target_unit = (
+            f"{mass_unit} {product if product != 'H2' else 'H'} / {mass_unit} H"
+        )
 
         if unit in ["% of H2", "% H2 component of fuel"]:
             scale = 1 / 100
@@ -95,7 +97,7 @@ def sanitize_production_intensity_units(
             # kg H2 / kg H2 = (kg H2 / kg H2) * (mass_factor * kg X / kg H2) = kg X / kg H2
             mass_factor = h2_mass_factor(unit, carrier)
 
-            # Should be larger (products are all heavier that H)
+            # Should be larger (products are all heavier than H)
             assert mass_factor > 1  # noqa: S101
             scale = scale * mass_factor
         elif unit == "kgNH3/tNH3" or unit == "kgNOx/tNH3":
