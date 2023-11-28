@@ -53,7 +53,9 @@ def sanitize_combustion_intensity_units(
 
 def h2_mass_factor(unit: str, species: str):
     """
-    H2 -> species == kg species / kg H2
+    Calculate a scaling factor to convert 1 kg of H into x kg of `species` 
+    
+    This assumes that the mass of H is preserved during the conversion. 
     """
     if species == "H2":
         factor = 1
@@ -89,8 +91,8 @@ def sanitize_production_intensity_units(
         )
 
         if unit in ["% of H2", "% H2 component of fuel"]:
-            scale = 1 / 100
             assert product == "H2"  # noqa: S101
+            scale = 1 / 100
         elif unit in ["%", "% of fuel (LNG) consumption", "% NH3 used"]:
             assert product != "H2"  # noqa: S101
             scale = 1 / 100  # % -> kg H2 / kg H2
