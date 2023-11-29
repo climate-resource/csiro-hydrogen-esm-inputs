@@ -148,6 +148,10 @@ def sanitize_production_intensity_units(
 
         try:
             if unit in ["% of H2", "% H2 component of fuel"]:
+            # assume the unit basically means % of H2 that leaks
+            # per % of H2 used so the scale is simply 1 / 100 i.e.
+            # go from % to kg H2 / kg H2 (i.e. kg H2 leaked/lost per 
+            # kg H2 used)
                 assert product == "H2"  # noqa: S101
                 scale = 1 / 100
             elif unit in ["%", "% of fuel (LNG) consumption", "% NH3 used"]:
