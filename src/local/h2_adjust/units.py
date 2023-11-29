@@ -22,11 +22,11 @@ __all__ = [
 
 def _get_unit_scaling(source_unit: str | Any, target_unit: str) -> float:
     if not isinstance(source_unit, str):
-        return 1.0
-    else:
-        uc = UnitConverter(source_unit, target_unit)
+        raise ValueError(source_unit)  # noqa: TRY004
 
-        return uc.convert_from(1)
+    uc = UnitConverter(source_unit, target_unit)
+
+    return uc.convert_from(1)
 
 
 def sanitize_combustion_intensity_units(
@@ -43,7 +43,11 @@ def sanitize_combustion_intensity_units(
         unit: str = ts.get_unique_meta("unit", True)
         target_unit = f"{mass_unit} {product} / {energy_unit}"
 
-        scale = _get_unit_scaling(unit, target_unit)
+        try:
+            scale = _get_unit_scaling(unit, target_unit)
+        except ValueError as e:
+            raise SanitizeError(unit, target_unit) from e
+
         result = ts * scale
         result["unit"] = target_unit
         return result
@@ -51,25 +55,77 @@ def sanitize_combustion_intensity_units(
     return intensities.apply(_convert_intensities)
 
 
-def h2_mass_factor(unit: str, species: str):
+def h2_mass_factor(species: str):
     """
-    Calculate a scaling factor to convert 1 kg of H into x kg of `species` 
-    
-    This assumes that the mass of H is preserved during the conversion. 
+    Calculate a scaling factor to convert 1 kg of H into x kg of `species`
+
+    This assumes that the mass of H is preserved during the conversion.
     """
     if species == "H2":
-        factor = 1
+        # H2 -> 2H
+        factor = get_mass_equivalence(
+            molar_mass_a=2,
+            molar_mass_b=1,
+            stoichiometric_coefficient_a=1,
+            stoichiometric_coefficient_b=2,
+        )
     elif species == "CH4":
-        factor = (12 + 4) / 4
+        # CO2 + 4H2 -> CH4 + 2H20 (over catalysts)
+        factor = get_mass_equivalence(
+            molar_mass_a=2,
+            molar_mass_b=12 + 4,
+            stoichiometric_coefficient_a=4,
+            stoichiometric_coefficient_b=1,
+        )
     elif species == "NH3":
-        factor = (14 + 3) / 3
-    elif species == "NOx":
-        # Assumes mass equivalence and NO2
-        factor = 14 + 2 * 16
+        # 3H2 + N2 -> 2NH3 (Haber Bosch process)
+        factor = get_mass_equivalence(
+            molar_mass_a=1,
+            molar_mass_b=14 + 3,
+            stoichiometric_coefficient_a=3,
+            stoichiometric_coefficient_b=1,
+        )
     else:
-        raise SanitizeError(unit)
+        raise ValueError(species)
 
     return factor
+
+
+def get_mass_equivalence(
+    molar_mass_a: float,
+    molar_mass_b: float,
+    stoichiometric_coefficient_a: int,
+    stoichiometric_coefficient_b: int,
+) -> float:
+    """
+    Get mass equivalence
+
+    This allows you to easily get the mass equivalence between two species
+    based on their molar mass and an assumption about the chemical reaction
+    used to go between them.
+
+    Examples
+    --------
+    >>> # assume that C <-> CO2 via C + O2 <-> CO2
+    >>> get_mass_equivalence(12, 12 + 2 * 16, 1, 1)
+    44 / 12
+
+    >>> # assume that 3H2 + 2N -> 2NH3
+    >>> get_mass_equivalence(2, 14, 3, 2)
+    14 / 2 * 2 / 3 = 14 / 3
+
+    >>> # the inclusion of stoichiometric ratios is why
+    >>> # it doesn't really matter if it's H or H2
+    >>> # assume that 3H + N -> NH3
+    >>> get_mass_equivalence(1, 14, 3, 1)
+    14 / 3
+    """
+    return (
+        molar_mass_b
+        / molar_mass_a
+        * stoichiometric_coefficient_b
+        / stoichiometric_coefficient_a
+    )
 
 
 def sanitize_production_intensity_units(
@@ -90,25 +146,35 @@ def sanitize_production_intensity_units(
             f"{mass_unit} {product if product != 'H2' else 'H'} / {mass_unit} H"
         )
 
-        if unit in ["% of H2", "% H2 component of fuel"]:
-            assert product == "H2"  # noqa: S101
-            scale = 1 / 100
-        elif unit in ["%", "% of fuel (LNG) consumption", "% NH3 used"]:
-            assert product != "H2"  # noqa: S101
-            scale = 1 / 100  # % -> kg H2 / kg H2
-            # kg H2 / kg H2 = (kg H2 / kg H2) * (mass_factor * kg X / kg H2) = kg X / kg H2
-            mass_factor = h2_mass_factor(unit, carrier)
+        try:
+            if unit in ["% of H2", "% H2 component of fuel"]:
+                assert product == "H2"  # noqa: S101
+                scale = 1 / 100
+            elif unit in ["%", "% of fuel (LNG) consumption", "% NH3 used"]:
+                assert product != "H2"  # noqa: S101
+                scale = 1 / 100  # % => 0.01 * kg H2 / kg H2
 
-            # Should be larger (products are all heavier than H)
-            assert mass_factor > 1  # noqa: S101
-            scale = scale * mass_factor
-        elif unit == "kgNH3/tNH3" or unit == "kgNOx/tNH3":
-            # kg X / t NH3 = (kg X / t NH3) * (0.001 tNH3 / kg NH3) * (19 kg NH3 / 3 kg H2) = kg X / kg H2
-            scale = _get_unit_scaling("kg / t", "kg/kg") * h2_mass_factor(unit, "NH3")
+                # kg H2 / kg H2
+                #   => (kg H2 / kg H2) * (mass_factor_carrier * kg X / kg H2)
+                #   => mass_factor_carrier * kg X / kg H2
+                mass_factor = h2_mass_factor(carrier)
 
-            assert carrier == "NH3"  # noqa: S101
-        else:
-            raise SanitizeError(unit)
+                # Should be larger (products are all heavier than H)
+                assert mass_factor > 1  # noqa: S101
+                scale = scale * mass_factor
+            elif unit == "kgNH3/tNH3" or unit == "kgNOx/tNH3":
+                # Derive the mass of NH3/NOx emissions per mass of H2
+                # Only requires the NH3 mass factor to convert the denominator into H2
+                # kg x/t NH3 => 0.001 * t NH3 / kg NH3 * kg x/t NH => 0.001 kg X / kg NH3
+                #   => 0.001 kg X / kg NH3 * mass_factor_NH3 * kg NH3 / kg H2
+                #   => 0.001 * mass_factor_NH3 kg X / kg H2
+                scale = _get_unit_scaling("kg / t", "kg/kg") * h2_mass_factor("NH3")
+
+                assert carrier == "NH3"  # noqa: S101
+            else:
+                raise ValueError(unit)  # noqa: TRY301
+        except (SanitizeError, ValueError) as e:
+            raise SanitizeError(unit, target_unit) from e
 
         result = ts * scale
         result["unit"] = target_unit
