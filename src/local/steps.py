@@ -255,6 +255,23 @@ def get_notebook_steps_scenario(
             ),
         ),
         SingleNotebookDirStep(
+            doc="calculate delta emissions from H2 usage",
+            notebook="200_projected_h2_emissions/211_calculate_delta_emissions",
+            raw_notebook_ext=".py",
+            configuration=(),
+            dependencies=(
+                config.delta_emissions.energy_by_carrier,
+                config.delta_emissions.clean.share_by_carrier,
+                config.delta_emissions.clean.emissions_intensities_production,
+                config.delta_emissions.clean.emissions_intensities_combustion,
+                config.delta_emissions.clean.leakage_rates,
+                config.delta_emissions.delta_emissions_complete,
+            ),
+            targets=(
+                get_checklist_file(config.delta_emissions.delta_emissions_figures),
+            ),
+        ),
+        SingleNotebookDirStep(
             doc="calculate baseline projected emissions",
             notebook="200_projected_h2_emissions/220_calculate_baseline_anthropogenic",
             raw_notebook_ext=".py",

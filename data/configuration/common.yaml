@@ -69,6 +69,7 @@ delta_emissions:
   energy_by_carrier: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/energy_by_carrier.csv"
   delta_emissions_complete: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/delta_emissions_complete.csv"
   delta_emissions_totals: "{output_root_dir}/{run_id}/{name}/data/interim/delta_emissions/delta_emissions_totals.csv"
+  delta_emissions_figures: "{output_root_dir}/{run_id}/{name}/plots"
 
 projected_h2_emissions:
   baseline_h2_emissions_regions: "{output_root_dir}/{run_id}/{name}/data/interim/baseline_h2_emissions_regions.csv"

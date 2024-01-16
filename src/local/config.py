@@ -236,6 +236,9 @@ class ConfigDeltaEmissions:
     delta_emissions_complete: Path
     delta_emissions_totals: Path
 
+    delta_emissions_figures: Path
+    """Directory to store the generate figures for this step"""
+
 
 @frozen
 class ConfigBaselineH2Emissions:

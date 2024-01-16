@@ -1,180 +1,214 @@
-name: ssp119-low
-ssp_scenario: ssp119
-output_notebook_dir: dev-output/ssp119-low/notebooks
-historical_notebook_dir: dev-output/historical/notebooks
-
-gridding_preparation:
-  zenoda_data_archive: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive
-  input_dir_rscript: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/raw/emissions_downscaling_archive/gridding
-  output_dir_rscript: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/processed/gridding
-  output_dir: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/data/processed/gridding
-
+base_model: IMAGE
+cmip6_concentrations:
+  concentration_scenario_ids:
+  - IMAGE-ssp119
+  - IMAGE-ssp126
+  - MESSAGE-GLOBIOM-ssp245
+  - REMIND-MAGPIE-ssp534-over
+  concentration_variables:
+  - mole-fraction-of-carbon-dioxide-in-air
+  - mole-fraction-of-methane-in-air
+  root_raw_data_dir: ../../data/raw/cmip6-concentrations
+concentration_gridding:
+  cmip6_seasonality_and_latitudinal_gradient_path: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/common/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc
+  interim_gridded_output_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/gridded-concentration-projections
+delta_emissions:
+  clean:
+    emissions_intensities_combustion: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/emissions_intensities_combustion_clean.csv
+    emissions_intensities_production: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/emissions_intensities_production_clean.csv
+    leakage_rates: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/leakage_rates_clean.csv
+    share_by_carrier: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/share_by_carrier_clean.csv
+  delta_emissions_complete: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/delta_emissions_complete.csv
+  delta_emissions_totals: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/delta_emissions_totals.csv
+  energy_by_carrier: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/delta_emissions/energy_by_carrier.csv
+  extensions:
+  - end_year: 2050
+    filters:
+      product: NOx
+      sector: Energy Sector
+      variable:
+      - Emissions Intensity|H2|Energy Sector
+      - Emissions Intensity|NH3|Energy Sector
+      - Emissions Intensity|CH4|Energy Sector
+    rate: -0.02
+    start_year: 2020
+  inputs:
+    emissions_intensities_combustion: ../../data/raw/delta_emissions/emissions_intensities_combustion_low.csv
+    emissions_intensities_production: ../../data/raw/delta_emissions/emissions_intensities_production_low.csv
+    leakage_rates: ../../data/raw/delta_emissions/leakage_rates_low.csv
+    share_by_carrier: ../../data/raw/delta_emissions/share_by_carrier_NZE.csv
 emissions:
   cleaning_operations:
-    - input_file: ../../data/raw/input_emissions/SSP_IAM_V2_201811.csv
-      filters:
-        scenario: SSP1-19
-        model: IMAGE
-    - input_file: ../../data/raw/input_emissions/SSP_CMIP6_201811.csv
-      filters:
-        scenario: SSP1-19
-        variable: CMIP6 Emissions|*
-        region:
-          - World
-          - R5.2*
-      renames:
-        - target: CMIP6 Emissions
-          to: Baseline Emissions
-          dimension: variable
+  - filters:
+      model: IMAGE
+      scenario: SSP1-19
+    input_file: ../../data/raw/input_emissions/SSP_IAM_V2_201811.csv
+    renames: []
+  - filters:
+      region:
+      - World
+      - R5.2*
+      scenario: SSP1-19
+      variable: CMIP6 Emissions|*
+    input_file: ../../data/raw/input_emissions/SSP_CMIP6_201811.csv
+    renames:
+    - dimension: variable
+      target: CMIP6 Emissions
+      to: Baseline Emissions
+  complete_scenario: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/emissions-scenario/emissions_CR-ssp119-low_complete.csv
+  complete_scenario_countries: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/emissions-scenario/emissions_CR-ssp119-low_countries.csv
+  figure_by_sector: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/emissions_by-sector.pdf
+  figure_by_sector_only_modified: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/emissions_by-sector-modified.pdf
+  figure_vs_rcmip: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/emissions_vs-rcmip.pdf
+  high_production: null
+  input_scenario: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/emissions-scenario/emissions_input.csv
+  magicc_scenario: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/emissions-scenario/emissions_CR-ssp119-low_magicc.csv
   metadata:
     assumptions: low
-
-  input_scenario: dev-output/ssp119-low/emissions_input.csv
-  magicc_scenario: dev-output/ssp119-low/emissions_CR-ssp119-low_magicc.csv
-  complete_scenario: dev-output/ssp119-low/emissions_CR-ssp119-low_complete.csv
-  complete_scenario_countries: dev-output/ssp119-low/emissions_CR-ssp119-low_countries.csv
-  figure_by_sector: dev-output/ssp119-low/plots/emissions_by-sector.pdf
-  figure_by_sector_only_modified: dev-output/ssp119-low/plots/emissions_by-sector-modified.pdf
-  figure_vs_rcmip: dev-output/ssp119-low/plots/emissions_vs-rcmip.pdf
-
+finalisation_data_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/finalisation/data/processed
+finalisation_notebook_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/finalisation/notebooks
+finalisation_plot_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/finalisation/plots
+gridding_preparation:
+  output_dir: ../../data/processed/gridding
+  output_rscript: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/notebooks/000_preparation/000_decompose_air_seasonality.R
+  raw_rscript: notebooks/000_preparation/000_decompose_air_seasonality.R
+  zenoda_data_archive: ../../data/raw/emissions_downscaling_archive
 historical_h2_emissions:
+  anthropogenic_proxy:
+    Emissions|H2|Biomass burning: Emissions|BC|MAGICC AFOLU
+    Emissions|H2|Fossil Fuel: Emissions|CO|MAGICC Fossil and Industrial
+  baseline_h2_emissions_countries: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/data/interim/baseline_h2_emissions_country.csv
+  baseline_h2_emissions_regions: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/data/interim/baseline_h2_emissions_regions.csv
+  baseline_source: ../../data/raw/baseline_h2_sources/petterson_2020.csv
+  ceds_breakdown_sectors:
+    Emissions|H2|Biomass burning:
+    - Agriculture
+    Emissions|H2|Fossil Fuel:
+    - Aircraft
+    - Energy Sector
+    - Industrial Sector
+    - Residential, Commercial, Other
+    - Solvents production and application
+    - Transportation Sector
+    - Waste
+    - International Shipping
+  figure_baseline_by_sector: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/plots/baseline_by-sector.pdf
+  figure_baseline_by_source: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/plots/baseline_by-source.pdf
+  figure_baseline_by_source_and_sector: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/plots/baseline_by-source-sector.pdf
   scenario: ssp245
-  baseline_source: ../../data/raw/baseline_h2_sources/petterson_2020.csv
-  anthropogenic_proxy:
-    "Emissions|H2|Fossil Fuel": Emissions|CO
-    "Emissions|H2|Biomass burning": Emissions|BC
-    "Emissions|H2|Photochemical production|CH4": Emissions|CH4
-    "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-  baseline_h2_emissions_regions: dev-output/historical/baseline_h2_emissions_regions.csv
-  baseline_h2_emissions_countries: dev-output/historical/baseline_h2_emissions_country.csv
-  figure_baseline_by_sector: dev-output/historical/plots/baseline_by-sector.pdf
-  figure_baseline_by_source: dev-output/historical/plots/baseline_by-source.pdf
-  figure_baseline_by_source_and_sector: dev-output/historical/plots/baseline_by-source-sector.pdf
-
 historical_h2_gridding:
+  fast: false
+  output_directory: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/data/interim/gridding
   proxy_mapping: ../../data/raw/gridding/grid_proxy_mapping.csv
   seasonality_mapping: ../../data/raw/gridding/seasonality_mapping_CEDS9.csv
-  sector_type: "CEDS9"
-  # TODO: make this non-user specific (should we remove the equivalent key
-  # from the scenarios?)
-  grid_data_directory: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/aneris/data/processed/gridding
-  output_directory: dev-output/historical/gridding
-  fast: true
-
+  sector_type: CEDS9
+historical_notebook_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/notebooks
 input4mips_archive:
-  local_archive: ../../../spaemis/data/processed/input4MIPs
-  results_archive: dev-output/results
-  version: 20230515
-
-delta_emissions:
-  inputs:
-    share_by_carrier: ../../data/raw/delta_emissions/share_by_carrier_NZE.csv
-    leakage_rates: ../../data/raw/delta_emissions/leakage_rates_low.csv
-    emissions_intensities_production: ../../data/raw/delta_emissions/emissions_intensities_production_low.csv
-    emissions_intensities_combustion: ../../data/raw/delta_emissions/emissions_intensities_combustion_low.csv
-  extensions:
-    - filters:
-        variable:
-          - Emissions Intensity|H2|Energy Sector
-          - Emissions Intensity|NH3|Energy Sector
-        sector: Energy Sector
-        product: NOx
-      start_year: 2020
-      end_year: 2100
-      rate: -0.04
-  clean:
-    share_by_carrier: dev-output/ssp119-low/delta_emissions/share_by_carrier_clean.csv
-    leakage_rates: dev-output/ssp119-low/delta_emissions/leakage_rates_clean.csv
-    emissions_intensities_production: dev-output/ssp119-low/delta_emissions/emissions_intensities_production_clean.csv
-    emissions_intensities_combustion: dev-output/ssp119-low/delta_emissions/emissions_intensities_combustion_clean.csv
-
-  energy_by_carrier: dev-output/ssp119-low/delta_emissions/energy_by_carrier.csv
-
-  delta_emissions_complete: dev-output/ssp119-low/delta_emissions/delta_emissions_complete.csv
-  delta_emissions_totals: dev-output/delta_emissions_totals.csv
-
-projected_h2_emissions:
-  scenario: "ssp119"
-  baseline_source: ../../data/raw/baseline_h2_sources/petterson_2020.csv
-  anthropogenic_proxy:
-    "Emissions|H2|Fossil Fuel": Emissions|CO
-    "Emissions|H2|Biomass burning": Emissions|BC
-    "Emissions|H2|Photochemical production|CH4": Emissions|CH4
-    "Emissions|H2|Photochemical production|VOC": Emissions|VOC
-  baseline_h2_emissions_regions: dev-output/ssp119-low/baseline_h2_emissions_regions.csv
-  baseline_h2_emissions_countries: dev-output/ssp119-low/baseline_h2_emissions_country.csv
-  figure_baseline_by_sector: dev-output/ssp119-low/plots/baseline_by-sector.pdf
-  figure_baseline_by_source: dev-output/ssp119-low/plots/baseline_by-source.pdf
-  figure_baseline_by_source_and_sector: dev-output/ssp119-low/plots/baseline_by-source-sector.pdf
-
+  complete_file_concentrations: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/gridding/concentrations.complete
+  complete_file_emissions_historical: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/historical/data/interim/gridding/emissions_historical.complete
+  complete_file_emissions_scenario: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/gridding/emissions_scenario.complete
+  local_archive: /data/cmip6/input4MIPs
+  results_archive: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/results
+  version: 0.1.0
+magicc_runs:
+  ar6_probabilistic_distribution_file: ../../data/raw/magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
+  magicc_executable_path: ../../data/raw/magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc
+  magicc_worker_number: 12
+  magicc_worker_root_dir: /tmp/magicc-workers
+  n_cfgs_to_run: 600
+  output_file: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/magicc-output/magicc-concentration-projections.nc
+name: ssp119-low
+output_notebook_dir: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/notebooks
 projected_gridding:
+  fast: false
+  output_directory: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/gridding
   proxy_mapping: ../../data/raw/gridding/grid_proxy_mapping.csv
   seasonality_mapping: ../../data/raw/gridding/seasonality_mapping_CEDS9.csv
-  sector_type: "CEDS9"
-  # TODO: make this non-user specific
-  grid_data_directory: /Users/znicholls/Documents/repos/csiro-hydrogen-esm-inputs/aneris/data/processed/gridding
-  output_directory: dev-output/ssp119-low/gridding
-  fast: true
-
-magicc_runs:
-  n_cfgs_to_run: 5
-  output_file: ../dev-output/ssp119-low/magicc-output/magicc-concentration-projections.nc
-  ar6_probabilistic_distribution_file: ../../data/raw/magicc-bits-and-pieces/magicc-ar6-0fd0f62-f023edb-drawnset/0fd0f62-derived-metrics-id-f023edb-drawnset.json
-  # this probably belongs in an environment variable if we're perfectly honest
-  # because it's platform dependent, @jared what do you think?
-  magicc_executable_path: ../../data/raw/magicc-bits-and-pieces/magicc-v7.5.3/bin/magicc-darwin-arm64
-  magicc_worker_root_dir: ~/Desktop
-  magicc_worker_number: 4
-
+  sector_type: CEDS9
+projected_h2_emissions:
+  anthropogenic_proxy:
+    Emissions|H2|Biomass burning: Emissions|BC|MAGICC AFOLU
+    Emissions|H2|Fossil Fuel: Emissions|CO|MAGICC Fossil and Industrial
+  baseline_h2_emissions_countries: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/baseline_h2_emissions_country.csv
+  baseline_h2_emissions_regions: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/interim/baseline_h2_emissions_regions.csv
+  baseline_source: ../../data/raw/baseline_h2_sources/petterson_2020.csv
+  ceds_breakdown_sectors:
+    Emissions|H2|Biomass burning:
+    - Agriculture
+    Emissions|H2|Fossil Fuel:
+    - Aircraft
+    - Energy Sector
+    - Industrial Sector
+    - Residential, Commercial, Other
+    - Solvents production and application
+    - Transportation Sector
+    - Waste
+    - International Shipping
+  figure_baseline_by_sector: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/baseline_by-sector.pdf
+  figure_baseline_by_source: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/baseline_by-source.pdf
+  figure_baseline_by_source_and_sector: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/plots/baseline_by-source-sector.pdf
+  scenario: ssp119
 rcmip:
-  # TODO: put this in bookshelf
   concentrations_path: ../../data/raw/rcmip/rcmip-concentrations-annual-means-v5-1-0.csv
-
-cmip6_concentrations:
-  root_raw_data_dir: ../../data/raw/cmip6-concentrations
-  concentration_scenario_ids:
-    - IMAGE-ssp119
-    - IMAGE-ssp126
-    - MESSAGE-GLOBIOM-ssp245
-    - REMIND-MAGPIE-ssp534-over
-  concentration_variables:
-    - mole-fraction-of-carbon-dioxide-in-air
-    - mole-fraction-of-methane-in-air
-
-concentration_gridding:
-  cmip6_seasonality_and_latitudinal_gradient_path: ../dev-output/ssp119-low/data/interim/cmip6-concentrations-grids/cmip6-seasonality-and-latitudinal-gradient.nc
-  interim_gridded_output_dir: ../dev-output/ssp119-low/data/interim/gridded-concentration-projections
-  gridded_output_dir: ../dev-output/ssp119-low/data/processed/input4MIPs-gridded-concentration-projections
-
 spatial_emissions:
-  - name: ssp119_australia
-    configuration_template:
-      name: ssp119_australia
-      inventory:
-        name: australia
-        year: 2016
-
-      timeslices:
-        - 2020
-        - 2040
-        - 2060
-        - 2080
-        - 2100
-
-      input_timeseries:
-      scalers:
-        default_scaler:
-          name: constant
-    scaler_templates:
-      - input_file: ../../data/raw/spaemis/templates/template_australia_H2_scalers.yaml
-        output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_H2_scalers.yaml
-      - input_file: ../../data/raw/spaemis/templates/template_australia_scalers.csv
-        output_file: ../dev-output/ssp119-low/data/processed/spaemis/template_australia_scalers.csv
-    scalar_template_replacements:
-      cr_h2_scenario: CR-IMAGE-ssp119-low
-      ssp_scenario: IAMC-IMAGE-ssp119-1-1
-    downscaling_config: ../dev-output/ssp119-low/data/processed/spaemis/config.yaml
-    inventory_directory: ../../../spaemis/data/raw/inventories
-    proxy_directory: ../../data/raw/spaemis/proxies
-    netcdf_output: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia/{run_id}_ssp119_australia_projections.nc"
-    csv_output_directory: ../dev-output/ssp119-low/data/processed/spaemis/results/ssp119_australia
+- configuration_template:
+    input_timeseries: null
+    inventory:
+      name: australia
+      year: 2016
+    name: ssp119_australia
+    scalers:
+      default_scaler:
+        name: constant
+    timeslices:
+    - 2020
+    - 2040
+    - 2060
+    - 2080
+    - 2100
+  csv_output_directory: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/results/spaemis/ssp119-low_australia
+  downscaling_config: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_australia/config.yaml
+  inventory_directory: ../../data/raw/inventories
+  name: ssp119_australia
+  netcdf_output: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/results/spaemis/ssp119-low_australia/20231127_ssp119-low_australia_projections.nc
+  point_source_directory: ../../data/raw/spaemis/point_sources
+  proxy_directory: ../../data/raw/spaemis/proxies
+  scalar_template_replacements:
+    cr_h2_scenario: CR-IMAGE-ssp119-low
+    ssp_scenario: IAMC-IMAGE-ssp119-1-1
+  scaler_templates:
+  - input_file: ../../data/raw/spaemis/templates/template_australia_H2_scalers.yaml
+    output_file: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_australia/template_australia_H2_scalers.yaml
+  - input_file: ../../data/raw/spaemis/templates/template_australia_scalers.csv
+    output_file: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_australia/template_australia_scalers.csv
+- configuration_template:
+    input_timeseries: null
+    inventory:
+      name: victoria
+      year: 2016
+    name: ssp119_victoria
+    scalers:
+      default_scaler:
+        name: constant
+    timeslices:
+    - 2020
+    - 2040
+    - 2060
+    - 2080
+    - 2100
+  csv_output_directory: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/results/spaemis/ssp119-low_victoria
+  downscaling_config: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_victoria/config.yaml
+  inventory_directory: ../../data/raw/inventories
+  name: ssp119_victoria
+  netcdf_output: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/results/spaemis/ssp119-low_victoria/20231127_ssp119-low_victoria_projections.nc
+  point_source_directory: ../../data/raw/spaemis/point_sources
+  proxy_directory: ../../data/raw/spaemis/proxies
+  scalar_template_replacements:
+    cr_h2_scenario: CR-IMAGE-ssp119-low
+    ssp_scenario: IAMC-IMAGE-ssp119-1-1
+  scaler_templates:
+  - input_file: ../../data/raw/spaemis/templates/template_victoria_H2_scalers.yaml
+    output_file: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_victoria/template_victoria_H2_scalers.yaml
+  - input_file: ../../data/raw/spaemis/templates/template_victoria_scalers.csv
+    output_file: /home/jared/code/cr/csiro-hydrogen-esm-inputs/output-bundles/20231127/ssp119-low/data/processed/spaemis/ssp119-low_victoria/template_victoria_scalers.csv
+ssp_scenario: ssp119
